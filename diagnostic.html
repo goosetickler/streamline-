@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport"
+      content="width=device-width,initial-scale=1">
+
+<title>NFL Launcher Diagnostic</title>
+
+<style>
+
+body{
+    margin:0;
+    padding:20px;
+    background:#0d1117;
+    color:white;
+    font-family:-apple-system,
+                BlinkMacSystemFont,
+                Arial,
+                sans-serif;
+}
+
+h1{
+    margin-top:0;
+}
+
+.card{
+    background:#161b22;
+    border:1px solid #30363d;
+    border-radius:12px;
+    padding:15px;
+    margin-bottom:15px;
+}
+
+button{
+    width:100%;
+    height:50px;
+    border:none;
+    border-radius:10px;
+    margin-bottom:10px;
+    background:#2383ff;
+    color:white;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+.pass{
+    color:#38d26e;
+}
+
+.fail{
+    color:#ff5e5e;
+}
+
+.pending{
+    color:#ffc857;
+}
+
+.log{
+    font-family:monospace;
+    white-space:pre-wrap;
+    line-height:1.4;
+}
+
+#testLogo{
+    width:60px;
+    height:60px;
+    display:none;
+    margin-top:10px;
+}
+
+</style>
+</head>
+<body>
+
+<h1>NFL Launcher Diagnostic</h1>
+
+<div class="card">
+
+<div id="htmlTest">
+✅ HTML Loaded
+</div>
+
+<div id="jsTest">
+⏳ JavaScript Pending
+</div>
+
+<div id="domTest">
+⏳ DOM Pending
+</div>
+
+<div id="deviceTest">
+⏳ Device Detection Pending
+</div>
+
+<div id="storageTest">
+⏳ Storage Test Pending
+</div>
+
+<div id="fetchTest">
+⏳ Fetch Test Pending
+</div>
+
+<div id="espnTest">
+⏳ ESPN Test Pending
+</div>
+
+<div id="logoTest">
+⏳ Logo Test Pending
+</div>
+
+<div id="deeplinkTest">
+⏳ Deep Link Test Pending
+</div>
+
+</div>
+
+<div class="card">
+
+<h3>Manual Tests</h3>
+
+<button id="btnStorage">
+Run Storage Test
+</button>
+
+<button id="btnFetch">
+Run Fetch Test
+</button>
+
+<button id="btnEspn">
+Run ESPN Test
+</button>
+
+<button id="btnLogo">
+Run ESPN Logo Test
+</button>
+
+<button id="btnDeepLink">
+Run Deep Link Test
+</button>
+
+</div>
+
+<div class="card">
+
+<h3>Device Info</h3>
+
+<div id="deviceInfo">
+Waiting...
+</div>
+
+</div>
+
+<div class="card">
+
+<h3>Debug Log</h3>
+
+<div id="log" class="log">
+Waiting...
+</div>
+
+</div>
+
+<img id="testLogo">
+
+<script>
+
+function log(message){
+
+    var logEl =
+        document.getElementById("log");
+
+    var line =
+        new Date().toLocaleTimeString()
+        + " | "
+        + message;
+
+    logEl.textContent =
+        line +
+        "\\n" +
+        logEl.textContent;
+
+    console.log(message);
+}
+
+try{
+
+document.getElementById(
+    "jsTest"
+).innerHTML =
+'<span class="pass">✅ JavaScript Loaded</span>';
+
+log(
+    "JavaScript Loaded"
+);
+
+}catch(e){
+
+alert(
+"JavaScript Startup Failed: "
++ e.message
+);
+
+}
+
+document.addEventListener(
+"DOMContentLoaded",
+function(){
+
+document.getElementById(
+ "domTest"
+).innerHTML =
+'<span class="pass">✅ DOM Loaded</span>';
+
+log(
+ "DOMContentLoaded Fired"
+);
+
+runDeviceDetection();
+
+wireButtons();
+
+});
+
+function runDeviceDetection(){
+
+try{
+
+var ua =
+ navigator.userAgent;
+
+var platform =
+ navigator.platform;
+
+var touch =
+ navigator.maxTouchPoints || 0;
+
+var isiOS =
+ /iPhone|iPad|iPod/i.test(ua);
+
+if(
+ platform === "MacIntel"
+ && touch > 1
+){
+ isiOS = true;
+}
+
+var isAndroid =
+ /Android/i.test(ua);
+
+var label =
+ "Desktop";
+
+if(isiOS)
+ label = 
