@@ -1107,7 +1107,8 @@
       } else if(sortMode === "final"){
         selected = base.filter(isFinalGame).sort((a,b) => new Date(b.dateTime) - new Date(a.dateTime));
       } else if(sortMode === "live"){
-        selected = base.sort((a,b) => statusSortWeight(a) - statusSortWeight(b) || new Date(a.dateTime) - new Date(b.dateTime));
+        // LIVE is a true filter: do not include scheduled or final games.
+        selected = base.filter(isLiveGame).sort(sortByDate);
       } else {
         const sorted = base.sort(sortByDate);
         const upcoming = sorted.filter(g => new Date(g.dateTime) >= cutoff);
@@ -1375,8 +1376,30 @@
       settingsOverlayEl?.setAttribute("aria-hidden", "true");
     }
 
+    function isDirectvVerifiedMatchup(game){
+      // Secondary DIRECTV schedule evidence. This is intentionally independent
+      // of ESPN's single broadcast string, which can omit a national feed when
+      // it reports only a local preseason affiliate.
+      const verified = [
+        { date:"2026-08-22", away:"PHI", home:"NE", channel:"NFL Network" }
+      ];
+      const kickoff = new Date(game.dateTime);
+      const localDate = Number.isNaN(kickoff.getTime()) ? "" :
+        `${kickoff.getFullYear()}-${String(kickoff.getMonth()+1).padStart(2,"0")}-${String(kickoff.getDate()).padStart(2,"0")}`;
+      return verified.some(item =>
+        item.date === localDate &&
+        item.away === String(game.awayAbbr || "").toUpperCase() &&
+        item.home === String(game.homeAbbr || "").toUpperCase()
+      );
+    }
+
     function isDirectvGame(game){
       if(!/^\d{5}$/.test(directvZip)) return false;
+
+      // First use DIRECTV-specific matchup evidence.
+      if(isDirectvVerifiedMatchup(game)) return true;
+
+      // Then fall back to ESPN's network metadata for networks DIRECTV carries.
       const n = String(game.network || "").toLowerCase().replace(/[^a-z0-9]+/g," ").trim();
       return [
         "abc","cbs","fox","nbc","espn",
@@ -1590,7 +1613,7 @@
       return `<div class="provider-icons" aria-label="Available streaming options">${providerKeys.map(key => {
         const provider = PROVIDER_LINKS[key];
         const primary = key === primaryKey ? " primary" : "";
-        return `<button class="provider-icon ${key}${primary}" title="${escapeHtml(provider.label)}" aria-label="Open ${escapeHtml(provider.label)}" onclick='openProvider("${key}", ${JSON.stringify(game).replace(/'/g,"&#39;")})'>${providerIconLabel(key)}</button>`;
+        return `<button class="provider-icon ${key}${primary}" title="${escapeHtml(provider.label)}${key === "directv" && isDirectvVerifiedMatchup(game) ? " · DIRECTV schedule verified" : ""}" aria-label="Open ${escapeHtml(provider.label)}" onclick='openProvider("${key}", ${JSON.stringify(game).replace(/'/g,"&#39;")})'>${providerIconLabel(key)}</button>`;
       }).join("")}</div>`;
     }
     function providerIconLabel(key){
@@ -1674,10 +1697,10 @@
       abbr = aliases[abbr] || abbr;
 
       const map = {
-        ARI:"Cards", ATL:"Falcons", BAL:"Ravens", BUF:"Bills", CAR:"Panthers", CHI:"Bears", CIN:"Bengals", CLE:"Browns",
-        DAL:"Cowboys", DEN:"Broncos", DET:"Lions", GB:"Packers", HOU:"Texans", IND:"Colts", JAX:"Jaguars", KC:"Refs",
-        LV:"Raiders", LAC:"Bolts", LAR:"Rams", MIA:"Dolphins", MIN:"Vikings", NE:"Patriots", NO:"Saints", NYG:"Giants",
-        NYJ:"Jets", PHI:"Eagles", PIT:"Steelers", SEA:"Seahawks", SF:"49ers", TB:"Bucs", TEN:"Titans", WAS:"Mandos"
+        ARI:"Cardinals", ATL:"Falcons", BAL:"Ravens", BUF:"Bills", CAR:"Panthers", CHI:"Bears", CIN:"Bengals", CLE:"Browns",
+        DAL:"Cowboys", DEN:"Broncos", DET:"Lions", GB:"Packers", HOU:"Texans", IND:"Colts", JAX:"Jaguars", KC:"Chiefs",
+        LV:"Raiders", LAC:"Chargers", LAR:"Rams", MIA:"Dolphins", MIN:"Vikings", NE:"Patriots", NO:"Saints", NYG:"Giants",
+        NYJ:"Jets", PHI:"Eagles", PIT:"Steelers", SEA:"Seahawks", SF:"49ers", TB:"Buccaneers", TEN:"Titans", WAS:"Commanders"
       };
       return map[abbr] || String(name || abbr).replace(/^(Arizona|Atlanta|Baltimore|Buffalo|Carolina|Chicago|Cincinnati|Cleveland|Dallas|Denver|Detroit|Green Bay|Houston|Indianapolis|Jacksonville|Kansas City|Las Vegas|Los Angeles|Miami|Minnesota|New England|New Orleans|New York|Philadelphia|Pittsburgh|San Francisco|Seattle|Tampa Bay|Tennessee|Washington)\s+/i, "");
     }
