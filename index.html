@@ -143,6 +143,7 @@
     .settings-provider[data-provider="youtubetv"].active{background:#ff0033;color:#fff}
     .settings-provider[data-provider="hulu"].active{background:#1ce783;color:#07111d}
     .settings-provider[data-provider="paramount"].active{background:#0064ff;color:#fff}
+    .settings-provider[data-provider="directv"].active{background:#00a8e0;color:#07111d}
     .settings-provider[data-provider="paramount"]{font-size:.66rem}
     .settings-provider[data-provider="fox"].active{background:#fff;color:#003c7e}
     .settings-provider[data-provider="espn"].active{background:#e60012;color:#fff}
@@ -638,6 +639,7 @@
       }
     }
 
+    .provider-icon.directv{background:#00a8e0;color:#07111d;width:38px}
   </style>
 </head>
 <body>
@@ -706,6 +708,7 @@
           <button class="settings-provider active" data-provider="youtubetv">YT TV</button>
           <button class="settings-provider active" data-provider="hulu">Hulu</button>
           <button class="settings-provider active" data-provider="paramount">Paramount+</button>
+          <button class="settings-provider active" data-provider="directv">DIRECTV</button>
           <button class="settings-provider active" data-provider="fox">FOX</button>
           <button class="settings-provider active" data-provider="espn">ESPN</button>
           <button class="settings-provider active" data-provider="prime">Prime</button>
@@ -714,6 +717,10 @@
         <p class="settings-hint">Selected services appear as watch options on each game card and are saved on this device.</p>
       </div>
       <div class="settings-section">
+        <h3 class="settings-section-title">DIRECTV Local Channels</h3>
+        <div class="tv-device-controls"><input id="directvZip" class="tv-device-select" type="text" inputmode="numeric" autocomplete="postal-code" maxlength="5" placeholder="ZIP Code"><button id="directvZipSave" class="tv-scan-btn" type="button">Save ZIP</button></div>
+        <p id="directvZipHint" class="settings-hint">Billing ZIP is used to enable DIRECTV options for local ABC, CBS, FOX and NBC broadcasts. Availability still depends on package and market agreements.</p>
+      </div><div class="settings-section">
         <h3 class="settings-section-title">Watch on TV</h3>
         <div class="tv-cast-row">
           <div class="tv-cast-toggle">
@@ -765,10 +772,12 @@
     const MAX_GAMES_TO_SHOW = 18;
     const SCHEDULE_CACHE_KEY = "nflLauncher.schedule.v2";
     const PROVIDER_PREF_KEY = "nflLauncher.enabledProviders.settings.v1";
+    const DIRECTV_ZIP_KEY = "nflLauncher.directv.zip.v1";
+    const PROVIDER_MIGRATION_V2_KEY = "nflLauncher.providers.migrated.directv.v2";
     const TV_CAST_ENABLED_KEY = "nflLauncher.tvCast.enabled.v1";
     const TV_CAST_DEVICE_KEY = "nflLauncher.tvCast.device.v1";
     const FANTASY_CACHE_PREFIX = "nflLauncher.realFantasy.v2.";
-    const DEFAULT_ENABLED_PROVIDERS = ["youtubetv","hulu","paramount","fox","espn","prime","nflplus"];
+    const DEFAULT_ENABLED_PROVIDERS = ["youtubetv","hulu","paramount","directv","fox","espn","prime","nflplus"];
 
     // Deep link notes:
     // - iOS custom URL schemes vary by provider and may change. Keep the web link as the reliable fallback.
@@ -831,6 +840,7 @@
         ios:"nfl://",
         androidPackage:"com.gotv.nflgamecenter.us.lite"
       },
+      directv: {label:"DIRECTV",web:"https://stream.directv.com/",ios:"directv://",androidPackage:"com.att.tv"},
       youtubetv: {
         label:"YouTube TV",
         web:"https://tv.youtube.com/",
@@ -888,6 +898,7 @@
     let allGames = [];
     let sortMode = localStorage.getItem("nflLauncher.sortMode") || "kickoff";
     let enabledProviders = readEnabledProviders();
+    let directvZip = localStorage.getItem(DIRECTV_ZIP_KEY) || "";
     let tvCastEnabled = localStorage.getItem(TV_CAST_ENABLED_KEY) === "true";
     let selectedTvDeviceId = localStorage.getItem(TV_CAST_DEVICE_KEY) || "";
     let discoveredTvDevices = [];
@@ -1213,7 +1224,19 @@
     function readEnabledProviders(){
       try{
         const saved = JSON.parse(localStorage.getItem(PROVIDER_PREF_KEY) || "null");
-        if(Array.isArray(saved)) return saved.filter(key => DEFAULT_ENABLED_PROVIDERS.includes(key));
+        if(Array.isArray(saved)){
+          let providers = saved.filter(key => DEFAULT_ENABLED_PROVIDERS.includes(key));
+
+          // One-time migration for installs that saved provider preferences before
+          // DIRECTV support existed. Without this, DIRECTV detection succeeds but
+          // is silently removed by the user's older saved provider filter.
+          if(localStorage.getItem(PROVIDER_MIGRATION_V2_KEY) !== "true"){
+            if(!providers.includes("directv")) providers.push("directv");
+            localStorage.setItem(PROVIDER_PREF_KEY, JSON.stringify(providers));
+            localStorage.setItem(PROVIDER_MIGRATION_V2_KEY, "true");
+          }
+          return providers;
+        }
       }catch(err){}
       return [...DEFAULT_ENABLED_PROVIDERS];
     }
@@ -1306,6 +1329,10 @@
         });
       };
       syncButtons();
+      const dz=document.querySelector("#directvZip"), ds=document.querySelector("#directvZipSave"), dh=document.querySelector("#directvZipHint");
+      if(dz) dz.value=directvZip;
+      const saveDz=()=>{const v=String(dz?.value||"").trim();if(!/^\d{5}$/.test(v)){if(dh)dh.textContent="Enter a valid 5-digit billing ZIP code.";return;}directvZip=v;localStorage.setItem(DIRECTV_ZIP_KEY,v);if(dh)dh.textContent=`DIRECTV billing ZIP saved: ${v}. Availability still depends on package and market agreements.`;showToast(`DIRECTV ZIP saved: ${v}`);renderSchedule();};
+      ds?.addEventListener("click",saveDz);dz?.addEventListener("keydown",e=>{if(e.key==="Enter")saveDz();});
       syncTvCastUi();
       tvCastEnabledEl?.addEventListener("change", () => {
         tvCastEnabled = !!tvCastEnabledEl.checked;
@@ -1346,6 +1373,15 @@
     function closeSettings(){
       settingsOverlayEl?.classList.remove("open");
       settingsOverlayEl?.setAttribute("aria-hidden", "true");
+    }
+
+    function isDirectvGame(game){
+      if(!/^\d{5}$/.test(directvZip)) return false;
+      const n = String(game.network || "").toLowerCase().replace(/[^a-z0-9]+/g," ").trim();
+      return [
+        "abc","cbs","fox","nbc","espn",
+        "nfl network","nfln","nfl network national"
+      ].some(x => n.includes(x));
     }
 
     function getEnabledProviderKeysForGame(game){
@@ -1543,6 +1579,9 @@
       // merges with, or suppresses providers found from ESPN.
       if(isParamountPlusGame(game)) keys.push("paramount");
 
+      // DIRECTV is a separate additive pass and requires a saved billing ZIP.
+      if(isDirectvGame(game)) keys.push("directv");
+
       const seen = new Set();
       return keys.filter(key => PROVIDER_LINKS[key] && !seen.has(key) && seen.add(key));
     }
@@ -1555,7 +1594,7 @@
       }).join("")}</div>`;
     }
     function providerIconLabel(key){
-      const labels = { prime:"PRIME", peacock:"PC", espn:"ESPN", paramount:"P+", fox:"FOX", hulu:"HULU", nflnetwork:"NFL+", nflplus:"NFL+", youtubetv:"YT" };
+      const labels = { prime:"PRIME", peacock:"PC", espn:"ESPN", paramount:"P+", directv:"DTV", fox:"FOX", hulu:"HULU", nflnetwork:"NFL+", nflplus:"NFL+", youtubetv:"YT" };
       return labels[key] || key.toUpperCase();
     }
     function getGameResult(game){
