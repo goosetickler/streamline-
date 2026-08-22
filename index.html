@@ -326,7 +326,7 @@
     .provider-icon.peacock{background:linear-gradient(135deg,#ffcf33,#00a1de,#7ac143,#ef3e42);color:#07111d}
     .provider-icon.espn{background:#e60012;color:white}
     .provider-icon.paramount{background:#0064ff;color:white}
-    .provider-icon.fox{background:#fff;color:#003c7e}
+    .provider-icon.fox{background:#003c7e;color:white}
     .provider-icon.hulu{background:#1ce783;color:#07111d}
     .provider-icon.nflnetwork,.provider-icon.nflplus{background:#013369;color:white}
     .provider-icon.youtubetv{background:#ff0033;color:white}
@@ -454,154 +454,188 @@
     @media (max-width:520px){.center-score{min-width:68px}.center-score .vs{width:14px}.center-score .team-score:first-child{margin-right:9px}.center-score .team-score:last-child{margin-left:9px}}
 
 
-    /* SCOREBOARD CENTERLINE FIX v2 */
-    .game-top{position:relative;display:grid;grid-template-columns:minmax(82px,1fr) 104px minmax(82px,1fr);align-items:center;gap:8px}
-    .game-top .game-clock-top{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:104px;min-width:104px;text-align:center;white-space:nowrap;pointer-events:none;z-index:2}
-    .teams-row{display:grid;grid-template-columns:minmax(0,1fr) 104px minmax(0,1fr);align-items:center;gap:8px;position:relative}
-    .center-score{position:relative;display:grid;grid-template-columns:36px 20px 36px;column-gap:6px;align-items:center;justify-content:center;width:104px;min-width:104px}
-    .center-score .team-score,.center-score .team-score:first-child,.center-score .team-score:last-child{width:36px;min-width:36px;margin:0;padding:0;justify-self:center;text-align:center;font-size:1.6rem;line-height:1;font-variant-numeric:tabular-nums}
-    .center-score .vs{position:static;transform:none;width:20px;margin:0;padding:0;justify-self:center;text-align:center;line-height:1}
-    .team-row{position:relative}
-    .team-stack{position:relative;flex:0 0 auto}
-    .team-row .possession,.team-row:not(.home) .possession,.team-row.home .possession{position:absolute;top:50%;z-index:4;transform:translateY(-50%);display:grid;place-items:center;width:18px;height:18px;padding:0;font-size:.72rem;line-height:1;pointer-events:none;filter:drop-shadow(0 2px 3px rgba(0,0,0,.65))}
-    .team-row:not(.home) .possession{left:42px;right:auto}
-    .team-row.home .possession{right:42px;left:auto}
-    .team-row:not(.home):has(.possession) .team-name,.team-row.home:has(.possession) .team-name{padding-left:0;padding-right:0}
-    @media (max-width:520px){
-      .game-top{grid-template-columns:minmax(74px,1fr) 92px minmax(74px,1fr);gap:4px}
-      .game-top .game-clock-top{width:92px;min-width:92px}
-      .teams-row{grid-template-columns:minmax(0,1fr) 92px minmax(0,1fr);gap:4px}
-      .center-score{grid-template-columns:32px 16px 32px;column-gap:6px;width:92px;min-width:92px}
-      .center-score .team-score,.center-score .team-score:first-child,.center-score .team-score:last-child{width:32px;min-width:32px;font-size:1.45rem}
-      .center-score .vs{width:16px;font-size:.72rem}
-      .team-row:not(.home) .possession{left:36px}
-      .team-row.home .possession{right:36px}
+    /* FOX provider chip: match the white/blue Settings treatment */
+    .provider-icon.fox{
+      background:#fff;
+      color:#003c7e;
+      border-color:rgba(255,255,255,.85);
     }
 
-
-    /* POSSESSION SCORE-SIDE FIX v3
-       Keep the v2 clock/@/score centerline, but anchor possession beside
-       the score instead of on the team logo/name. */
-    .team-row .possession,
-    .team-row:not(.home) .possession,
-    .team-row.home .possession{
-      position:absolute;
-      top:50%;
-      transform:translateY(-50%);
-      z-index:5;
-      width:18px;
-      height:18px;
-      display:grid;
-      place-items:center;
-      padding:0;
-      font-size:.72rem;
-      line-height:1;
-      pointer-events:none;
-      filter:drop-shadow(0 2px 3px rgba(0,0,0,.65));
-    }
-
-    /* Away possession: inside edge, immediately left of away score. */
-    .team-row:not(.home) .possession{
-      left:auto;
-      right:-17px;
-    }
-
-    /* Home possession: inside edge, immediately right of home score. */
-    .team-row.home .possession{
-      left:-17px;
-      right:auto;
-    }
-
-    .team-row:not(.home):has(.possession) .team-name,
-    .team-row.home:has(.possession) .team-name{
-      padding-left:0;
-      padding-right:0;
-    }
-
-    @media (max-width:520px){
-      .team-row:not(.home) .possession{left:auto;right:-14px}
-      .team-row.home .possession{left:-14px;right:auto}
-    }
-
-
-    /* POSSESSION RESERVED SCORE SLOT v4
-       Five fixed center columns: away possession | away score | @ | home score | home possession.
-       The football can no longer overlap one- or two-digit scores. */
-    .game-top{
-      grid-template-columns:minmax(82px,1fr) 132px minmax(82px,1fr);
-    }
-    .game-top .game-clock-top{
-      width:132px;
-      min-width:132px;
-    }
-    .teams-row{
-      grid-template-columns:minmax(0,1fr) 132px minmax(0,1fr);
-    }
-    .center-score{
-      display:grid;
-      grid-template-columns:18px 36px 20px 36px 18px;
-      column-gap:1px;
-      width:132px;
-      min-width:132px;
-      align-items:center;
-      justify-content:center;
-    }
-    .center-score .team-score,
-    .center-score .team-score:first-child,
-    .center-score .team-score:last-child{
-      width:36px;
-      min-width:36px;
-      margin:0;
-      padding:0;
-      justify-self:center;
-      text-align:center;
-      font-variant-numeric:tabular-nums;
-    }
-    .center-score .vs{
-      position:static;
-      transform:none;
-      width:20px;
-      margin:0;
-      padding:0;
-      justify-self:center;
-      text-align:center;
-    }
-    .score-possession{
-      width:18px;
-      height:18px;
-      display:grid;
-      place-items:center;
-      justify-self:center;
-      font-size:.72rem;
-      line-height:1;
-      filter:drop-shadow(0 2px 3px rgba(0,0,0,.65));
-    }
-
-    @media (max-width:520px){
-      .game-top{
-        grid-template-columns:minmax(74px,1fr) 120px minmax(74px,1fr);
-      }
-      .game-top .game-clock-top{
-        width:120px;
-        min-width:120px;
-      }
+    /* iOS team-name fix:
+       Earlier mobile rules give the center score a fixed width while each team
+       is a minmax(0,1fr) column. Safari aggressively shrinks those flexible
+       columns, then the global ellipsis rule truncates nearly every name.
+       Give team columns a practical minimum and let names use their available width. */
+    @supports (-webkit-touch-callout:none){
       .teams-row{
-        grid-template-columns:minmax(0,1fr) 120px minmax(0,1fr);
+        grid-template-columns:minmax(92px,1fr) 76px minmax(92px,1fr);
+        gap:5px;
+      }
+      .team-row{
+        min-width:92px;
+      }
+      .team-row .team-name{
+        width:auto;
+        max-width:none;
+        min-width:0;
+        overflow:visible;
+        text-overflow:clip;
+        white-space:nowrap;
+        font-size:.78rem;
+        letter-spacing:-.025em;
+      }
+      .team-logo{
+        width:40px;
+        height:40px;
       }
       .center-score{
-        grid-template-columns:16px 32px 16px 32px 16px;
-        column-gap:1px;
-        width:120px;
-        min-width:120px;
+        min-width:76px;
+        width:76px;
+      }
+    }
+
+    /* Very narrow iPhones: preserve readable full team names before shrinking scores. */
+    @media (max-width:390px){
+      @supports (-webkit-touch-callout:none){
+        .teams-row{
+          grid-template-columns:minmax(84px,1fr) 68px minmax(84px,1fr);
+          gap:3px;
+        }
+        .team-row{min-width:84px;gap:3px}
+        .team-row .team-name{font-size:.72rem}
+        .team-logo{width:36px;height:36px}
+        .center-score{min-width:68px;width:68px}
+      }
+    }
+
+
+    /* iOS scoreboard correction: protect score positions from team-name sizing */
+    @supports (-webkit-touch-callout:none){
+      .teams-row{
+        grid-template-columns:minmax(0,1fr) 92px minmax(0,1fr);
+        gap:5px;
+      }
+      .team-row{min-width:0;gap:4px}
+      .team-row .team-name{
+        min-width:0;
+        max-width:100%;
+        overflow:hidden;
+        text-overflow:ellipsis;
+        white-space:nowrap;
+        font-size:.76rem;
+        letter-spacing:-.03em;
+      }
+      .team-logo{width:40px;height:40px}
+
+      .center-score{
+        position:relative;
+        display:grid;
+        grid-template-columns:32px 20px 32px;
+        width:92px;
+        min-width:92px;
+        gap:4px;
+        align-items:center;
+        justify-content:center;
       }
       .center-score .team-score,
       .center-score .team-score:first-child,
       .center-score .team-score:last-child{
+        position:static;
         width:32px;
         min-width:32px;
+        margin:0;
+        padding:0;
+        justify-self:center;
+        text-align:center;
       }
-      .center-score .vs{width:16px}
-      .score-possession{width:16px;height:16px;font-size:.68rem}
+      .center-score .vs{
+        position:static;
+        transform:none;
+        width:20px;
+        margin:0;
+        padding:0;
+        justify-self:center;
+        text-align:center;
+      }
+    }
+
+    @media (max-width:390px){
+      @supports (-webkit-touch-callout:none){
+        .teams-row{grid-template-columns:minmax(0,1fr) 82px minmax(0,1fr);gap:3px}
+        .team-logo{width:36px;height:36px}
+        .team-row .team-name{font-size:.70rem}
+        .center-score{
+          grid-template-columns:29px 18px 29px;
+          width:82px;
+          min-width:82px;
+          gap:3px;
+        }
+        .center-score .team-score,
+        .center-score .team-score:first-child,
+        .center-score .team-score:last-child{width:29px;min-width:29px}
+        .center-score .vs{width:18px}
+      }
+    }
+
+
+    /* AUTHORITATIVE SCOREBOARD LAYOUT
+       Keep away score, @, and home score in separate fixed cells.
+       This intentionally overrides all earlier center-score experiments. */
+    .center-score{
+      display:grid !important;
+      grid-template-columns:34px 22px 34px !important;
+      width:98px !important;
+      min-width:98px !important;
+      gap:4px !important;
+      align-items:center !important;
+      justify-content:center !important;
+      position:relative !important;
+    }
+    .center-score > .team-score{
+      position:static !important;
+      display:block !important;
+      width:34px !important;
+      min-width:34px !important;
+      max-width:34px !important;
+      margin:0 !important;
+      padding:0 !important;
+      transform:none !important;
+      justify-self:center !important;
+      text-align:center !important;
+      line-height:1 !important;
+    }
+    .center-score > .team-score:first-child{grid-column:1 !important}
+    .center-score > .vs{
+      grid-column:2 !important;
+      position:static !important;
+      display:block !important;
+      width:22px !important;
+      min-width:22px !important;
+      margin:0 !important;
+      padding:0 !important;
+      transform:none !important;
+      justify-self:center !important;
+      text-align:center !important;
+      line-height:1 !important;
+    }
+    .center-score > .team-score:last-child{grid-column:3 !important}
+
+    @media (max-width:390px){
+      .center-score{
+        grid-template-columns:31px 20px 31px !important;
+        width:90px !important;
+        min-width:90px !important;
+        gap:4px !important;
+      }
+      .center-score > .team-score{
+        width:31px !important;
+        min-width:31px !important;
+        max-width:31px !important;
+      }
+      .center-score > .vs{
+        width:20px !important;
+        min-width:20px !important;
+      }
     }
 
   </style>
@@ -1152,20 +1186,14 @@
                 result.away
             )}
             <div class="center-score">
-                <span class="score-possession away-possession" aria-hidden="true">
-                    ${game.possessionAbbr === game.awayAbbr ? "🏈" : ""}
-                </span>
                 <span class="team-score ${result.away}">
-                    ${game.awayScore || ""}
+                    ${game.awayScore ?? ""}
                 </span>
 
                 <span class="vs">@</span>
 
                 <span class="team-score ${result.home}">
-                    ${game.homeScore || ""}
-                </span>
-                <span class="score-possession home-possession" aria-hidden="true">
-                    ${game.possessionAbbr === game.homeAbbr ? "🏈" : ""}
+                    ${game.homeScore ?? ""}
                 </span>
             </div>
           ${renderTeam(
@@ -1557,7 +1585,7 @@
       const logoHtml = logo
         ? `<img class="team-logo" src="${escapeHtml(logo)}" alt="${escapeHtml(name)} logo" loading="lazy" decoding="async" onerror="this.replaceWith(makeFallbackLogo('${escapeJs(abbr)}'))">`
         : `<span class="team-logo fallback">${escapeHtml(abbr)}</span>`;
-      const possessionHtml = ""; // Possession is rendered in a reserved center-score slot.
+      const possessionHtml = hasPossession ? `<span class="possession" title="Possession">🏈</span>` : "";
       const recordHtml = record ? `<div class="team-record">${escapeHtml(record)}</div>` : "";
       const winnerHtml = "";
       const resultClass = result ? ` ${result}` : "";
@@ -1569,6 +1597,7 @@
           </span>
 
           ${possessionHtml}
+
           <div class="team-stack">
               ${logoHtml}
               ${recordHtml}
@@ -1583,6 +1612,7 @@
           </div>
 
           ${possessionHtml}
+
           <span class="team-name">
               ${escapeHtml(shortName)}
           </span>
