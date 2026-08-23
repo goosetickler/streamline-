@@ -760,7 +760,7 @@
 <button class="settings-provider active" data-provider="directv">DIRECTV</button>
 <button class="settings-provider active" data-provider="peacock">Peacock</button>
 <button class="settings-provider active" data-provider="netflix">Netflix</button>
-          <button class="settings-provider active" data-provider="directv">DIRECTV</button>
+          
           <button class="settings-provider active" data-provider="fox">FOX</button>
           <button class="settings-provider active" data-provider="espn">ESPN</button>
           <button class="settings-provider active" data-provider="prime">Prime</button>
@@ -785,10 +785,6 @@
         </div>
       </div>
       <div class="settings-section">
-        <h3 class="settings-section-title">DIRECTV Local Channels</h3>
-        <div class="tv-device-controls"><input id="directvZip" class="tv-device-select" type="text" inputmode="numeric" autocomplete="postal-code" maxlength="5" placeholder="ZIP Code"><button id="directvZipSave" class="tv-scan-btn" type="button">Save ZIP</button></div>
-        <p id="directvZipHint" class="settings-hint">Billing ZIP is used to enable DIRECTV options for local ABC, CBS, FOX and NBC broadcasts. Availability still depends on package and market agreements.</p>
-      </div><div class="settings-section">
         <h3 class="settings-section-title">DIRECTV</h3><div class="tv-device-controls"><input id="directvZip" class="tv-device-select" maxlength="5" inputmode="numeric" placeholder="ZIP Code"><button id="directvZipSave" class="tv-scan-btn">Save ZIP</button></div><p id="directvZipHint" class="settings-hint">Verified-first DIRECTV detection. ZIP provides market context; local-network affiliation alone will not create a DTV result.</p></div><div class="settings-section"><h3 class="settings-section-title">Watch on TV</h3>
         <div class="tv-cast-row">
           <div class="tv-cast-toggle">
@@ -839,7 +835,7 @@
     const ESPN_SUMMARY_BASE = "https://site.web.api.espn.com/apis/site/v2/sports/football/nfl/summary";
     const MAX_GAMES_TO_SHOW = 18;
     const SCHEDULE_CACHE_KEY = "nflLauncher.schedule.v2";
-    const PROVIDER_PREF_KEY = "nflLauncher.enabledProviders.settings.v1";
+    const PROVIDER_PREF_KEY = "nflLauncher.enabledProviders.settings.v3";
     const PREFERRED_PROVIDER_KEY = "nflLauncher.preferredProvider.v1";
     const NEW_PROVIDER_FILTER_MIGRATION_KEY = "nflLauncher.providers.peacockNetflixDefaultOn.v1";
 const DIRECTV_ZIP_KEY="nflLauncher.directv.zip.v3";
@@ -847,7 +843,7 @@ const DIRECTV_ZIP_KEY="nflLauncher.directv.zip.v3";
     const TV_CAST_ENABLED_KEY = "nflLauncher.tvCast.enabled.v1";
     const TV_CAST_DEVICE_KEY = "nflLauncher.tvCast.device.v1";
     const FANTASY_CACHE_PREFIX = "nflLauncher.realFantasy.v2.";
-    const DEFAULT_ENABLED_PROVIDERS = ["youtubetv","hulu","paramount","directv","fox","espn","prime","nflplus"];
+    const DEFAULT_ENABLED_PROVIDERS = ["youtubetv","hulu","paramount","directv","peacock","netflix","fox","espn","prime","nflplus"];
 
     // Deep link notes:
     // - iOS custom URL schemes vary by provider and may change. Keep the web link as the reliable fallback.
@@ -864,22 +860,19 @@ const DIRECTV_ZIP_KEY="nflLauncher.directv.zip.v3";
         label:"Prime Video",
         web:"https://www.primevideo.com/sports",
         ios:"aiv://",
-        androidPackage:"com.amazon.avod.thirdpartyclient",
-        androidScheme:"aiv"
+        androidPackage:"com.amazon.avod.thirdpartyclient"
       },
       peacock: {
         label:"Peacock",
         web:"https://www.peacocktv.com/sports/nfl",
         ios:"peacocktv://",
-        androidPackage:"com.peacocktv.peacockandroid",
-        androidScheme:"peacocktv"
+        androidPackage:"com.peacocktv.peacockandroid"
       },
       espn: {
         label:"ESPN / ABC",
         web:"https://www.espn.com/watch/",
         ios:"espn://",
-        androidPackage:"com.espn.score_center",
-        androidScheme:"espn"
+        androidPackage:"com.espn.score_center"
       },
       paramount: {
         // Opens Paramount+ sports. Game availability can depend on the user's
@@ -887,39 +880,34 @@ const DIRECTV_ZIP_KEY="nflLauncher.directv.zip.v3";
         label:"CBS / Paramount+",
         web:"https://www.paramountplus.com/shows/nfl-on-cbs/",
         ios:"paramountplus://",
-        androidPackage:"com.cbs.ca",
-        androidScheme:"paramountplus"
+        androidPackage:"com.cbs.ca"
       },
       fox: {
         label:"FOX",
         web:"https://www.foxsports.com/live",
         ios:"foxsports://",
-        androidPackage:"com.foxsports.android",
-        androidScheme:"foxsports"
+        androidPackage:"com.foxsports.android"
       },
       hulu: {
         label:"Hulu + Live TV",
         web:"https://www.hulu.com/nfl",
         ios:"hulu://",
-        androidPackage:"com.hulu.plus",
-        androidScheme:"hulu"
+        androidPackage:"com.hulu.plus"
       },
       nflnetwork: {
         label:"NFL Network",
         web:"https://www.nfl.com/network/",
         ios:"nfl://",
-        androidPackage:"com.gotv.nflgamecenter.us.lite",
-        androidScheme:"nfl"
+        androidPackage:"com.gotv.nflgamecenter.us.lite"
       },
       nflplus: {
         label:"NFL+",
         web:"https://www.nfl.com/plus/",
         ios:"nfl://",
-        androidPackage:"com.gotv.nflgamecenter.us.lite",
-        androidScheme:"nfl"
+        androidPackage:"com.gotv.nflgamecenter.us.lite"
       },
       directv: {label:"DIRECTV",web:"https://stream.directv.com/",ios:"directv://",androidPackage:"com.att.tv"},
-      netflix:{label:"Netflix",web:"https://www.netflix.com/",androidPackage:"com.netflix.mediaclient",androidScheme:"nflx"},
+      netflix:{label:"Netflix",web:"https://www.netflix.com/",androidPackage:"com.netflix.mediaclient"},
       youtubetv: {
         label:"YouTube TV",
         web:"https://tv.youtube.com/",
@@ -1884,15 +1872,22 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
 
     function buildAndroidAppIntent(provider, webUrl){
       if(!provider.androidPackage) return webUrl;
-      const u=new URL(webUrl);
-      const fallback=encodeURIComponent(webUrl);
-      const scheme=provider.androidScheme || "https";
-      return `intent://${u.host}${u.pathname}${u.search}#Intent;scheme=${scheme};package=${provider.androidPackage};S.browser_fallback_url=${fallback};end`;
+      const u = new URL(webUrl);
+      const fallback = encodeURIComponent(webUrl);
+
+      // Explicitly target the provider package. This is stronger than relying
+      // on Android's generic web-link resolver and avoids the malformed custom-
+      // scheme/HTTPS-host combination used by the previous build.
+      return `intent://${u.host}${u.pathname}${u.search}#Intent;scheme=https;package=${provider.androidPackage};action=android.intent.action.VIEW;category=android.intent.category.BROWSABLE;S.browser_fallback_url=${fallback};end`;
     }
 
     function getPlatformUrl(provider, webUrl){
-      if(DEVICE.isAndroid && provider.androidPackage) return buildAndroidAppIntent(provider,webUrl);
-      if(DEVICE.isIOS && provider.ios) return provider.ios;
+      if(DEVICE.isAndroid && provider.androidPackage){
+        return buildAndroidAppIntent(provider, webUrl);
+      }
+      if(DEVICE.isIOS && provider.ios){
+        return provider.ios;
+      }
       return webUrl;
     }
 
