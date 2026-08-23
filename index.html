@@ -665,6 +665,29 @@
     .week-chip.active .week-chip-title{color:#fff}
     @media(max-width:520px){.week-nav-shell{grid-template-columns:30px minmax(0,1fr) 30px}.week-chip{flex-basis:104px}.week-arrow{font-size:1.7rem}}
 
+
+    .preferred-provider-row{display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;gap:10px;margin-top:12px}
+    .preferred-provider-label{color:var(--muted);font-size:.68rem;font-weight:1000;letter-spacing:.08em;text-transform:uppercase}
+    .preferred-provider-select{height:40px;border:1px solid var(--line);border-radius:12px;background:#111827;color:var(--text);padding:0 10px;font:inherit;font-size:.72rem;font-weight:850;min-width:0}
+    .week-chip.postseason{background:rgba(83,183,255,.08);color:#bfe7ff}
+    .week-chip.postseason.active{background:linear-gradient(135deg,rgba(83,183,255,.28),rgba(49,93,255,.20));box-shadow:inset 0 -2px 0 #53b7ff}
+    .week-chip.championship{background:rgba(255,209,102,.10);color:#ffe29a}
+    .week-chip.championship.active{background:linear-gradient(135deg,rgba(255,209,102,.30),rgba(255,153,51,.18));box-shadow:inset 0 -2px 0 #ffd166}
+    .week-chip.superbowl{background:linear-gradient(135deg,rgba(255,209,102,.16),rgba(83,183,255,.12));color:#fff}
+    .week-chip.superbowl.active{background:linear-gradient(135deg,rgba(255,209,102,.42),rgba(83,183,255,.28));box-shadow:inset 0 -2px 0 #ffd166}
+
+
+    .week-chip-meta{font-size:.48rem;font-weight:1000;letter-spacing:.10em;text-transform:uppercase;line-height:1;margin-bottom:3px;opacity:.82}
+    .week-chip.postseason,.week-chip.championship,.week-chip.superbowl{height:54px}
+    .week-chip.championship .week-chip-meta,.week-chip.superbowl .week-chip-meta{color:#ffd166}
+
+
+    .week-chip.future-empty{opacity:.82}
+    .week-chip.postseason,.week-chip.championship,.week-chip.superbowl{
+      flex-basis:122px;
+      height:58px;
+    }
+
   </style>
 </head>
 <body>
@@ -737,19 +760,31 @@
 <button class="settings-provider active" data-provider="directv">DIRECTV</button>
 <button class="settings-provider active" data-provider="peacock">Peacock</button>
 <button class="settings-provider active" data-provider="netflix">Netflix</button>
-          <button class="settings-provider active" data-provider="directv">DIRECTV</button>
+          
           <button class="settings-provider active" data-provider="fox">FOX</button>
           <button class="settings-provider active" data-provider="espn">ESPN</button>
           <button class="settings-provider active" data-provider="prime">Prime</button>
           <button class="settings-provider active" data-provider="nflplus">NFL+</button>
         </div>
         <p class="settings-hint">Selected services appear as watch options on each game card and are saved on this device.</p>
+        <div class="preferred-provider-row">
+          <label for="preferredProvider" class="preferred-provider-label">Preferred Service</label>
+          <select id="preferredProvider" class="preferred-provider-select" aria-label="Preferred streaming service">
+            <option value="auto">Auto (Recommended)</option>
+            <option value="directv">DIRECTV</option>
+            <option value="youtubetv">YouTube TV</option>
+            <option value="hulu">Hulu</option>
+            <option value="paramount">Paramount+</option>
+            <option value="peacock">Peacock</option>
+            <option value="prime">Prime Video</option>
+            <option value="netflix">Netflix</option>
+            <option value="nflplus">NFL+</option>
+            <option value="espn">ESPN</option>
+            <option value="fox">FOX</option>
+          </select>
+        </div>
       </div>
       <div class="settings-section">
-        <h3 class="settings-section-title">DIRECTV Local Channels</h3>
-        <div class="tv-device-controls"><input id="directvZip" class="tv-device-select" type="text" inputmode="numeric" autocomplete="postal-code" maxlength="5" placeholder="ZIP Code"><button id="directvZipSave" class="tv-scan-btn" type="button">Save ZIP</button></div>
-        <p id="directvZipHint" class="settings-hint">Billing ZIP is used to enable DIRECTV options for local ABC, CBS, FOX and NBC broadcasts. Availability still depends on package and market agreements.</p>
-      </div><div class="settings-section">
         <h3 class="settings-section-title">DIRECTV</h3><div class="tv-device-controls"><input id="directvZip" class="tv-device-select" maxlength="5" inputmode="numeric" placeholder="ZIP Code"><button id="directvZipSave" class="tv-scan-btn">Save ZIP</button></div><p id="directvZipHint" class="settings-hint">Verified-first DIRECTV detection. ZIP provides market context; local-network affiliation alone will not create a DTV result.</p></div><div class="settings-section"><h3 class="settings-section-title">Watch on TV</h3>
         <div class="tv-cast-row">
           <div class="tv-cast-toggle">
@@ -800,13 +835,15 @@
     const ESPN_SUMMARY_BASE = "https://site.web.api.espn.com/apis/site/v2/sports/football/nfl/summary";
     const MAX_GAMES_TO_SHOW = 18;
     const SCHEDULE_CACHE_KEY = "nflLauncher.schedule.v2";
-    const PROVIDER_PREF_KEY = "nflLauncher.enabledProviders.settings.v1";
+    const PROVIDER_PREF_KEY = "nflLauncher.enabledProviders.settings.v2";
+    const PREFERRED_PROVIDER_KEY = "nflLauncher.preferredProvider.v1";
+    const NEW_PROVIDER_FILTER_MIGRATION_KEY = "nflLauncher.providers.peacockNetflixDefaultOn.v1";
 const DIRECTV_ZIP_KEY="nflLauncher.directv.zip.v3";
     const PROVIDER_MIGRATION_V2_KEY = "nflLauncher.providers.migrated.directv.v2";
     const TV_CAST_ENABLED_KEY = "nflLauncher.tvCast.enabled.v1";
     const TV_CAST_DEVICE_KEY = "nflLauncher.tvCast.device.v1";
     const FANTASY_CACHE_PREFIX = "nflLauncher.realFantasy.v2.";
-    const DEFAULT_ENABLED_PROVIDERS = ["youtubetv","hulu","paramount","directv","fox","espn","prime","nflplus"];
+    const DEFAULT_ENABLED_PROVIDERS = ["youtubetv","hulu","paramount","directv","peacock","netflix","fox","espn","prime","nflplus"];
 
     // Deep link notes:
     // - iOS custom URL schemes vary by provider and may change. Keep the web link as the reliable fallback.
@@ -930,6 +967,7 @@ const DIRECTV_ZIP_KEY="nflLauncher.directv.zip.v3";
     let selectedScheduleWeek = null;
     let scheduleWeeks = [];
     let enabledProviders = readEnabledProviders();
+    let preferredProvider = localStorage.getItem(PREFERRED_PROVIDER_KEY) || "auto";
 let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
     let tvCastEnabled = localStorage.getItem(TV_CAST_ENABLED_KEY) === "true";
     let selectedTvDeviceId = localStorage.getItem(TV_CAST_DEVICE_KEY) || "";
@@ -1191,9 +1229,17 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       scheduleLiveRefresh();
     }
 
+    function getPreferredProviderForGame(providerKeys){
+      if(!providerKeys.length) return "";
+      if(preferredProvider !== "auto" && providerKeys.includes(preferredProvider)) return preferredProvider;
+      // NFL Network is visually consolidated under NFL+.
+      if(preferredProvider === "nflplus" && providerKeys.includes("nflnetwork")) return "nflnetwork";
+      return providerKeys[0];
+    }
+
     function renderGameCard(game){
       const providerKeys = getEnabledProviderKeysForGame(game);
-      const providerKey = providerKeys[0] || providerFromNetwork(game.network);
+      const providerKey = getPreferredProviderForGame(providerKeys) || providerFromNetwork(game.network);
       const provider = PROVIDER_LINKS[providerKey] || PROVIDER_LINKS.nflplus;
       const isLive = isLiveGame(game);
       const isFinal = isFinalGame(game);
@@ -1368,6 +1414,15 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
         });
       };
       syncButtons();
+      const preferredProviderEl=document.querySelector("#preferredProvider");
+      if(preferredProviderEl){
+        preferredProviderEl.value=preferredProvider;
+        preferredProviderEl.addEventListener("change",()=>{
+          preferredProvider=preferredProviderEl.value||"auto";
+          localStorage.setItem(PREFERRED_PROVIDER_KEY,preferredProvider);
+          renderSchedule();
+        });
+      }
       const dz=document.querySelector("#directvZip"),ds=document.querySelector("#directvZipSave"),dh=document.querySelector("#directvZipHint"); if(dz)dz.value=directvZip;
       const saveDz=()=>{const v=String(dz?.value||"").trim();if(!/^\d{5}$/.test(v)){if(dh)dh.textContent="Enter a valid 5-digit ZIP.";return;}directvZip=v;localStorage.setItem(DIRECTV_ZIP_KEY,v);showToast("DIRECTV ZIP saved");renderSchedule();};ds?.addEventListener("click",saveDz);dz?.addEventListener("keydown",e=>{if(e.key==="Enter")saveDz();});
       syncTvCastUi();
@@ -1847,24 +1902,84 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
 
     function buildScheduleWeeks(){
       const groups=new Map();
+
+      // Preserve ESPN-derived game buckets, especially preseason.
       allGames.forEach(g=>{
-        const key=scheduleWeekKey(g); if(!key)return;
+        const key=scheduleWeekKey(g);
+        if(!key)return;
         const d=new Date(g.dateTime);
         if(!groups.has(key))groups.set(key,[]);
         groups.get(key).push(d);
       });
-      scheduleWeeks=Array.from(groups.entries()).sort((a,b)=>a[0].localeCompare(b[0])).map(([key,dates],i)=>{
-        const min=new Date(Math.min(...dates)),max=new Date(Math.max(...dates));
-        return {key,index:i,min,max};
+
+      // Guarantee the complete 2026 regular-season timeline exists even when ESPN
+      // has not returned games for a future week yet.
+      const regularWeekStarts=[
+        "2026-09-06","2026-09-13","2026-09-20","2026-09-27",
+        "2026-10-04","2026-10-11","2026-10-18","2026-10-25",
+        "2026-11-01","2026-11-08","2026-11-15","2026-11-22",
+        "2026-11-29","2026-12-06","2026-12-13","2026-12-20",
+        "2026-12-27","2027-01-03"
+      ];
+
+      // These synthetic entries are navigation metadata, not fabricated games.
+      regularWeekStarts.forEach(key=>{
+        if(!groups.has(key))groups.set(key,[]);
       });
-      if(!scheduleWeeks.length){selectedScheduleWeek=null;return}
+
+      // Guarantee postseason navigation exists before teams/matchups are known.
+      [
+        "2027-01-10", // Wild Card
+        "2027-01-17", // Divisional
+        "2027-01-24", // Conference Championships
+        "2027-01-31", // Pro Bowl
+        "2027-02-07"  // Super Bowl
+      ].forEach(key=>{
+        if(!groups.has(key))groups.set(key,[]);
+      });
+
+      scheduleWeeks=Array.from(groups.entries())
+        .sort((a,b)=>a[0].localeCompare(b[0]))
+        .map(([key,dates],i)=>{
+          const start=new Date(key+"T00:00:00");
+          const endDate=new Date(start);
+          endDate.setDate(endDate.getDate()+6);
+
+          // Display the full calendar-week range for synthetic/future weeks.
+          // Existing game data remains available for filtering but does not shrink
+          // the date range shown in the navigator.
+          return {key,index:i,min:start,max:endDate,hasGames:dates.length>0};
+        });
+
+      if(!scheduleWeeks.length){
+        selectedScheduleWeek=null;
+        return;
+      }
+
       if(!selectedScheduleWeek||!scheduleWeeks.some(w=>w.key===selectedScheduleWeek)){
-        const now=new Date(), current=scheduleWeeks.find(w=>now>=new Date(w.key+"T00:00:00")&&now<new Date(new Date(w.key+"T00:00:00").getTime()+7*86400000));
+        const now=new Date();
+        const current=scheduleWeeks.find(w=>{
+          const s=new Date(w.key+"T00:00:00");
+          return now>=s&&now<new Date(s.getTime()+7*86400000);
+        });
         selectedScheduleWeek=(current||scheduleWeeks.find(w=>w.max>=now)||scheduleWeeks[scheduleWeeks.length-1]).key;
       }
     }
 
+    function postseasonInfo(week){
+      const special={
+        "2027-01-10":{label:"WILD CARD",tag:"PLAYOFFS",cls:"postseason"},
+        "2027-01-17":{label:"DIV RD",tag:"PLAYOFFS",cls:"postseason"},
+        "2027-01-24":{label:"CONF CHAMP",tag:"FINAL FOUR",cls:"championship"},
+        "2027-01-31":{label:"PRO BOWL",tag:"ALL-STAR",cls:"postseason"},
+        "2027-02-07":{label:"SUPER BOWL",tag:"CHAMPIONSHIP",cls:"superbowl"}
+      };
+      return special[week.key]||null;
+    }
+
     function weekLabel(week){
+      const post=postseasonInfo(week);
+      if(post)return post.label;
       const regularStart=new Date("2026-09-06T00:00:00");
       const d=new Date(week.key+"T00:00:00");
       if(d<regularStart){
@@ -1872,13 +1987,21 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
         return `PRE WK ${preseason.findIndex(w=>w.key===week.key)+1}`;
       }
       const n=Math.floor((d-regularStart)/(7*86400000))+1;
-      return `WEEK ${Math.max(1,n)}`;
+      return `WEEK ${Math.min(18,Math.max(1,n))}`;
+    }
+
+    function weekClass(week){
+      return postseasonInfo(week)?.cls||"";
+    }
+
+    function weekMetaTag(week){
+      return postseasonInfo(week)?.tag||"";
     }
 
     function renderWeekNavigator(){
       buildScheduleWeeks();
       if(!weekTimelineEl)return;
-      weekTimelineEl.innerHTML=scheduleWeeks.map(w=>`<button class="week-chip${w.key===selectedScheduleWeek?" active":""}" data-week="${w.key}"><span class="week-chip-title">${weekLabel(w)}</span><span class="week-chip-range">${w.min.toLocaleDateString([],{month:"short",day:"numeric"})} - ${w.max.toLocaleDateString([],{month:"short",day:"numeric"})}</span></button>`).join("");
+      weekTimelineEl.innerHTML=scheduleWeeks.map(w=>`<button class="week-chip ${weekClass(w)}${w.hasGames?"":" future-empty"}${w.key===selectedScheduleWeek?" active":""}" data-week="${w.key}">${weekMetaTag(w)?`<span class="week-chip-meta">${weekMetaTag(w)}</span>`:""}<span class="week-chip-title">${weekLabel(w)}</span><span class="week-chip-range">${w.min.toLocaleDateString([],{month:"short",day:"numeric"})} - ${w.max.toLocaleDateString([],{month:"short",day:"numeric"})}</span></button>`).join("");
       weekTimelineEl.querySelectorAll(".week-chip").forEach(btn=>btn.addEventListener("click",()=>selectScheduleWeek(btn.dataset.week)));
       const active=weekTimelineEl.querySelector(".week-chip.active");
       active?.scrollIntoView({behavior:"smooth",inline:"center",block:"nearest"});
