@@ -688,6 +688,23 @@
       height:58px;
     }
 
+
+    /* Regular-season Week 1 kickoff treatment */
+    .week-chip.kickoff{
+      background:rgba(106,255,183,.10);
+      color:#c8ffe5;
+      height:58px;
+      flex-basis:122px;
+    }
+    .week-chip.kickoff .week-chip-meta{
+      color:var(--green);
+    }
+    .week-chip.kickoff.active{
+      background:linear-gradient(135deg,rgba(106,255,183,.28),rgba(83,183,255,.18));
+      box-shadow:inset 0 -2px 0 var(--green);
+      color:#fff;
+    }
+
   </style>
 </head>
 <body>
@@ -859,58 +876,67 @@ const DIRECTV_ZIP_KEY="nflLauncher.directv.zip.v3";
       prime: {
         label:"Prime Video",
         web:"https://www.primevideo.com/sports",
+        iosUniversal:"https://www.primevideo.com/sports",
         ios:"aiv://",
         androidPackage:"com.amazon.avod.thirdpartyclient"
       },
       peacock: {
         label:"Peacock",
         web:"https://www.peacocktv.com/sports/nfl",
+        iosUniversal:"https://www.peacocktv.com/deeplink",
         ios:"peacocktv://",
-        androidPackage:"com.peacocktv.peacockandroid"
+        androidWeb:"https://www.peacocktv.com/deeplink",androidPackage:"com.peacocktv.peacockandroid"
       },
       espn: {
         label:"ESPN / ABC",
         web:"https://www.espn.com/watch/",
+        iosUniversal:"https://www.espn.com/watch/",
         ios:"espn://",
-        androidPackage:"com.espn.score_center"
+        androidWeb:"https://www.espn.com/watch/",androidPackage:"com.espn.score_center"
       },
       paramount: {
         // Opens Paramount+ sports. Game availability can depend on the user's
         // local CBS station, subscription tier, device, and market.
         label:"CBS / Paramount+",
         web:"https://www.paramountplus.com/shows/nfl-on-cbs/",
+        iosUniversal:"https://www.paramountplus.com/shows/nfl-on-cbs/",
         ios:"paramountplus://",
         androidPackage:"com.cbs.ca"
       },
       fox: {
         label:"FOX",
         web:"https://www.foxsports.com/live",
+        iosUniversal:"https://www.foxsports.com/live",
         ios:"foxsports://",
         androidPackage:"com.foxsports.android"
       },
       hulu: {
         label:"Hulu + Live TV",
         web:"https://www.hulu.com/nfl",
+        iosUniversal:"https://www.hulu.com/nfl",
         ios:"hulu://",
         androidPackage:"com.hulu.plus"
       },
       nflnetwork: {
         label:"NFL Network",
         web:"https://www.nfl.com/network/",
+        iosUniversal:"https://www.nfl.com/network/",
         ios:"nfl://",
-        androidPackage:"com.gotv.nflgamecenter.us.lite"
+        androidWeb:"https://www.nfl.com/",androidPackage:"com.gotv.nflgamecenter.us.lite"
       },
       nflplus: {
         label:"NFL+",
         web:"https://www.nfl.com/plus/",
+        iosUniversal:"https://www.nfl.com/plus/",
         ios:"nfl://",
-        androidPackage:"com.gotv.nflgamecenter.us.lite"
+        androidWeb:"https://www.nfl.com/",androidPackage:"com.gotv.nflgamecenter.us.lite"
       },
       directv: {label:"DIRECTV",web:"https://stream.directv.com/",ios:"directv://",androidPackage:"com.att.tv"},
-      netflix:{label:"Netflix",web:"https://www.netflix.com/",androidPackage:"com.netflix.mediaclient"},
+      netflix:{label:"Netflix",web:"https://www.netflix.com/",iosUniversal:"https://www.netflix.com/",androidPackage:"com.netflix.mediaclient"},
       youtubetv: {
         label:"YouTube TV",
         web:"https://tv.youtube.com/",
+        iosUniversal:"https://tv.youtube.com/",
         ios:"youtubetv://",
         androidPackage:"com.google.android.apps.youtube.unplugged"
       }
@@ -1076,7 +1102,10 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
           if(result.status === "fulfilled") games.push(...normalizeEspn(result.value, seen));
         }
       }
-      return games.sort((a,b) => new Date(a.dateTime) - new Date(b.dateTime));
+      const currentPreseasonStart = new Date("2026-08-01T00:00:00");
+      return games
+        .filter(game => new Date(game.dateTime) >= currentPreseasonStart)
+        .sort((a,b) => new Date(a.dateTime) - new Date(b.dateTime));
     }
 
     // Thin fetch wrapper. cache:"no-store" helps avoid stale scores/status,
@@ -1173,7 +1202,8 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
     function getDisplayGames(sourceGames = allGames){
       const now = new Date();
       const cutoff = new Date(now.getTime() - 4 * 60 * 60 * 1000);
-      const baseAll = [...sourceGames];
+      const currentPreseasonStart = new Date("2026-08-01T00:00:00");
+      const baseAll = [...sourceGames].filter(game => new Date(game.dateTime) >= currentPreseasonStart);
       const base = selectedScheduleWeek
         ? baseAll.filter(g => scheduleWeekKey(g) === selectedScheduleWeek)
         : baseAll;
@@ -1835,7 +1865,7 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
         showToast("TV launch unavailable - opening on phone");
       }
       const webUrl = addTracking(provider.web, game.id);
-      const targetUrl = getPlatformUrl(provider, webUrl);
+      const targetUrl = getPlatformUrl(provider, webUrl, game);
       showToast(`Opening ${provider.label}`);
 
       if(DEVICE.isAndroid && targetUrl.startsWith("intent://")){
@@ -1843,14 +1873,10 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
         return;
       }
 
-      if(DEVICE.isIOS && provider.ios){
-        const startedAt = Date.now();
+      if(DEVICE.isIOS){
+        // Universal Link: iOS opens the associated app when installed and the
+        // provider claims this path; otherwise Safari opens the same HTTPS URL.
         window.location.href = targetUrl;
-        setTimeout(() => {
-          if(Date.now() - startedAt < 1800 && !document.hidden){
-            window.location.href = webUrl;
-          }
-        }, 900);
         return;
       }
 
@@ -1870,23 +1896,29 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
     );
 }
 
-    function buildAndroidAppIntent(provider, webUrl){
-      if(!provider.androidPackage) return webUrl;
-      const u = new URL(webUrl);
-      const fallback = encodeURIComponent(webUrl);
-
-      // Explicitly target the provider package. This is stronger than relying
-      // on Android's generic web-link resolver and avoids the malformed custom-
-      // scheme/HTTPS-host combination used by the previous build.
-      return `intent://${u.host}${u.pathname}${u.search}#Intent;scheme=https;package=${provider.androidPackage};action=android.intent.action.VIEW;category=android.intent.category.BROWSABLE;S.browser_fallback_url=${fallback};end`;
+    const NETFLIX_TITLE_IDS = {};
+    function getNetflixAndroidUrl(game){
+      const id=NETFLIX_TITLE_IDS[String(game?.id||"")];
+      return id ? `nflx://www.netflix.com/watch/${encodeURIComponent(id)}` : "nflx://www.netflix.com/";
     }
 
-    function getPlatformUrl(provider, webUrl){
-      if(DEVICE.isAndroid && provider.androidPackage){
-        return buildAndroidAppIntent(provider, webUrl);
+    function buildAndroidAppIntent(provider, webUrl, game){
+      if(!provider.androidPackage) return webUrl;
+      if(provider.androidPackage==="com.netflix.mediaclient"){
+        const appUrl=getNetflixAndroidUrl(game).replace(/^nflx:\/\//,"");
+        return `intent://${appUrl}#Intent;scheme=nflx;package=${provider.androidPackage};S.browser_fallback_url=${encodeURIComponent(webUrl)};end`;
       }
-      if(DEVICE.isIOS && provider.ios){
-        return provider.ios;
+      const target=provider.androidWeb||webUrl;
+      const u=new URL(target);
+      return `intent://${u.host}${u.pathname}${u.search}#Intent;scheme=https;package=${provider.androidPackage};action=android.intent.action.VIEW;category=android.intent.category.BROWSABLE;S.browser_fallback_url=${encodeURIComponent(webUrl)};end`;
+    }
+
+    function getPlatformUrl(provider, webUrl, game){
+      if(DEVICE.isAndroid && provider.androidPackage){
+        return buildAndroidAppIntent(provider, webUrl, game);
+      }
+      if(DEVICE.isIOS){
+        return provider.iosUniversal || webUrl;
       }
       return webUrl;
     }
@@ -2004,13 +2036,20 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
     }
 
     function weekMetaTag(week){
-      return postseasonInfo(week)?.tag||"";
+      const post = postseasonInfo(week);
+      if(post) return post.tag || "";
+      if(weekLabel(week) === "WEEK 1") return "KICKOFF";
+      return "";
+    }
+
+    function isKickoffWeek(week){
+      return weekLabel(week) === "WEEK 1";
     }
 
     function renderWeekNavigator(){
       buildScheduleWeeks();
       if(!weekTimelineEl)return;
-      weekTimelineEl.innerHTML=scheduleWeeks.map(w=>`<button class="week-chip ${weekClass(w)}${w.hasGames?"":" future-empty"}${w.key===selectedScheduleWeek?" active":""}" data-week="${w.key}">${weekMetaTag(w)?`<span class="week-chip-meta">${weekMetaTag(w)}</span>`:""}<span class="week-chip-title">${weekLabel(w)}</span><span class="week-chip-range">${w.min.toLocaleDateString([],{month:"short",day:"numeric"})} - ${w.max.toLocaleDateString([],{month:"short",day:"numeric"})}</span></button>`).join("");
+      weekTimelineEl.innerHTML=scheduleWeeks.map(w=>`<button class="week-chip ${weekClass(w)}${isKickoffWeek(w)?" kickoff":""}${w.hasGames?"":" future-empty"}${w.key===selectedScheduleWeek?" active":""}" data-week="${w.key}">${weekMetaTag(w)?`<span class="week-chip-meta">${weekMetaTag(w)}</span>`:""}<span class="week-chip-title">${weekLabel(w)}</span><span class="week-chip-range">${w.min.toLocaleDateString([],{month:"short",day:"numeric"})} - ${w.max.toLocaleDateString([],{month:"short",day:"numeric"})}</span></button>`).join("");
       weekTimelineEl.querySelectorAll(".week-chip").forEach(btn=>btn.addEventListener("click",()=>selectScheduleWeek(btn.dataset.week)));
       const active=weekTimelineEl.querySelector(".week-chip.active");
       active?.scrollIntoView({behavior:"smooth",inline:"center",block:"nearest"});
