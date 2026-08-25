@@ -1250,9 +1250,12 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
         // LIVE is a true filter: do not include scheduled or final games.
         selected = base.filter(isLiveGame).sort(sortByDate);
       } else {
-        const sorted = base.sort(sortByDate);
-        const upcoming = sorted.filter(g => new Date(g.dateTime) >= cutoff);
-        selected = upcoming.length ? upcoming : sorted;
+        // GAMES is the active schedule, not a duplicate results view.
+        // Show scheduled + live games only. Once the week is fully complete,
+        // completed games remain exclusively under RESULTS.
+        selected = base
+          .filter(g => !isFinalGame(g))
+          .sort(sortByDate);
       }
       return selected.slice(0, MAX_GAMES_TO_SHOW);
     }
@@ -1280,7 +1283,11 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       updateWeekRange(games);
       updateFilterCounts();
       if(!games.length){
-        scheduleEl.innerHTML = `<section class="empty"><h2>No games found</h2><p>Try Refresh or check the provider endpoint.</p></section>`;
+        const scoped = selectedScheduleWeek ? allGames.filter(g=>scheduleWeekKey(g)===selectedScheduleWeek) : allGames;
+        const allFinal = scoped.length > 0 && scoped.every(isFinalGame);
+        scheduleEl.innerHTML = allFinal && sortMode === "kickoff"
+          ? `<section class="empty"><h2>Week Complete</h2><p>All games are final. Open RESULTS to view scores.</p></section>`
+          : `<section class="empty"><h2>No games found</h2><p>Try another filter or refresh the schedule.</p></section>`;
         return;
       }
       const groups = groupByDay(games);
@@ -2059,7 +2066,7 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
         ? allGames.filter(g=>scheduleWeekKey(g)===selectedScheduleWeek)
         : allGames;
       const counts={
-        kickoff:scoped.length,
+        kickoff:scoped.filter(g=>!isFinalGame(g)).length,
         live:scoped.filter(isLiveGame).length,
         final:scoped.filter(isFinalGame).length
       };
