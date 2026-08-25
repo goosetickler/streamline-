@@ -705,6 +705,38 @@
       color:#fff;
     }
 
+
+    /* Selected week owns the green highlight; KICKOFF is metadata only */
+    .week-chip.active,
+    .week-chip.postseason.active,
+    .week-chip.championship.active,
+    .week-chip.superbowl.active,
+    .week-chip.kickoff.active{
+      background:linear-gradient(135deg,rgba(106,255,183,.30),rgba(83,183,255,.18)) !important;
+      color:#fff !important;
+      box-shadow:inset 0 -2px 0 var(--green) !important;
+    }
+    .week-chip.kickoff{
+      background:transparent !important;
+      color:var(--muted);
+    }
+    .week-chip.kickoff .week-chip-meta{
+      color:var(--green);
+    }
+    .week-chip.kickoff.active .week-chip-meta{
+      color:#c8ffe5;
+    }
+
+
+    .sort-tabs{grid-template-columns:repeat(3,1fr)}
+    .sort-tab{display:flex;align-items:center;justify-content:center;gap:5px}
+    .filter-count{display:none;min-width:18px;height:18px;padding:0 5px;border-radius:999px;background:rgba(255,255,255,.13);color:inherit;font-size:.58rem;font-weight:1000;line-height:18px;text-align:center}
+    .filter-count.has-count{display:inline-block}
+    .sort-tab.active .filter-count{background:rgba(7,17,29,.16)}
+    .live-filter-dot{display:none;width:6px;height:6px;border-radius:50%;background:var(--red);box-shadow:0 0 0 3px rgba(255,54,95,.12)}
+    .sort-tab.has-live .live-filter-dot{display:inline-block}
+    .sort-tab[data-sort="live"].active{background:var(--red);color:#fff;border-color:transparent}
+
   </style>
 </head>
 <body>
@@ -748,10 +780,9 @@
         <button id="weekNextBtn" class="week-arrow" type="button" aria-label="Next week">›</button>
       </section>
       <nav class="sort-tabs" aria-label="Schedule sort options">
-        <button class="sort-tab active" data-sort="kickoff">All</button>
-        <button class="sort-tab" data-sort="live">Live</button>
-        <button class="sort-tab" data-sort="scheduled">Upcoming</button>
-        <button class="sort-tab" data-sort="final">Final</button>
+        <button class="sort-tab active" data-sort="kickoff"><span>Games</span><span class="filter-count" data-count="kickoff"></span></button>
+        <button class="sort-tab" data-sort="live"><span class="live-filter-dot"></span><span>Live</span><span class="filter-count" data-count="live"></span></button>
+        <button class="sort-tab" data-sort="final"><span>Results</span><span class="filter-count" data-count="final"></span></button>
       </nav>
     </header>
 
@@ -1150,7 +1181,10 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
           possessionAbbr: getPossessionAbbr(competition, home, away),
           homeTimeouts: getTimeouts(competition, home, "home"),
           awayTimeouts: getTimeouts(competition, away, "away"),
-          venue: competition.venue?.fullName || ""
+          venue: competition.venue?.fullName || "",
+          seasonYear:Number(event.season?.year||raw?.season?.year||getSeasonYear()),
+          seasonType:Number(event.season?.type||raw?.season?.type||0),
+          weekNumber:Number(event.week?.number||raw?.week?.number||0)
         };
       }).filter(g => g && g.dateTime && !Number.isNaN(new Date(g.dateTime).getTime()));
     }
@@ -1244,6 +1278,7 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
     function renderSchedule(){
       const games = getDisplayGames();
       updateWeekRange(games);
+      updateFilterCounts();
       if(!games.length){
         scheduleEl.innerHTML = `<section class="empty"><h2>No games found</h2><p>Try Refresh or check the provider endpoint.</p></section>`;
         return;
@@ -1928,145 +1963,57 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       return `${url}${joiner}utm_source=nfl_game_launcher&game=${encodeURIComponent(gameId)}`;
     }
 
-    function scheduleWeekKey(game){
-      const d=new Date(game.dateTime);
-      if(Number.isNaN(d.getTime())) return "";
-      const season=getSeasonYear();
-      // Use Sunday-start calendar buckets for the UI. ESPN season/week metadata
-      // is not retained in the normalized game object, so this gives a stable,
-      // intuitive timeline across preseason/regular/postseason data.
-      const sunday=new Date(d);
-      sunday.setHours(0,0,0,0);
-      sunday.setDate(sunday.getDate()-sunday.getDay());
-      return sunday.toISOString().slice(0,10);
+    function scheduleWeekKey(g){
+      const type=Number(g.seasonType||0),week=Number(g.weekNumber||0);
+      if(type&&week)return `${type}:${week}`;
+      const d=new Date(g.dateTime),rs=new Date("2026-09-06");
+      if(d<rs)return `1:${Math.max(1,Math.min(3,Math.floor((d-new Date("2026-08-01"))/604800000)+1))}`;
+      return `2:${Math.max(1,Math.min(18,Math.floor((d-rs)/604800000)+1))}`;
     }
-
     function buildScheduleWeeks(){
       const groups=new Map();
-
-      // Preserve ESPN-derived game buckets, especially preseason.
-      allGames.forEach(g=>{
-        const key=scheduleWeekKey(g);
-        if(!key)return;
-        const d=new Date(g.dateTime);
-        if(!groups.has(key))groups.set(key,[]);
-        groups.get(key).push(d);
-      });
-
-      // Guarantee the complete 2026 regular-season timeline exists even when ESPN
-      // has not returned games for a future week yet.
-      const regularWeekStarts=[
-        "2026-09-06","2026-09-13","2026-09-20","2026-09-27",
-        "2026-10-04","2026-10-11","2026-10-18","2026-10-25",
-        "2026-11-01","2026-11-08","2026-11-15","2026-11-22",
-        "2026-11-29","2026-12-06","2026-12-13","2026-12-20",
-        "2026-12-27","2027-01-03"
-      ];
-
-      // These synthetic entries are navigation metadata, not fabricated games.
-      regularWeekStarts.forEach(key=>{
-        if(!groups.has(key))groups.set(key,[]);
-      });
-
-      // Guarantee postseason navigation exists before teams/matchups are known.
-      [
-        "2027-01-10", // Wild Card
-        "2027-01-17", // Divisional
-        "2027-01-24", // Conference Championships
-        "2027-01-31", // Pro Bowl
-        "2027-02-07"  // Super Bowl
-      ].forEach(key=>{
-        if(!groups.has(key))groups.set(key,[]);
-      });
-
-      scheduleWeeks=Array.from(groups.entries())
-        .sort((a,b)=>a[0].localeCompare(b[0]))
-        .map(([key,dates],i)=>{
-          const start=new Date(key+"T00:00:00");
-          const endDate=new Date(start);
-          endDate.setDate(endDate.getDate()+6);
-
-          // Display the full calendar-week range for synthetic/future weeks.
-          // Existing game data remains available for filtering but does not shrink
-          // the date range shown in the navigator.
-          return {key,index:i,min:start,max:endDate,hasGames:dates.length>0};
-        });
-
-      if(!scheduleWeeks.length){
-        selectedScheduleWeek=null;
-        return;
-      }
-
-      if(!selectedScheduleWeek||!scheduleWeeks.some(w=>w.key===selectedScheduleWeek)){
-        const now=new Date();
-        const current=scheduleWeeks.find(w=>{
-          const s=new Date(w.key+"T00:00:00");
-          return now>=s&&now<new Date(s.getTime()+7*86400000);
-        });
-        selectedScheduleWeek=(current||scheduleWeeks.find(w=>w.max>=now)||scheduleWeeks[scheduleWeeks.length-1]).key;
-      }
+      allGames.forEach(g=>{const k=scheduleWeekKey(g);if(k){if(!groups.has(k))groups.set(k,[]);groups.get(k).push(g)}});
+      [1,2,3].forEach(w=>groups.has(`1:${w}`)||groups.set(`1:${w}`,[]));
+      for(let w=1;w<=18;w++)groups.has(`2:${w}`)||groups.set(`2:${w}`,[]);
+      [1,2,3,4,5].forEach(w=>groups.has(`3:${w}`)||groups.set(`3:${w}`,[]));
+      scheduleWeeks=[...groups].sort((a,b)=>{const A=a[0].split(":").map(Number),B=b[0].split(":").map(Number);return A[0]*100+A[1]-B[0]*100-B[1]}).map(([key,games])=>{const [type,week]=key.split(":").map(Number),ds=games.map(g=>new Date(g.dateTime));return{key,type,week,hasGames:!!games.length,min:ds.length?new Date(Math.min(...ds)):null,max:ds.length?new Date(Math.max(...ds)):null}});
+      if(!selectedScheduleWeek||!scheduleWeeks.some(w=>w.key===selectedScheduleWeek))selectedScheduleWeek=(findCurrentScheduleWeek()||scheduleWeeks[0])?.key;
     }
-
-    function postseasonInfo(week){
-      const special={
-        "2027-01-10":{label:"WILD CARD",tag:"PLAYOFFS",cls:"postseason"},
-        "2027-01-17":{label:"DIV RD",tag:"PLAYOFFS",cls:"postseason"},
-        "2027-01-24":{label:"CONF CHAMP",tag:"FINAL FOUR",cls:"championship"},
-        "2027-01-31":{label:"PRO BOWL",tag:"ALL-STAR",cls:"postseason"},
-        "2027-02-07":{label:"SUPER BOWL",tag:"CHAMPIONSHIP",cls:"superbowl"}
-      };
-      return special[week.key]||null;
+    function findCurrentScheduleWeek(){
+      const now=Date.now(),pop=scheduleWeeks.filter(w=>w.hasGames);
+      return pop.find(w=>allGames.filter(g=>scheduleWeekKey(g)===w.key).some(g=>Math.abs(new Date(g.dateTime)-now)<4*86400000))
+        ||pop.find(w=>allGames.filter(g=>scheduleWeekKey(g)===w.key).some(g=>new Date(g.dateTime)>now))
+        ||pop[pop.length-1];
     }
-
-    function weekLabel(week){
-      const post=postseasonInfo(week);
-      if(post)return post.label;
-      const regularStart=new Date("2026-09-06T00:00:00");
-      const d=new Date(week.key+"T00:00:00");
-      if(d<regularStart){
-        const preseason=scheduleWeeks.filter(w=>new Date(w.key+"T00:00:00")<regularStart);
-        return `PRE WK ${preseason.findIndex(w=>w.key===week.key)+1}`;
-      }
-      const n=Math.floor((d-regularStart)/(7*86400000))+1;
-      return `WEEK ${Math.min(18,Math.max(1,n))}`;
-    }
-
-    function weekClass(week){
-      return postseasonInfo(week)?.cls||"";
-    }
-
-    function weekMetaTag(week){
-      const post = postseasonInfo(week);
-      if(post) return post.tag || "";
-      if(weekLabel(week) === "WEEK 1") return "KICKOFF";
-      return "";
-    }
-
-    function isKickoffWeek(week){
-      return weekLabel(week) === "WEEK 1";
-    }
-
+    function postseasonInfo(w){if(w.type!==3)return null;return({1:{label:"WILD CARD",tag:"PLAYOFFS",cls:"postseason"},2:{label:"DIV RD",tag:"PLAYOFFS",cls:"postseason"},3:{label:"CONF CHAMP",tag:"FINAL FOUR",cls:"championship"},4:{label:"PRO BOWL",tag:"ALL-STAR",cls:"postseason"},5:{label:"SUPER BOWL",tag:"CHAMPIONSHIP",cls:"superbowl"}})[w.week]||null}
+    function weekLabel(w){const p=postseasonInfo(w);return p?p.label:w.type===1?`PRE ${w.week}`:`WEEK ${w.week}`}
+    function weekClass(w){return postseasonInfo(w)?.cls||""}
+    function weekMetaTag(w){const p=postseasonInfo(w);return p?p.tag:(w.type===2&&w.week===1?"KICKOFF":"")}
+    function isKickoffWeek(w){return w.type===2&&w.week===1}
+    function weekDateRange(w){return w.min&&w.max?`${w.min.toLocaleDateString([],{month:"short",day:"numeric"})} - ${w.max.toLocaleDateString([],{month:"short",day:"numeric"})}`:""}
     function renderWeekNavigator(){
-      buildScheduleWeeks();
-      if(!weekTimelineEl)return;
-      weekTimelineEl.innerHTML=scheduleWeeks.map(w=>`<button class="week-chip ${weekClass(w)}${isKickoffWeek(w)?" kickoff":""}${w.hasGames?"":" future-empty"}${w.key===selectedScheduleWeek?" active":""}" data-week="${w.key}">${weekMetaTag(w)?`<span class="week-chip-meta">${weekMetaTag(w)}</span>`:""}<span class="week-chip-title">${weekLabel(w)}</span><span class="week-chip-range">${w.min.toLocaleDateString([],{month:"short",day:"numeric"})} - ${w.max.toLocaleDateString([],{month:"short",day:"numeric"})}</span></button>`).join("");
-      weekTimelineEl.querySelectorAll(".week-chip").forEach(btn=>btn.addEventListener("click",()=>selectScheduleWeek(btn.dataset.week)));
-      const active=weekTimelineEl.querySelector(".week-chip.active");
-      active?.scrollIntoView({behavior:"smooth",inline:"center",block:"nearest"});
-      const i=scheduleWeeks.findIndex(w=>w.key===selectedScheduleWeek);
-      if(weekPrevBtnEl)weekPrevBtnEl.disabled=i<=0;
-      if(weekNextBtnEl)weekNextBtnEl.disabled=i<0||i>=scheduleWeeks.length-1;
+      buildScheduleWeeks();if(!weekTimelineEl)return;
+      weekTimelineEl.innerHTML=scheduleWeeks.map(w=>`<button class="week-chip ${weekClass(w)}${isKickoffWeek(w)?" kickoff":""}${w.hasGames?"":" future-empty"}${w.key===selectedScheduleWeek?" active":""}" data-week="${w.key}">${weekMetaTag(w)?`<span class="week-chip-meta">${weekMetaTag(w)}</span>`:""}<span class="week-chip-title">${weekLabel(w)}</span>${weekDateRange(w)?`<span class="week-chip-range">${weekDateRange(w)}</span>`:""}</button>`).join("");
+      weekTimelineEl.querySelectorAll(".week-chip").forEach(b=>b.addEventListener("click",()=>selectScheduleWeek(b.dataset.week)));
+      requestAnimationFrame(()=>weekTimelineEl.querySelector(".week-chip.active")?.scrollIntoView({behavior:"smooth",inline:"center",block:"nearest"}));
     }
-
-    function selectScheduleWeek(key){
-      selectedScheduleWeek=key;
+    function selectScheduleWeek(k){
+      selectedScheduleWeek=k;
+      const scoped=allGames.filter(g=>scheduleWeekKey(g)===selectedScheduleWeek);
+      if(sortMode==="live"&&!scoped.some(isLiveGame))sortMode="kickoff";
+      if(sortMode==="final"&&!scoped.some(isFinalGame))sortMode="kickoff";
+      localStorage.setItem("nflLauncher.sortMode",sortMode);
+      document.querySelectorAll(".sort-tab").forEach(tab=>tab.classList.toggle("active",tab.dataset.sort===sortMode));
+      updateSortHint();
       renderWeekNavigator();
       renderSchedule();
     }
-
-    function moveScheduleWeek(delta){
-      const i=scheduleWeeks.findIndex(w=>w.key===selectedScheduleWeek), next=scheduleWeeks[i+delta];
-      if(next)selectScheduleWeek(next.key);
+    function scrollWeekTimeline(dir){
+      if(!weekTimelineEl)return;
+      const chip=weekTimelineEl.querySelector(".week-chip");
+      const gap=4;
+      const amount=(chip?.getBoundingClientRect().width||112)+gap;
+      weekTimelineEl.scrollBy({left:dir*amount,behavior:"smooth"});
     }
 
     function updateWeekRange(games){ renderWeekNavigator(); }
@@ -2107,8 +2054,26 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       });
       updateSortHint();
     }
+    function updateFilterCounts(){
+      const scoped=selectedScheduleWeek
+        ? allGames.filter(g=>scheduleWeekKey(g)===selectedScheduleWeek)
+        : allGames;
+      const counts={
+        kickoff:scoped.length,
+        live:scoped.filter(isLiveGame).length,
+        final:scoped.filter(isFinalGame).length
+      };
+      document.querySelectorAll(".filter-count[data-count]").forEach(el=>{
+        const count=counts[el.dataset.count]||0;
+        el.textContent=count?String(count):"";
+        el.classList.toggle("has-count",count>0);
+      });
+      const liveBtn=document.querySelector('.sort-tab[data-sort="live"]');
+      liveBtn?.classList.toggle("has-live",counts.live>0);
+    }
+
     function updateSortHint(){
-      const labels = { kickoff:"All Games", live:"Live Games", scheduled:"Upcoming Games", final:"Finals Scores" };
+      const labels = { kickoff:"Games", live:"Live", final:"Results" };
       if(sortHintEl) sortHintEl.textContent = labels[sortMode] || labels.kickoff;
     }
     function scheduleLiveRefresh(){
@@ -2125,8 +2090,8 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       updateHeaderOffset
     );
 
-    weekPrevBtnEl?.addEventListener("click",()=>moveScheduleWeek(-1));
-    weekNextBtnEl?.addEventListener("click",()=>moveScheduleWeek(1));
+    weekPrevBtnEl?.addEventListener("click",()=>scrollWeekTimeline(-1));
+    weekNextBtnEl?.addEventListener("click",()=>scrollWeekTimeline(1));
     initSortControls();
     initSettingsControls();
     document.querySelector("#refreshBtn").addEventListener("click", fetchSchedule);
