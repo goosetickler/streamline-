@@ -796,6 +796,101 @@
     .selftest-broadcast{color:var(--accent);overflow-wrap:anywhere}
     @media(max-width:520px){.selftest-detail-row{grid-template-columns:58px 72px 1fr}.selftest-broadcast{grid-column:1/-1;padding-left:0}}
 
+
+    /* Provider App Test must sit above Settings and every other overlay */
+    #providerTestModal{
+      position:fixed !important;
+      inset:0 !important;
+      z-index:2147483647 !important;
+      isolation:isolate;
+    }
+    #providerTestModal.open{display:flex !important}
+    #providerTestModal .provider-test-panel{
+      position:relative;
+      z-index:1;
+    }
+
+
+    /* Keep Settings title + close button visible while the settings body scrolls */
+    .settings-header{
+      position:sticky !important;
+      top:0;
+      z-index:20;
+      background:var(--panel);
+      margin:-1px -1px 0;
+      padding:14px 14px 10px;
+      border-radius:16px 16px 0 0;
+    }
+    .settings-header::after{
+      content:"";
+      position:absolute;
+      left:14px;
+      right:14px;
+      bottom:0;
+      height:1px;
+      background:var(--line);
+    }
+    .settings-header .settings-close,
+    .settings-header button{
+      position:relative;
+      z-index:21;
+    }
+
+
+    .settings-sheet>.settings-top{
+      position:sticky !important;
+      top:0;
+      z-index:50;
+      background:var(--panel);
+      margin:-14px -14px 0;
+      padding:14px 14px 11px;
+      border-radius:16px 16px 0 0;
+      box-shadow:0 8px 12px rgba(0,0,0,.14);
+    }
+    .settings-sheet>.settings-top .settings-close{
+      position:relative;
+      z-index:51;
+    }
+
+
+    /* Settings layout: header stays fixed; only content below it scrolls. */
+    .settings-sheet{
+      display:flex !important;
+      flex-direction:column !important;
+      overflow:hidden !important;
+      max-height:min(92vh,760px);
+    }
+    .settings-sheet>.settings-top{
+      position:relative !important;
+      top:auto !important;
+      z-index:50;
+      flex:0 0 auto;
+      background:var(--panel);
+      margin:0 !important;
+      padding:0 0 11px !important;
+      border-radius:0;
+      box-shadow:none !important;
+    }
+    .settings-scroll-body{
+      flex:1 1 auto;
+      min-height:0;
+      overflow-y:auto;
+      overflow-x:hidden;
+      overscroll-behavior:contain;
+      padding-right:4px;
+    }
+
+
+    .settings-sheet>.settings-top{
+      padding:0 0 7px !important;
+      min-height:38px;
+      align-items:center;
+    }
+    .settings-sheet>.settings-top .settings-title{
+      margin:0;
+      line-height:1.1;
+    }
+
   </style>
 </head>
 <body>
@@ -854,10 +949,11 @@
       <div class="settings-top">
         <div>
           <h2 id="settingsTitle" class="settings-title">Settings</h2>
-          <p class="settings-subtitle">Choose streaming services and keep the header clean for game info.</p>
+          
         </div>
         <button id="settingsCloseBtn" class="settings-close" aria-label="Close settings">×</button>
       </div>
+      <div class="settings-scroll-body">
       <div class="settings-section">
         <h3 class="settings-section-title">Streaming Services</h3>
         <div class="settings-provider-grid" aria-label="Streaming service filters">
@@ -932,7 +1028,8 @@
           <p id="tvCastHint" class="settings-hint">Browser security does not expose a raw Wi-Fi device list. Scan uses supported browser casting APIs when available; otherwise the system cast/device picker is used at WATCH time.</p>
         </div>
       </div>
-    </section>
+    
+      </div></section>
   </div>
 
   <script>
@@ -1530,7 +1627,7 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       const statusClass = isLive ? "live" : (isFinal ? "final" : "scheduled");
       const actionRow = isFinal ? "" : `
           <div class="lower-row">
-            ${providerIcons || `<div class="no-provider">No selected stream</div>`}
+            ${providerIcons || `<div class="no-provider">No streams available</div>`}
             ${providerKeys.length ? `<button class="watch" aria-label="Open ${escapeHtml(provider.label)} for ${escapeHtml(game.awayAbbr)} at ${escapeHtml(game.homeAbbr)}" onclick='openProvider("${providerKey}", ${JSON.stringify(game).replace(/'/g,"&#39;")})'>${playIcon()} WATCH</button>` : ""}
           </div>`;
       return `
@@ -1778,7 +1875,7 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       list.innerHTML=ordered.map(key=>{
         const p=PROVIDER_LINKS[key];
         const mobile=DEVICE.isAndroid
-          ? `Android · ${p.androidPackage||"web fallback"}`
+          ? `Android HTTPS package intent · ${p.androidPackage||"web fallback"}`
           : DEVICE.isIOS
             ? `iOS · ${p.ios||p.iosUniversal||"web fallback"}`
             : "Desktop · web";
@@ -1799,6 +1896,14 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       buildProviderTestList();
       const modal=document.querySelector("#providerTestModal");
       if(!modal)return;
+
+      const settings=document.querySelector("#settingsModal");
+      if(settings && settings.classList.contains("open")){
+        settings.dataset.hiddenForProviderTest="true";
+        settings.style.visibility="hidden";
+        settings.style.pointerEvents="none";
+      }
+
       modal.classList.add("open");
       modal.setAttribute("aria-hidden","false");
       document.body.classList.add("provider-test-open");
@@ -1810,6 +1915,13 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       modal.classList.remove("open");
       modal.setAttribute("aria-hidden","true");
       document.body.classList.remove("provider-test-open");
+
+      const settings=document.querySelector("#settingsModal");
+      if(settings?.dataset.hiddenForProviderTest==="true"){
+        settings.style.visibility="";
+        settings.style.pointerEvents="";
+        delete settings.dataset.hiddenForProviderTest;
+      }
     }
 
     document.addEventListener("click",event=>{
@@ -2476,10 +2588,9 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
     }
 
     // Mobile launch policy:
-    // 1) Try the provider's native app scheme first.
-    // 2) If the app is not installed / the scheme is not handled, fall back to
-    //    the provider's Universal/App Link, then ordinary HTTPS.
-    // Desktop continues to open the web target.
+    // Android: package-targeted HTTPS intent first (known-good rollback strategy).
+    // iOS: native scheme first, then Universal Link/web fallback.
+    // Desktop: ordinary HTTPS.
     async function openProvider(providerKey, game){
       const provider = PROVIDER_LINKS[providerKey] || PROVIDER_LINKS.nflplus;
       if(tvCastEnabled && selectedTvDeviceId){
@@ -2555,24 +2666,19 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
     }
 
     function buildAndroidAppIntent(provider, webUrl, game){
-      if(!provider.androidPackage) return webUrl;
+      if(!provider.androidPackage) return provider.androidWeb || webUrl;
 
-      // Netflix supports its own nflx scheme and can optionally target a title.
-      if(provider.androidPackage==="com.netflix.mediaclient"){
-        const appUrl=getNetflixAndroidUrl(game).replace(/^nflx:\/\//,"");
-        return `intent://${appUrl}#Intent;scheme=nflx;package=${provider.androidPackage};action=android.intent.action.VIEW;category=android.intent.category.BROWSABLE;S.browser_fallback_url=${encodeURIComponent(webUrl)};end`;
+      // Rollback to the earlier package-targeted HTTPS intent strategy.
+      // Android receives the provider's normal HTTPS/App Link but explicitly
+      // targets the installed package. If the app cannot handle it, Chrome uses
+      // the browser fallback URL.
+      const target=provider.androidWeb || webUrl;
+      try{
+        const u=new URL(target);
+        return `intent://${u.host}${u.pathname}${u.search}#Intent;scheme=https;package=${provider.androidPackage};action=android.intent.action.VIEW;category=android.intent.category.BROWSABLE;S.browser_fallback_url=${encodeURIComponent(webUrl)};end`;
+      }catch(_){
+        return webUrl;
       }
-
-      // Prefer the provider's native scheme so Chrome does not claim the HTTPS
-      // URL before Android has a chance to route it to the installed app.
-      if(provider.androidScheme){
-        return `intent://open#Intent;scheme=${provider.androidScheme};package=${provider.androidPackage};action=android.intent.action.VIEW;category=android.intent.category.BROWSABLE;S.browser_fallback_url=${encodeURIComponent(provider.androidWeb||webUrl)};end`;
-      }
-
-      // Last resort: explicit package-targeted HTTPS App Link.
-      const target=provider.androidWeb||webUrl;
-      const u=new URL(target);
-      return `intent://${u.host}${u.pathname}${u.search}#Intent;scheme=https;package=${provider.androidPackage};action=android.intent.action.VIEW;category=android.intent.category.BROWSABLE;S.browser_fallback_url=${encodeURIComponent(webUrl)};end`;
     }
 
     function getPlatformUrl(provider, webUrl, game){
