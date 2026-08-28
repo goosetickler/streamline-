@@ -743,10 +743,6 @@
     .diag-row{display:flex;gap:6px;align-items:flex-start;margin:2px 0}
     .diag-confidence{font-weight:1000;color:var(--green);min-width:54px}
 
-
-    .provider-diagnostics.show{display:block !important}
-    .diag-title{font-size:.56rem;font-weight:1000;letter-spacing:.10em;color:var(--accent);margin-bottom:5px}
-
   </style>
 </head>
 <body>
@@ -1029,22 +1025,45 @@ const DIRECTV_ZIP_KEY="nflLauncher.directv.zip.v3";
     // - Paramount+ maps to NFL on CBS games.
     // - FOX maps to games televised on FOX via FOX Sports / FOX One.
     // - NFL+ is included as a mobile/local/primetime fallback where eligible.
-    const NETWORK_STREAM_MAP = {
-      "prime video":["prime","nflplus"],
-      "prime":["prime","nflplus"],
-      "amazon":["prime","nflplus"],
-      "nbc":["peacock","youtubetv","hulu","nflplus"],
-      "peacock":["peacock","nflplus"],
-      "espn":["espn","youtubetv","hulu","nflplus"],
-      "abc":["espn","youtubetv","hulu","nflplus"],
-      "cbs":["paramount","youtubetv","hulu","nflplus"],
-      "paramount":["paramount","nflplus"],
-      "fox":["fox","youtubetv","hulu","nflplus"],
-      "nfl network":["nflnetwork","nflplus","youtubetv","hulu"],
-      "nfln":["nflnetwork","nflplus","youtubetv","hulu"],
-      "youtube":["youtubetv"],
-      "local":["nflplus","youtubetv","hulu"]
-    };
+    const NETWORK_DISTRIBUTION = Object.freeze({
+      CBS: ["paramount","youtubetv","hulu"],
+      NBC: ["peacock","youtubetv","hulu"],
+      FOX_NATIONAL: ["fox","youtubetv","hulu"],
+      FOX_LOCAL: ["youtubetv","hulu"],
+      ESPN: ["espn","youtubetv","hulu"],
+      NFL_NETWORK: ["nflplus","youtubetv","hulu"],
+      PRIME: ["prime"],
+      NETFLIX: ["netflix"],
+      PEACOCK_EXCLUSIVE: ["peacock"]
+    });
+
+    function classifyBroadcastNetwork(game){
+      const names=getBroadcastNames(game);
+      const joined=names.join(" | ").toLowerCase();
+
+      if(joined.includes("netflix")) return "NETFLIX";
+      if(joined.includes("prime video") || joined.includes("amazon prime")) return "PRIME";
+      if(joined.includes("peacock") && !joined.includes("nbc")) return "PEACOCK_EXCLUSIVE";
+      if(joined.includes("nfl network") || joined.includes("nfln")) return "NFL_NETWORK";
+      if(joined.includes("espn")) return "ESPN";
+      if(joined.includes("cbs") || joined.includes("paramount")) return "CBS";
+      if(joined.includes("nbc")) return "NBC";
+
+      // FOX must distinguish the national streaming product from a local affiliate.
+      if(isNationalFoxBroadcast(game)) return "FOX_NATIONAL";
+      if(names.some(name=>/fox/i.test(name))) return "FOX_LOCAL";
+
+      return "UNKNOWN";
+    }
+
+    function baseProvidersForNetwork(game){
+      const networkClass=classifyBroadcastNetwork(game);
+      return {
+        networkClass,
+        providers:[...(NETWORK_DISTRIBUTION[networkClass]||[])]
+      };
+    }
+
 
     const FALLBACK_SCHEDULE = [
       { id:"demo-1", dateTime:"2026-09-10T17:20:00-07:00", awayTeam:"Kansas City Chiefs", awayAbbr:"KC",  awayLogo:"https://a.espncdn.com/i/teamlogos/nfl/500/kc.png",  homeTeam:"Denver Broncos",      homeAbbr:"DEN", homeLogo:"https://a.espncdn.com/i/teamlogos/nfl/500/den.png", network:"Prime Video", status:"scheduled", venue:"Demo Stadium" },
@@ -1359,8 +1378,8 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       const rows=getProviderEvidenceForGame(game);
       const broadcasts=getBroadcastNames(game);
       return `<div class="provider-diagnostics show">
-        <div class="diag-title">PROVIDER DIAGNOSTICS</div>
         <div><b>ESPN broadcasts:</b> ${escapeHtml(broadcasts.join(" · ")||"none")}</div>
+        <div><b>Network class:</b> ${escapeHtml(classifyBroadcastNetwork(game))}</div>
         ${rows.map(e=>`<div class="diag-row"><span class="diag-confidence">${labels[e.confidence]||"?"}</span><span><b>${escapeHtml(providerIconLabel(e.provider))}</b> · ${escapeHtml(e.source)} · ${escapeHtml(e.reason)}</span></div>`).join("")}
       </div>`;
     }
@@ -1432,8 +1451,7 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
           </div>
           ${fantasyBlock}
           ${actionRow}
-          ${renderProviderDiagnostics(game)}
-      </article>`;
+        </article>`;
     }
     function migrateAppData(){
       const previous=Number(localStorage.getItem(APP_DATA_VERSION_KEY)||0);
@@ -1923,6 +1941,13 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
 
     function getProviderEvidenceForGame(game){
       const evidence=[];
+      const classified=baseProvidersForNetwork(game);
+      classified.providers.forEach(provider=>{
+        const confidence = ["PRIME","NETFLIX","NFL_NETWORK"].includes(classified.networkClass)
+          ? PROVIDER_CONFIDENCE.VERIFIED
+          : PROVIDER_CONFIDENCE.STRONG;
+        evidence.push(providerEvidence(provider,confidence,"Network matrix",`${classified.networkClass} distribution`,getBroadcastNames(game)));
+      });
       const names=getBroadcastNames(game);
 
       // ESPN is authoritative for the game schedule, but provider confidence
@@ -1972,32 +1997,31 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
     }
 
     function getProviderKeysForGame(game){
-      const n = getBroadcastNames(game).join(" | ").toLowerCase();
-      let keys = [];
+      const {networkClass,providers}=baseProvidersForNetwork(game);
+      let keys=[...providers];
 
-      // Pass 1: preserve the original ESPN network -> provider detection.
-      Object.keys(NETWORK_STREAM_MAP).forEach(key => {
-        if(key === "fox") return;
-        if(n.includes(key)){ keys = keys.concat(NETWORK_STREAM_MAP[key]); }
-      });
+      // Streaming exclusives / special eligibility are independent additions.
+      if(isParamountPlusGame(game) && networkClass!=="CBS") keys.push("paramount");
+      if(isPeacockGame(game) && !keys.includes("peacock")) keys.push("peacock");
+      if(isNetflixGame(game) && !keys.includes("netflix")) keys.push("netflix");
 
-      // FOX is handled separately so local affiliates such as FOX5 / FOX 5
-      // do not create false-positive FOX Sports / FOX One watch options.
-      if(isNationalFoxBroadcast(game)) keys.push("fox");
-      if(!keys.length) keys = [providerFromNetwork(game.network)];
-
-      // Pass 2: Paramount+ is independent and additive. It never replaces,
-      // merges with, or suppresses providers found from ESPN.
-      if(isParamountPlusGame(game)) keys.push("paramount");
-      if(isPeacockGame(game)) keys.push("peacock");
-      if(isNetflixGame(game)) keys.push("netflix");
+      // DIRECTV is enrichment-only and requires separate verification.
       if(isDirectvGame(game)) keys.push("directv");
 
-      // DIRECTV is a separate additive pass and requires a saved billing ZIP.
-      if(isDirectvGame(game)) keys.push("directv");
+      // NFL+ is conditional. NFL Network is a direct qualifying signal; for other
+      // networks we avoid assuming universal NFL+ availability until local/device
+      // eligibility is positively established.
+      if(networkClass==="NFL_NETWORK" && !keys.includes("nflplus")) keys.push("nflplus");
 
-      const seen = new Set();
-      return keys.filter(key => PROVIDER_LINKS[key] && !seen.has(key) && seen.add(key));
+      // Unknown broadcasts retain a conservative fallback rather than manufacturing
+      // a full distribution set from a loose substring.
+      if(!keys.length){
+        const fallback=providerFromNetwork(game.network);
+        if(fallback && fallback!=="nflplus") keys.push(fallback);
+      }
+
+      const seen=new Set();
+      return keys.filter(key=>PROVIDER_LINKS[key]&&!seen.has(key)&&seen.add(key));
     }
     function renderProviderIcons(providerKeys, primaryKey, game){
       if(!providerKeys.length) return "";
