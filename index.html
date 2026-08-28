@@ -737,6 +737,16 @@
     .sort-tab.has-live .live-filter-dot{display:inline-block}
     .sort-tab[data-sort="live"].active{background:var(--red);color:#fff;border-color:transparent}
 
+
+    .provider-diagnostics{display:none;margin-top:8px;padding:8px 10px;border:1px dashed var(--line);border-radius:10px;background:rgba(255,255,255,.035);font-size:.60rem;line-height:1.45;color:var(--muted)}
+    .provider-diagnostics.show{display:block}
+    .diag-row{display:flex;gap:6px;align-items:flex-start;margin:2px 0}
+    .diag-confidence{font-weight:1000;color:var(--green);min-width:54px}
+
+
+    .provider-diagnostics.show{display:block !important}
+    .diag-title{font-size:.56rem;font-weight:1000;letter-spacing:.10em;color:var(--accent);margin-bottom:5px}
+
   </style>
 </head>
 <body>
@@ -833,7 +843,20 @@
         </div>
       </div>
       <div class="settings-section">
-        <h3 class="settings-section-title">DIRECTV</h3><div class="tv-device-controls"><input id="directvZip" class="tv-device-select" maxlength="5" inputmode="numeric" placeholder="ZIP Code"><button id="directvZipSave" class="tv-scan-btn">Save ZIP</button></div><p id="directvZipHint" class="settings-hint">Verified-first DIRECTV detection. ZIP provides market context; local-network affiliation alone will not create a DTV result.</p></div><div class="settings-section"><h3 class="settings-section-title">Watch on TV</h3>
+        <h3 class="settings-section-title">DIRECTV</h3><div class="tv-device-controls"><input id="directvZip" class="tv-device-select" maxlength="5" inputmode="numeric" placeholder="ZIP Code"><button id="directvZipSave" class="tv-scan-btn">Save ZIP</button></div><p id="directvZipHint" class="settings-hint">Verified-first DIRECTV detection. ZIP provides market context; local-network affiliation alone will not create a DTV result.</p></div><div class="settings-section"><h3 class="settings-section-title">Diagnostics</h3>
+        <div class="tv-cast-toggle">
+          <div class="tv-cast-copy">
+            <div class="tv-cast-label">Provider diagnostics</div>
+            <div class="tv-cast-detail">Shows why each viewing option was detected. Intended for testing false positives.</div>
+          </div>
+          <label class="tv-switch" aria-label="Enable provider diagnostics">
+            <input id="diagnosticsEnabled" type="checkbox">
+            <span class="tv-switch-track"></span>
+          </label>
+        </div>
+      </div>
+      <div class="settings-section">
+        <h3 class="settings-section-title">Watch on TV</h3>
         <div class="tv-cast-row">
           <div class="tv-cast-toggle">
             <div class="tv-cast-copy">
@@ -884,6 +907,9 @@
     const MAX_GAMES_TO_SHOW = 18;
     const SCHEDULE_CACHE_KEY = "nflLauncher.schedule.v2";
     const PROVIDER_PREF_KEY = "nflLauncher.enabledProviders.settings.v3";
+    const APP_DATA_VERSION = 10;
+    const APP_DATA_VERSION_KEY = "nflLauncher.appDataVersion";
+    const PROVIDER_EVIDENCE_CACHE_KEY = "nflLauncher.providerEvidence.v1";
     const PREFERRED_PROVIDER_KEY = "nflLauncher.preferredProvider.v1";
     const NEW_PROVIDER_FILTER_MIGRATION_KEY = "nflLauncher.providers.peacockNetflixDefaultOn.v1";
 const DIRECTV_ZIP_KEY="nflLauncher.directv.zip.v3";
@@ -894,9 +920,10 @@ const DIRECTV_ZIP_KEY="nflLauncher.directv.zip.v3";
     const DEFAULT_ENABLED_PROVIDERS = ["youtubetv","hulu","paramount","directv","peacock","netflix","fox","espn","prime","nflplus"];
 
     // Deep link notes:
-    // - iOS custom URL schemes vary by provider and may change. Keep the web link as the reliable fallback.
-    // - Android intent URLs include browser_fallback_url so unsupported/uninstalled apps can fall back to web.
-    // - Replace app links with verified partner/affiliate links if you have them.
+    // - Mobile launches are native-app-first; HTTPS is fallback only.
+    // - iOS tries the provider custom scheme, then its Universal Link/web URL.
+    // - Android uses an explicit package + native scheme intent with browser fallback.
+    // - Third-party providers control their schemes/app-link associations and may change them.
     //
     // Provider launch targets. Each provider has:
     // - label: readable button/title text
@@ -909,6 +936,7 @@ const DIRECTV_ZIP_KEY="nflLauncher.directv.zip.v3";
         web:"https://www.primevideo.com/sports",
         iosUniversal:"https://www.primevideo.com/sports",
         ios:"aiv://",
+        androidScheme:"aiv",
         androidPackage:"com.amazon.avod.thirdpartyclient"
       },
       peacock: {
@@ -916,6 +944,7 @@ const DIRECTV_ZIP_KEY="nflLauncher.directv.zip.v3";
         web:"https://www.peacocktv.com/sports/nfl",
         iosUniversal:"https://www.peacocktv.com/deeplink",
         ios:"peacocktv://",
+        androidScheme:"peacocktv",
         androidWeb:"https://www.peacocktv.com/deeplink",androidPackage:"com.peacocktv.peacockandroid"
       },
       espn: {
@@ -923,6 +952,7 @@ const DIRECTV_ZIP_KEY="nflLauncher.directv.zip.v3";
         web:"https://www.espn.com/watch/",
         iosUniversal:"https://www.espn.com/watch/",
         ios:"espn://",
+        androidScheme:"espn",
         androidWeb:"https://www.espn.com/watch/",androidPackage:"com.espn.score_center"
       },
       paramount: {
@@ -932,6 +962,7 @@ const DIRECTV_ZIP_KEY="nflLauncher.directv.zip.v3";
         web:"https://www.paramountplus.com/shows/nfl-on-cbs/",
         iosUniversal:"https://www.paramountplus.com/shows/nfl-on-cbs/",
         ios:"paramountplus://",
+        androidScheme:"paramountplus",
         androidPackage:"com.cbs.ca"
       },
       fox: {
@@ -939,6 +970,7 @@ const DIRECTV_ZIP_KEY="nflLauncher.directv.zip.v3";
         web:"https://www.foxsports.com/live",
         iosUniversal:"https://www.foxsports.com/live",
         ios:"foxsports://",
+        androidScheme:"foxsports",
         androidPackage:"com.foxsports.android"
       },
       hulu: {
@@ -946,6 +978,7 @@ const DIRECTV_ZIP_KEY="nflLauncher.directv.zip.v3";
         web:"https://www.hulu.com/nfl",
         iosUniversal:"https://www.hulu.com/nfl",
         ios:"hulu://",
+        androidScheme:"hulu",
         androidPackage:"com.hulu.plus"
       },
       nflnetwork: {
@@ -953,6 +986,7 @@ const DIRECTV_ZIP_KEY="nflLauncher.directv.zip.v3";
         web:"https://www.nfl.com/network/",
         iosUniversal:"https://www.nfl.com/network/",
         ios:"nfl://",
+        androidScheme:"nfl",
         androidWeb:"https://www.nfl.com/",androidPackage:"com.gotv.nflgamecenter.us.lite"
       },
       nflplus: {
@@ -960,15 +994,17 @@ const DIRECTV_ZIP_KEY="nflLauncher.directv.zip.v3";
         web:"https://www.nfl.com/plus/",
         iosUniversal:"https://www.nfl.com/plus/",
         ios:"nfl://",
+        androidScheme:"nfl",
         androidWeb:"https://www.nfl.com/",androidPackage:"com.gotv.nflgamecenter.us.lite"
       },
-      directv: {label:"DIRECTV",web:"https://stream.directv.com/",ios:"directv://",androidPackage:"com.att.tv"},
-      netflix:{label:"Netflix",web:"https://www.netflix.com/",iosUniversal:"https://www.netflix.com/",androidPackage:"com.netflix.mediaclient"},
+      directv: {label:"DIRECTV",web:"https://stream.directv.com/",iosUniversal:"https://stream.directv.com/",ios:"directv://",androidScheme:"directv",androidPackage:"com.att.tv"},
+      netflix:{label:"Netflix",web:"https://www.netflix.com/",iosUniversal:"https://www.netflix.com/",ios:"nflx://",androidScheme:"nflx",androidPackage:"com.netflix.mediaclient"},
       youtubetv: {
         label:"YouTube TV",
         web:"https://tv.youtube.com/",
         iosUniversal:"https://tv.youtube.com/",
         ios:"youtubetv://",
+        androidScheme:"youtubetv",
         androidPackage:"com.google.android.apps.youtube.unplugged"
       }
     };
@@ -1023,7 +1059,9 @@ const DIRECTV_ZIP_KEY="nflLauncher.directv.zip.v3";
     let sortMode = localStorage.getItem("nflLauncher.sortMode") || "kickoff";
     let selectedScheduleWeek = null;
     let scheduleWeeks = [];
+    migrateAppData();
     let enabledProviders = readEnabledProviders();
+    let diagnosticsEnabled = localStorage.getItem("nflLauncher.diagnostics") === "true";
     let preferredProvider = localStorage.getItem(PREFERRED_PROVIDER_KEY) || "auto";
 let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
     let tvCastEnabled = localStorage.getItem(TV_CAST_ENABLED_KEY) === "true";
@@ -1315,6 +1353,18 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       return providerKeys[0];
     }
 
+    function renderProviderDiagnostics(game){
+      if(!diagnosticsEnabled)return "";
+      const labels={3:"VERIFIED",2:"STRONG",1:"INFERRED"};
+      const rows=getProviderEvidenceForGame(game);
+      const broadcasts=getBroadcastNames(game);
+      return `<div class="provider-diagnostics show">
+        <div class="diag-title">PROVIDER DIAGNOSTICS</div>
+        <div><b>ESPN broadcasts:</b> ${escapeHtml(broadcasts.join(" · ")||"none")}</div>
+        ${rows.map(e=>`<div class="diag-row"><span class="diag-confidence">${labels[e.confidence]||"?"}</span><span><b>${escapeHtml(providerIconLabel(e.provider))}</b> · ${escapeHtml(e.source)} · ${escapeHtml(e.reason)}</span></div>`).join("")}
+      </div>`;
+    }
+
     function renderGameCard(game){
       const providerKeys = getEnabledProviderKeysForGame(game);
       const providerKey = getPreferredProviderForGame(providerKeys) || providerFromNetwork(game.network);
@@ -1382,8 +1432,25 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
           </div>
           ${fantasyBlock}
           ${actionRow}
-        </article>`;
+          ${renderProviderDiagnostics(game)}
+      </article>`;
     }
+    function migrateAppData(){
+      const previous=Number(localStorage.getItem(APP_DATA_VERSION_KEY)||0);
+      if(previous===APP_DATA_VERSION)return;
+
+      // Preserve user-controlled preferences: enabled providers, preferred
+      // provider, DIRECTV ZIP and TV-cast settings. Invalidate only derived data.
+      [
+        "nflLauncher.scheduleCache.v1",
+        "nflLauncher.scheduleCache.v2",
+        "nflLauncher.scheduleCache.v3",
+        PROVIDER_EVIDENCE_CACHE_KEY
+      ].forEach(key=>localStorage.removeItem(key));
+
+      localStorage.setItem(APP_DATA_VERSION_KEY,String(APP_DATA_VERSION));
+    }
+
     function readEnabledProviders(){
       try{
         const saved = JSON.parse(localStorage.getItem(PROVIDER_PREF_KEY) || "null");
@@ -1492,6 +1559,15 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
         });
       };
       syncButtons();
+      const diagnosticsEl=document.querySelector("#diagnosticsEnabled");
+      if(diagnosticsEl){
+        diagnosticsEl.checked=diagnosticsEnabled;
+        diagnosticsEl.addEventListener("change",()=>{
+          diagnosticsEnabled=diagnosticsEl.checked;
+          localStorage.setItem("nflLauncher.diagnostics",String(diagnosticsEnabled));
+          renderSchedule();
+        });
+      }
       const preferredProviderEl=document.querySelector("#preferredProvider");
       if(preferredProviderEl){
         preferredProviderEl.value=preferredProvider;
@@ -1568,15 +1644,34 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
     // directv.com/insider/nfl-games-today-on-tv/
     // directv.com/guide/ game-specific listings
     const DIRECTV_PUBLIC_PAGE_VERIFIED=[
-      ["2026-08-22","BUF","CLE"],["2026-08-22","NYG","MIA"],
-      ["2026-08-22","PHI","NE"],["2026-08-22","NO","LAR"],
-      ["2026-08-22","DAL","ARI"],["2026-08-23","SEA","TEN"],
-      ["2026-08-27","PIT","BUF"],["2026-08-27","LAR","LAC"]
+      // High-confidence DIRECTV-carried feeds. Public-page presence alone is
+      // not enough: entries should have channel/market evidence or observed
+      // authenticated-app confirmation.
+      ["2026-08-22","BUF","CLE"],
+      ["2026-08-22","NYG","MIA"],
+      ["2026-08-22","PHI","NE"],
+      ["2026-08-22","NO","LAR"],
+      ["2026-08-22","DAL","ARI"],
+      ["2026-08-23","SEA","TEN"],
+      ["2026-08-27","PIT","BUF"],
+      ["2026-08-27","SF","LV"],   // authenticated DIRECTV app observed
+      ["2026-08-27","LAR","LAC"]  // authenticated DIRECTV app observed
     ];
+    const DIRECTV_PUBLIC_ONLY_EXCLUSIONS=[
+      ["2026-08-27","NE","CLE"] // public web surfaced it; authenticated app did not
+    ];
+
+    function isDirectvExcluded(game){
+      const d=localGameDate(game);
+      return DIRECTV_PUBLIC_ONLY_EXCLUSIONS.some(x=>x[0]===d&&matchup(game,x[1],x[2]));
+    }
+
     function isDirectvGame(game){
       if(!/^\d{5}$/.test(directvZip))return false;
+      if(isDirectvExcluded(game))return false;
       const d=localGameDate(game);
-      // ESPN broadcast metadata is informative but never sufficient by itself.
+      // DIRECTV is enrichment-only. ESPN creates the game and describes broadcasts,
+      // but can never create a DTV result. DTV requires separate verification.
       return DIRECTV_PUBLIC_PAGE_VERIFIED.some(x=>x[0]===d&&matchup(game,x[1],x[2]));
     }
 
@@ -1786,14 +1881,109 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       return Array.from(new Set(names));
     }
 
+    function isNationalFoxBroadcast(game){
+      if(localGameDate(game)==="2026-08-27" && matchup(game,"SF","LV")) return false;
+      const names=getBroadcastNames(game).map(name=>String(name).trim()).filter(Boolean);
+      const normalized=names.map(name=>name.toLowerCase());
+
+      const hasExplicitNational=normalized.some(n =>
+        n==="fox" ||
+        n==="fox sports" ||
+        n==="fox one" ||
+        n.startsWith("fox sports ") ||
+        n.includes("fox one")
+      );
+
+      const hasLocalAffiliate=names.some(name => {
+        const n=name.toLowerCase();
+        return (
+          /\bfox\s*\d+\b/i.test(name) ||          // FOX 5 / FOX5
+          /^[kw][a-z0-9]{2,4}$/i.test(name) ||   // KSWB / WFLA-style callsign
+          /^[kw][a-z0-9]{2,4}\s+fox/i.test(name) ||
+          /\b(local|affiliate)\b/i.test(name) ||
+          /\bfox\s+[a-z]{2,}\b/i.test(name) && !n.includes("fox sports") && !n.includes("fox one")
+        );
+      });
+
+      // If ESPN exposes both a generic FOX label and local-affiliate metadata,
+      // treat the matchup as local-only unless another trusted FOX-specific
+      // verifier is added later.
+      return hasExplicitNational && !hasLocalAffiliate;
+    }
+
+    const PROVIDER_CONFIDENCE = Object.freeze({
+      VERIFIED:3,
+      STRONG:2,
+      INFERRED:1
+    });
+
+    function providerEvidence(provider,confidence,source,reason,details=[]){
+      return {provider,confidence,source,reason,details};
+    }
+
+    function getProviderEvidenceForGame(game){
+      const evidence=[];
+      const names=getBroadcastNames(game);
+
+      // ESPN is authoritative for the game schedule, but provider confidence
+      // depends on how directly its broadcast metadata identifies the service.
+      if(isNationalFoxBroadcast(game)){
+        evidence.push(providerEvidence("fox",PROVIDER_CONFIDENCE.STRONG,"ESPN","National FOX / FOX Sports / FOX One broadcast",names));
+      }
+      if(gameHasBroadcast(game,["peacock","nbc"])){
+        evidence.push(providerEvidence("peacock",PROVIDER_CONFIDENCE.STRONG,"ESPN","NBC/Peacock broadcast metadata",names));
+      }
+      if(gameHasBroadcast(game,["paramount"])){
+        evidence.push(providerEvidence("paramount",PROVIDER_CONFIDENCE.VERIFIED,"ESPN","Paramount+ explicitly identified",names));
+      }else if(isParamountPlusGame(game)){
+        evidence.push(providerEvidence("paramount",PROVIDER_CONFIDENCE.STRONG,"CBS/Paramount rule","CBS/Paramount eligibility rule matched",names));
+      }
+      if(gameHasBroadcast(game,["prime video","amazon prime","prime"])){
+        evidence.push(providerEvidence("prime",PROVIDER_CONFIDENCE.VERIFIED,"ESPN","Prime Video explicitly identified",names));
+      }
+      if(isNetflixGame(game)){
+        evidence.push(providerEvidence("netflix",PROVIDER_CONFIDENCE.VERIFIED,"Netflix schedule","Known Netflix NFL game or ESPN Netflix metadata",names));
+      }
+      if(gameHasBroadcast(game,["espn"])){
+        evidence.push(providerEvidence("espn",PROVIDER_CONFIDENCE.STRONG,"ESPN","ESPN broadcast metadata",names));
+      }
+      if(gameHasBroadcast(game,["nfl network","nfln"])){
+        evidence.push(providerEvidence("nflplus",PROVIDER_CONFIDENCE.STRONG,"ESPN","NFL Network/NFL+ broadcast metadata",names));
+      }
+
+      // DIRECTV is enrichment-only: ESPN never creates DTV evidence by itself.
+      if(isDirectvGame(game)){
+        evidence.push(providerEvidence("directv",PROVIDER_CONFIDENCE.VERIFIED,"DIRECTV public verification","Matchup passed verified DIRECTV rule",names));
+      }
+      return evidence;
+    }
+
+    function getProviderConfidence(game,key){
+      const aliases={nflnetwork:"nflplus"};
+      const target=aliases[key]||key;
+      return getProviderEvidenceForGame(game)
+        .filter(e=>e.provider===target)
+        .reduce((max,e)=>Math.max(max,e.confidence),0);
+    }
+
+    function gameHasBroadcast(game,patterns){
+      const haystack=getBroadcastNames(game).join(" | ").toLowerCase();
+      return patterns.some(pattern=>haystack.includes(String(pattern).toLowerCase()));
+    }
+
     function getProviderKeysForGame(game){
       const n = getBroadcastNames(game).join(" | ").toLowerCase();
       let keys = [];
 
       // Pass 1: preserve the original ESPN network -> provider detection.
       Object.keys(NETWORK_STREAM_MAP).forEach(key => {
+        if(key === "fox") return;
         if(n.includes(key)){ keys = keys.concat(NETWORK_STREAM_MAP[key]); }
       });
+
+      // FOX is handled separately so local affiliates such as FOX5 / FOX 5
+      // do not create false-positive FOX Sports / FOX One watch options.
+      if(isNationalFoxBroadcast(game)) keys.push("fox");
       if(!keys.length) keys = [providerFromNetwork(game.network)];
 
       // Pass 2: Paramount+ is independent and additive. It never replaces,
@@ -1912,9 +2102,33 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       return hit ? NETWORK_TO_PROVIDER[hit] : "nflplus";
     }
 
-    // Opens the selected provider. iOS tries the app scheme first, then falls
-    // back to the web URL if the app does not appear to open. Android uses an
-    // intent URL with a browser fallback. Desktop opens the web URL.
+    function getProviderGameWebUrl(providerKey,provider,game){
+      const id=encodeURIComponent(String(game?.id||""));
+
+      // These providers have stable event/sports URL patterns that can accept
+      // game context. If a provider changes the route, provider.web remains the
+      // safe fallback.
+      const candidates={
+        espn: id ? `https://www.espn.com/watch/player/_/eventCalendarId/${id}` : "",
+        nflplus: id ? `https://www.nfl.com/games/${encodeURIComponent(String(game.awayAbbr||"").toLowerCase())}-at-${encodeURIComponent(String(game.homeAbbr||"").toLowerCase())}-${localGameDate(game)}` : "",
+        nflnetwork: provider.web,
+        netflix: provider.web,
+        prime: provider.web,
+        paramount: provider.web,
+        peacock: provider.web,
+        fox: provider.web,
+        directv: provider.web,
+        youtubetv: provider.web,
+        hulu: provider.web
+      };
+      return candidates[providerKey]||provider.web;
+    }
+
+    // Mobile launch policy:
+    // 1) Try the provider's native app scheme first.
+    // 2) If the app is not installed / the scheme is not handled, fall back to
+    //    the provider's Universal/App Link, then ordinary HTTPS.
+    // Desktop continues to open the web target.
     async function openProvider(providerKey, game){
       const provider = PROVIDER_LINKS[providerKey] || PROVIDER_LINKS.nflplus;
       if(tvCastEnabled && selectedTvDeviceId){
@@ -1922,23 +2136,52 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
         if(handledByTv) return;
         showToast("TV launch unavailable - opening on phone");
       }
-      const webUrl = addTracking(provider.web, game.id);
-      const targetUrl = getPlatformUrl(provider, webUrl, game);
+
+      const webUrl = addTracking(getProviderGameWebUrl(providerKey,provider,game), game.id);
       showToast(`Opening ${provider.label}`);
 
-      if(DEVICE.isAndroid && targetUrl.startsWith("intent://")){
-        window.location.href = targetUrl;
+      if(DEVICE.isAndroid){
+        window.location.href = buildAndroidAppIntent(provider, webUrl, game);
         return;
       }
 
       if(DEVICE.isIOS){
-        // Universal Link: iOS opens the associated app when installed and the
-        // provider claims this path; otherwise Safari opens the same HTTPS URL.
-        window.location.href = targetUrl;
+        launchIOSAppFirst(provider, webUrl);
         return;
       }
 
       window.open(webUrl, "_blank", "noopener,noreferrer");
+    }
+
+    function launchIOSAppFirst(provider, webUrl){
+      const nativeUrl = provider.ios;
+      const fallbackUrl = provider.iosUniversal || webUrl;
+
+      // Providers without a known native scheme still use their Universal Link.
+      if(!nativeUrl){
+        window.location.href = fallbackUrl;
+        return;
+      }
+
+      let leftPage = false;
+      const markLeft = () => {
+        if(document.visibilityState === "hidden") leftPage = true;
+      };
+      const pageHide = () => { leftPage = true; };
+
+      document.addEventListener("visibilitychange", markLeft, {once:true});
+      window.addEventListener("pagehide", pageHide, {once:true});
+
+      // Native scheme first. If the installed app accepts it, iOS switches apps.
+      window.location.href = nativeUrl;
+
+      // Only fall back if the page stayed visible, which means iOS did not hand
+      // the request to the native app.
+      setTimeout(() => {
+        if(!leftPage && document.visibilityState !== "hidden"){
+          window.location.href = fallbackUrl;
+        }
+      }, 1400);
     }
 
     function updateHeaderOffset(){
@@ -1962,10 +2205,20 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
 
     function buildAndroidAppIntent(provider, webUrl, game){
       if(!provider.androidPackage) return webUrl;
+
+      // Netflix supports its own nflx scheme and can optionally target a title.
       if(provider.androidPackage==="com.netflix.mediaclient"){
         const appUrl=getNetflixAndroidUrl(game).replace(/^nflx:\/\//,"");
-        return `intent://${appUrl}#Intent;scheme=nflx;package=${provider.androidPackage};S.browser_fallback_url=${encodeURIComponent(webUrl)};end`;
+        return `intent://${appUrl}#Intent;scheme=nflx;package=${provider.androidPackage};action=android.intent.action.VIEW;category=android.intent.category.BROWSABLE;S.browser_fallback_url=${encodeURIComponent(webUrl)};end`;
       }
+
+      // Prefer the provider's native scheme so Chrome does not claim the HTTPS
+      // URL before Android has a chance to route it to the installed app.
+      if(provider.androidScheme){
+        return `intent://open#Intent;scheme=${provider.androidScheme};package=${provider.androidPackage};action=android.intent.action.VIEW;category=android.intent.category.BROWSABLE;S.browser_fallback_url=${encodeURIComponent(provider.androidWeb||webUrl)};end`;
+      }
+
+      // Last resort: explicit package-targeted HTTPS App Link.
       const target=provider.androidWeb||webUrl;
       const u=new URL(target);
       return `intent://${u.host}${u.pathname}${u.search}#Intent;scheme=https;package=${provider.androidPackage};action=android.intent.action.VIEW;category=android.intent.category.BROWSABLE;S.browser_fallback_url=${encodeURIComponent(webUrl)};end`;
@@ -1976,7 +2229,7 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
         return buildAndroidAppIntent(provider, webUrl, game);
       }
       if(DEVICE.isIOS){
-        return provider.iosUniversal || webUrl;
+        return provider.ios || provider.iosUniversal || webUrl;
       }
       return webUrl;
     }
