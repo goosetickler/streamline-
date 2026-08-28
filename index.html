@@ -1097,8 +1097,13 @@
     const MAX_GAMES_TO_SHOW = 18;
     const SCHEDULE_CACHE_KEY = "nflLauncher.schedule.v2";
     const PROVIDER_PREF_KEY = "nflLauncher.enabledProviders.settings.v5";
-    const APP_DATA_VERSION = 11;
+    const APP_DATA_VERSION = 12;
     const APP_DATA_VERSION_KEY = "nflLauncher.appDataVersion";
+    const SEASON_CACHE_KEY="nflLauncher.seasonSchedule.v1";
+    const SEASON_CACHE_TTL_MS=12*60*60*1000;
+    const WEEK_STATE_CACHE_KEY="nflLauncher.weekState.v1";
+    const PREGAME_REFRESH_MS=5*60*1000;
+    const LIVE_REFRESH_MS=30*1000;
     const PROVIDER_EVIDENCE_CACHE_KEY = "nflLauncher.providerEvidence.v1";
     const PREFERRED_PROVIDER_KEY = "nflLauncher.preferredProvider.v1";
     const NEW_PROVIDER_FILTER_MIGRATION_KEY = "nflLauncher.providers.peacockNetflixDefaultOn.v1";
@@ -1401,6 +1406,88 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
     // Pulls ESPN data and normalizes it into this app's simple game model.
     // Starts with the season-level request, then falls back to week-by-week
     // requests if not enough playable games are returned.
+    function readSeasonScheduleCache(){
+      try{
+        const saved=JSON.parse(localStorage.getItem(SEASON_CACHE_KEY)||"null");
+        if(!saved?.games?.length)return null;
+        return {
+          games:saved.games,
+          savedAt:Number(saved.savedAt||0),
+          fresh:Date.now()-Number(saved.savedAt||0)<SEASON_CACHE_TTL_MS
+        };
+      }catch(_){return null}
+    }
+
+    function writeSeasonScheduleCache(games){
+      try{
+        localStorage.setItem(SEASON_CACHE_KEY,JSON.stringify({
+          savedAt:Date.now(),
+          games
+        }));
+      }catch(_){}
+    }
+
+    function mergeDynamicGameState(base,update){
+      // Schedule identity/broadcast metadata remains from the long-lived season
+      // cache. Only volatile scoreboard state is refreshed.
+      return {
+        ...base,
+        homeScore:update.homeScore,
+        awayScore:update.awayScore,
+        status:update.status,
+        statusDetail:update.statusDetail,
+        period:update.period,
+        clock:update.clock,
+        possessionAbbr:update.possessionAbbr,
+        homeTimeouts:update.homeTimeouts,
+        awayTimeouts:update.awayTimeouts,
+        homeRecord:update.homeRecord||base.homeRecord,
+        awayRecord:update.awayRecord||base.awayRecord,
+        broadcasts:update.broadcasts?.length?update.broadcasts:base.broadcasts,
+        network:update.network&&update.network!=="TBD"?update.network:base.network
+      };
+    }
+
+    function mergeWeekState(updates){
+      if(!Array.isArray(updates)||!updates.length)return;
+      const byId=new Map(updates.map(g=>[String(g.id),g]));
+      allGames=allGames.map(game=>{
+        // Final games are immutable for our purposes; do not repeatedly rewrite them.
+        if(isFinalGame(game))return game;
+        const update=byId.get(String(game.id));
+        return update?mergeDynamicGameState(game,update):game;
+      });
+    }
+
+    function getCurrentWeekDescriptor(){
+      buildScheduleWeeks();
+      const current=findCurrentScheduleWeek();
+      return current?{type:current.type,week:current.week,key:current.key}:null;
+    }
+
+    async function fetchCurrentWeekState(){
+      const current=getCurrentWeekDescriptor();
+      if(!current)return [];
+
+      // Once every game in the current week is final there is no score state left
+      // worth polling.
+      const currentGames=allGames.filter(g=>scheduleWeekKey(g)===current.key);
+      if(currentGames.length && currentGames.every(isFinalGame))return [];
+
+      const url=`https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard?limit=100&dates=${getSeasonYear()}&seasontype=${current.type}&week=${current.week}`;
+      try{
+        const raw=await fetchJson(url);
+        const updates=normalizeEspn(raw,new Set());
+        // Ignore already-final games before merge to minimize processing.
+        return updates.filter(update=>{
+          const existing=allGames.find(g=>String(g.id)===String(update.id));
+          return !existing || !isFinalGame(existing);
+        });
+      }catch(_){
+        return [];
+      }
+    }
+
     async function fetchEspnSchedule(){
       const urls = buildEspnUrls();
       const seen = new Set();
@@ -1837,6 +1924,11 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
 
       push(typeof classifyBroadcastNetwork==="function"?"pass":"fail","Network classifier","classifier v3 available");
       push(Array.isArray(allGames)&&allGames.length?"pass":"warn","ESPN schedule",`${allGames.length||0} games loaded`);
+      const seasonCache=readSeasonScheduleCache();
+      push(seasonCache?.games?.length?"pass":"warn","Season cache",seasonCache?.games?.length?`${seasonCache.games.length} games · ${seasonCache.fresh?"fresh":"stale"}`:"not populated");
+      const currentDescriptor=getCurrentWeekDescriptor();
+      const currentGames=currentDescriptor?allGames.filter(g=>scheduleWeekKey(g)===currentDescriptor.key):[];
+      push(currentGames.length?"pass":"warn","Score polling scope",currentGames.length?`${currentGames.filter(g=>!isFinalGame(g)).length} non-final current-week games eligible for updates`:"no current week");
 
       const contradictions=allGames.filter(game=>{
         const dtv=getDirectvEligibility(game);
@@ -1894,16 +1986,14 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       showToast(results.some(r=>r.status==="fail")?"Diagnostics found an issue":"Diagnostic self test complete");
     }
 
-    function refreshDerivedData(){
-      // Preserve all user-controlled Settings. Clear only derived schedule/data caches.
-      [
-        "nflLauncher.scheduleCache.v1",
-        "nflLauncher.scheduleCache.v2",
-        "nflLauncher.scheduleCache.v3",
-        "nflLauncher.providerEvidence.v1"
-      ].forEach(key=>localStorage.removeItem(key));
-      showToast("Refreshing schedule data");
-      fetchSchedule();
+    async function refreshDerivedData(){
+      // Preserve user settings; invalidate only downloaded schedule/state data.
+      [SEASON_CACHE_KEY,WEEK_STATE_CACHE_KEY,
+       "nflLauncher.scheduleCache.v1","nflLauncher.scheduleCache.v2","nflLauncher.scheduleCache.v3",
+       "nflLauncher.providerEvidence.v1"].forEach(key=>localStorage.removeItem(key));
+      showToast("Refreshing full NFL schedule");
+      await refreshFullSeasonSchedule({manual:true});
+      scheduleScoreRefresh();
     }
 
     function buildProviderTestList(){
@@ -2847,11 +2937,84 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       const labels = { kickoff:"Games", live:"Live", final:"Results" };
       if(sortHintEl) sortHintEl.textContent = labels[sortMode] || labels.kickoff;
     }
-    function scheduleLiveRefresh(){
-      clearTimeout(liveRefreshTimer);
-      if(allGames.some(isLiveGame)){
-        liveRefreshTimer = setTimeout(fetchSchedule, 30000);
+    let scoreRefreshTimer=null;
+
+    function clearScoreRefresh(){
+      clearTimeout(scoreRefreshTimer);
+      scoreRefreshTimer=null;
+    }
+
+    function scheduleScoreRefresh(){
+      clearScoreRefresh();
+      const current=getCurrentWeekDescriptor();
+      if(!current)return;
+      const games=allGames.filter(g=>scheduleWeekKey(g)===current.key);
+      if(!games.length || games.every(isFinalGame))return;
+
+      const hasLive=games.some(isLiveGame);
+      const now=Date.now();
+      const hasNearKickoff=games.some(g=>{
+        if(isFinalGame(g))return false;
+        const kickoff=new Date(g.dateTime).getTime();
+        return kickoff-now<6*60*60*1000 && kickoff-now>-60*60*1000;
+      });
+
+      // 30s only while a game is actually live. Otherwise 5m when games are
+      // approaching; no high-frequency polling for distant future games.
+      const delay=hasLive?LIVE_REFRESH_MS:(hasNearKickoff?PREGAME_REFRESH_MS:15*60*1000);
+      scoreRefreshTimer=setTimeout(refreshCurrentWeekState,delay);
+    }
+
+    async function refreshCurrentWeekState(){
+      const updates=await fetchCurrentWeekState();
+      if(updates.length){
+        mergeWeekState(updates);
+        renderWeekNavigator();
+        renderSchedule();
       }
+      scheduleScoreRefresh();
+    }
+
+    async function refreshFullSeasonSchedule({manual=false}={}){
+      try{
+        const games=await fetchEspnSchedule();
+        if(games?.length){
+          allGames=games;
+          writeSeasonScheduleCache(games);
+          renderWeekNavigator();
+          renderSchedule();
+          await refreshCurrentWeekState();
+          return true;
+        }
+      }catch(_){}
+      if(manual)showToast("Schedule refresh failed - using cached data");
+      return false;
+    }
+
+    async function bootstrapSchedule(){
+      const cached=readSeasonScheduleCache();
+
+      // Instant startup from local season cache.
+      if(cached?.games?.length){
+        allGames=cached.games;
+        renderWeekNavigator();
+        renderSchedule();
+      }
+
+      // Full season schedule is relatively static. Refresh only when missing or
+      // older than 12 hours.
+      if(!cached || !cached.fresh){
+        await refreshFullSeasonSchedule();
+      }else{
+        // Fresh cache: only pull volatile current-week score/status data.
+        await refreshCurrentWeekState();
+      }
+      scheduleScoreRefresh();
+    }
+
+    function scheduleLiveRefresh(){
+      // Compatibility shim: optimized current-week scheduler owns polling now.
+      scheduleScoreRefresh();
     }
     updatePlatformUi();
     updateHeaderOffset();
@@ -2865,8 +3028,8 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
     weekNextBtnEl?.addEventListener("click",()=>scrollWeekTimeline(1));
     initSortControls();
     initSettingsControls();
-    document.querySelector("#refreshBtn").addEventListener("click", fetchSchedule);
-    fetchSchedule();
+    document.querySelector("#refreshBtn").addEventListener("click", async()=>{showToast("Updating game data");await refreshCurrentWeekState();});
+    bootstrapSchedule();
   </script>
 
   <div id="providerTestModal" class="provider-test-modal" aria-hidden="true">
