@@ -1156,7 +1156,12 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
         const competitors = competition.competitors || [];
         const home = competitors.find(c => c.homeAway === "home") || {};
         const away = competitors.find(c => c.homeAway === "away") || {};
-        const broadcast = competition.broadcasts?.[0]?.names?.[0] || competition.broadcasts?.[0]?.shortName || "TBD";
+        const broadcastEntries = Array.isArray(competition.broadcasts) ? competition.broadcasts : [];
+        const broadcasts = broadcastEntries.flatMap(entry => {
+          const names = Array.isArray(entry?.names) && entry.names.length ? entry.names : [entry?.shortName || entry?.name || ""];
+          return names.filter(Boolean).map(name => ({name:String(name),shortName:String(entry?.shortName||""),market:String(entry?.market||entry?.type?.name||""),type:String(entry?.type?.name||"")}));
+        });
+        const broadcast = broadcasts[0]?.name || "TBD";
         const id = event.id || event.uid || `${away.team?.abbreviation}-${home.team?.abbreviation}-${event.date}`;
         if(seen.has(id)) return null;
         seen.add(id);
@@ -1174,6 +1179,7 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
           homeRecord:home.records?.[0]?.summary || "",
           awayRecord: away.records?.[0]?.summary || "",
           network: broadcast,
+          broadcasts,
           status: (event.status?.type?.state || event.status?.type?.name || "scheduled").toLowerCase(),
           statusDetail: event.status?.type?.shortDetail || event.status?.type?.detail || "",
           period: event.status?.period || event.status?.type?.period || "",
@@ -1556,18 +1562,22 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       );
     }
 
+    // Verified from stable DIRECTV-owned public schedule/guide pages.
+    // Sources used to maintain this table:
+    // directv.com/sports-info/football/nfl
+    // directv.com/insider/nfl-games-today-on-tv/
+    // directv.com/guide/ game-specific listings
+    const DIRECTV_PUBLIC_PAGE_VERIFIED=[
+      ["2026-08-22","BUF","CLE"],["2026-08-22","NYG","MIA"],
+      ["2026-08-22","PHI","NE"],["2026-08-22","NO","LAR"],
+      ["2026-08-22","DAL","ARI"],["2026-08-23","SEA","TEN"],
+      ["2026-08-27","PIT","BUF"],["2026-08-27","LAR","LAC"]
+    ];
     function isDirectvGame(game){
-      if(!/^\d{5}$/.test(directvZip)) return false;
-
-      // First use DIRECTV-specific matchup evidence.
-      if(isDirectvVerifiedMatchup(game)) return true;
-
-      // Then fall back to ESPN's network metadata for networks DIRECTV carries.
-      const n = String(game.network || "").toLowerCase().replace(/[^a-z0-9]+/g," ").trim();
-      return [
-        "abc","cbs","fox","nbc","espn",
-        "nfl network","nfln","nfl network national"
-      ].some(x => n.includes(x));
+      if(!/^\d{5}$/.test(directvZip))return false;
+      const d=localGameDate(game);
+      // ESPN broadcast metadata is informative but never sufficient by itself.
+      return DIRECTV_PUBLIC_PAGE_VERIFIED.some(x=>x[0]===d&&matchup(game,x[1],x[2]));
     }
 
     function localGameDate(g){const d=new Date(g.dateTime);return Number.isNaN(d.getTime())?"":`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;}
@@ -1770,8 +1780,14 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       );
     }
 
+    function getBroadcastNames(game){
+      const names=Array.isArray(game.broadcasts)?game.broadcasts.map(x=>String(x?.name||x?.shortName||"")).filter(Boolean):[];
+      if(game.network)names.push(String(game.network));
+      return Array.from(new Set(names));
+    }
+
     function getProviderKeysForGame(game){
-      const n = String(game.network || "").toLowerCase();
+      const n = getBroadcastNames(game).join(" | ").toLowerCase();
       let keys = [];
 
       // Pass 1: preserve the original ESPN network -> provider detection.
