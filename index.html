@@ -747,6 +747,55 @@
     .provider-diagnostics.show{display:block !important}
     .diag-title{font-size:.56rem;font-weight:1000;letter-spacing:.10em;color:var(--accent);margin-bottom:5px}
 
+
+    .dtv-diag{margin-top:6px;padding-top:6px;border-top:1px solid rgba(255,255,255,.08)}
+    .dtv-diag .diag-confidence{min-width:92px}
+    .diag-rejected{color:#ff9aa9}
+
+    .dtv-diagnostic-block{margin-top:6px;padding-top:6px;border-top:1px solid rgba(255,255,255,.08)}
+    .dtv-diagnostic-block .dtv-diag{margin-top:0;padding-top:0;border-top:0}
+    .dtv-zip-row{margin-top:4px}.dtv-zip-row .diag-confidence{color:var(--accent);min-width:92px}
+    .dtv-package-setting{display:flex;align-items:center;justify-content:space-between;gap:14px;margin:10px 0}
+    .dtv-package-row{margin-top:4px}
+    .dtv-render-row{margin-top:4px}.dtv-render-row .diag-confidence{color:var(--accent);min-width:92px}
+
+    .diagnostic-tools{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:10px}
+    .diag-tool-btn{border:1px solid var(--line);background:var(--panel-2);color:var(--text);border-radius:10px;padding:9px 7px;font:900 .64rem/1 system-ui;letter-spacing:.02em;cursor:pointer}
+    .diagnostic-selftest-results{display:none;margin-top:8px;padding:9px 10px;border:1px solid var(--line);border-radius:10px;background:rgba(255,255,255,.03);font-size:.62rem;line-height:1.5}
+    .diagnostic-selftest-results.show{display:block}
+    .selftest-pass{color:var(--green);font-weight:900}.selftest-fail{color:#ff8297;font-weight:900}.selftest-warn{color:#ffd166;font-weight:900}
+    .provider-test-modal{position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.72);display:none;align-items:flex-end;justify-content:center;padding:12px}
+    .provider-test-modal.open{display:flex}
+    .provider-test-panel{width:min(620px,100%);max-height:82vh;overflow:auto;background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:14px}
+    .provider-test-header{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-bottom:12px}
+    .provider-test-title{font-weight:1000;font-size:.92rem}.provider-test-subtitle{color:var(--muted);font-size:.65rem;margin-top:3px}
+    .provider-test-close{width:34px;height:34px;border-radius:10px;border:1px solid var(--line);background:var(--panel-2);color:var(--text);font-size:1.25rem}
+    .provider-test-list{display:grid;gap:7px}
+    .provider-test-row{display:grid;grid-template-columns:1fr auto;align-items:center;gap:10px;padding:9px 10px;border:1px solid var(--line);border-radius:11px;background:rgba(255,255,255,.025)}
+    .provider-test-name{font-weight:900;font-size:.72rem}.provider-test-meta{font-size:.58rem;color:var(--muted);margin-top:2px;overflow-wrap:anywhere}
+    .provider-test-open{border:0;border-radius:9px;padding:8px 12px;background:var(--accent);color:#07111d;font-weight:1000;font-size:.64rem}
+    .provider-diagnostics{font-size:.61rem;line-height:1.5}
+    .diag-summary{display:grid;grid-template-columns:auto 1fr;gap:2px 8px;margin-bottom:7px}
+    .diag-label{color:var(--accent);font-weight:1000;letter-spacing:.03em}
+    .diag-provider-list{border-top:1px solid rgba(255,255,255,.08);padding-top:6px;margin-top:6px}
+    .diag-dtv-summary{border-top:1px solid rgba(255,255,255,.08);padding-top:6px;margin-top:7px}
+    @media(max-width:520px){.diagnostic-tools{grid-template-columns:1fr}.provider-test-modal{padding:6px}}
+
+
+    body.provider-test-open{overflow:hidden}
+    .provider-test-close{position:relative;z-index:2;cursor:pointer;touch-action:manipulation}
+    .provider-test-done{width:100%;margin-top:12px;border:1px solid var(--line);border-radius:11px;padding:11px;background:var(--panel-2);color:var(--text);font-weight:1000;cursor:pointer;touch-action:manipulation}
+
+
+    .selftest-item+.selftest-item{margin-top:5px}
+    .selftest-detail-list{margin:6px 0 8px 0;border-left:2px solid rgba(255,209,102,.35);padding-left:8px}
+    .selftest-detail-row{display:grid;grid-template-columns:64px 82px 76px 1fr;gap:6px;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.055);font-size:.58rem;align-items:start}
+    .selftest-week{font-weight:1000;color:#ffd166}
+    .selftest-matchup{font-weight:900;color:var(--text)}
+    .selftest-date{color:var(--muted)}
+    .selftest-broadcast{color:var(--accent);overflow-wrap:anywhere}
+    @media(max-width:520px){.selftest-detail-row{grid-template-columns:58px 72px 1fr}.selftest-broadcast{grid-column:1/-1;padding-left:0}}
+
   </style>
 </head>
 <body>
@@ -843,7 +892,7 @@
         </div>
       </div>
       <div class="settings-section">
-        <h3 class="settings-section-title">DIRECTV</h3><div class="tv-device-controls"><input id="directvZip" class="tv-device-select" maxlength="5" inputmode="numeric" placeholder="ZIP Code"><button id="directvZipSave" class="tv-scan-btn">Save ZIP</button></div><p id="directvZipHint" class="settings-hint">Verified-first DIRECTV detection. ZIP provides market context; local-network affiliation alone will not create a DTV result.</p></div><div class="settings-section"><h3 class="settings-section-title">Diagnostics</h3>
+        <h3 class="settings-section-title">DIRECTV</h3><div class="tv-device-controls"><input id="directvZip" class="tv-device-select" maxlength="5" inputmode="numeric" placeholder="ZIP Code"><button id="directvZipSave" class="tv-scan-btn">Save ZIP</button></div><div class="dtv-package-setting"><div><div class="tv-cast-label">DIRECTV NFL / Sports Package</div><div class="tv-cast-detail">Include NFL Network games that require an additional DIRECTV sports entitlement.</div></div><label class="tv-switch"><input id="directvNflPackage" type="checkbox"><span class="tv-switch-track"></span></label></div><p id="directvZipHint" class="settings-hint">Verified-first DIRECTV detection. ZIP provides market context; local-network affiliation alone will not create a DTV result.</p></div><div class="settings-section"><h3 class="settings-section-title">Diagnostics</h3>
         <div class="tv-cast-toggle">
           <div class="tv-cast-copy">
             <div class="tv-cast-label">Provider diagnostics</div>
@@ -854,6 +903,12 @@
             <span class="tv-switch-track"></span>
           </label>
         </div>
+        <div class="diagnostic-tools">
+          <button id="runDiagnosticSelfTest" class="diag-tool-btn" type="button">Run Self Test</button>
+          <button id="refreshDerivedData" class="diag-tool-btn" type="button">Refresh Data</button>
+          <button id="openProviderTest" class="diag-tool-btn" type="button">Test App Links</button>
+        </div>
+        <div id="diagnosticSelfTestResults" class="diagnostic-selftest-results" aria-live="polite"></div>
       </div>
       <div class="settings-section">
         <h3 class="settings-section-title">Watch on TV</h3>
@@ -906,13 +961,16 @@
     const ESPN_SUMMARY_BASE = "https://site.web.api.espn.com/apis/site/v2/sports/football/nfl/summary";
     const MAX_GAMES_TO_SHOW = 18;
     const SCHEDULE_CACHE_KEY = "nflLauncher.schedule.v2";
-    const PROVIDER_PREF_KEY = "nflLauncher.enabledProviders.settings.v3";
-    const APP_DATA_VERSION = 10;
+    const PROVIDER_PREF_KEY = "nflLauncher.enabledProviders.settings.v5";
+    const APP_DATA_VERSION = 11;
     const APP_DATA_VERSION_KEY = "nflLauncher.appDataVersion";
     const PROVIDER_EVIDENCE_CACHE_KEY = "nflLauncher.providerEvidence.v1";
     const PREFERRED_PROVIDER_KEY = "nflLauncher.preferredProvider.v1";
     const NEW_PROVIDER_FILTER_MIGRATION_KEY = "nflLauncher.providers.peacockNetflixDefaultOn.v1";
 const DIRECTV_ZIP_KEY="nflLauncher.directv.zip.v3";
+    const DIRECTV_NFL_PACKAGE_KEY="nflLauncher.directv.nflPackage.v1";
+    const DIRECTV_PUBLIC_SCHEDULE_CACHE_KEY="nflLauncher.directv.publicSchedule.v1";
+    const DIRECTV_PUBLIC_SCHEDULE_TTL_MS=6*60*60*1000;
     const PROVIDER_MIGRATION_V2_KEY = "nflLauncher.providers.migrated.directv.v2";
     const TV_CAST_ENABLED_KEY = "nflLauncher.tvCast.enabled.v1";
     const TV_CAST_DEVICE_KEY = "nflLauncher.tvCast.device.v1";
@@ -1030,34 +1088,56 @@ const DIRECTV_ZIP_KEY="nflLauncher.directv.zip.v3";
     // - FOX maps to games televised on FOX via FOX Sports / FOX One.
     // - NFL+ is included as a mobile/local/primetime fallback where eligible.
     const NETWORK_DISTRIBUTION = Object.freeze({
-      CBS: ["paramount","youtubetv","hulu"],
-      NBC: ["peacock","youtubetv","hulu"],
-      FOX_NATIONAL: ["fox","youtubetv","hulu"],
-      FOX_LOCAL: ["youtubetv","hulu"],
-      ESPN: ["espn","youtubetv","hulu"],
+      CBS: ["paramount","youtubetv","hulu","nflplus"],
+      NBC: ["peacock","youtubetv","hulu","nflplus"],
+      FOX_NATIONAL: ["fox","youtubetv","hulu","nflplus"],
+      FOX_LOCAL: ["youtubetv","hulu","nflplus"],
+      ESPN: ["espn","youtubetv","hulu","nflplus"],
+      ABC: ["espn","youtubetv","hulu","nflplus"],
       NFL_NETWORK: ["nflplus","youtubetv","hulu"],
-      PRIME: ["prime"],
-      NETFLIX: ["netflix"],
-      PEACOCK_EXCLUSIVE: ["peacock"]
+      PRIME: ["prime","nflplus"],
+      NETFLIX: ["netflix","nflplus"],
+      PEACOCK_EXCLUSIVE: ["peacock","nflplus"]
     });
+
+    const LOCAL_AFFILIATE_PARENT_RULES = [
+      {pattern:/\bWUSA(?:9)?\b/i,parent:"CBS"},
+      {pattern:/\bKPIX\b/i,parent:"CBS"},
+      {pattern:/\bWCBS\b/i,parent:"CBS"},
+      {pattern:/\bKCBS\b/i,parent:"CBS"},
+      {pattern:/\bWBAL(?:-TV)?\b/i,parent:"NBC"},
+      {pattern:/\bKUSA(?:-TV)?\b|\b9NEWS\b/i,parent:"NBC"},
+      {pattern:/\bKPNX\b|\b12NEWS\b/i,parent:"NBC"},
+      {pattern:/\bKNBC\b|\bWMAQ\b|\bWNBC\b/i,parent:"NBC"},
+      {pattern:/\bKITR\b|\bKABC\b|\bWABC\b|\bWPVI\b|\bWLS\b|\bKGO\b/i,parent:"ABC"},
+      {pattern:/\bKSWB\b|\bKTTV\b|\bWNYW\b|\bWFLD\b/i,parent:"FOX_LOCAL"}
+    ];
+
+    function classifyLocalAffiliate(names){
+      const joined=names.join(" | ");
+      const hit=LOCAL_AFFILIATE_PARENT_RULES.find(rule=>rule.pattern.test(joined));
+      return hit?.parent||"";
+    }
 
     function classifyBroadcastNetwork(game){
       const names=getBroadcastNames(game);
-      const joined=names.join(" | ").toLowerCase();
+      const s=names.join(" | ").replace(/\s+/g," ").trim();
+      if(/\bnetflix\b/i.test(s))return "NETFLIX";
+      if(/\b(?:amazon\s+)?prime(?:\s+video)?\b/i.test(s))return "PRIME";
+      if(/\bpeacock\b/i.test(s)&&!/\bnbc/i.test(s))return "PEACOCK_EXCLUSIVE";
+      if(/\bnfl\s*(?:network|net)\b|\bnfln\b/i.test(s))return "NFL_NETWORK";
+      if(/\bespn(?:2|news|u)?\b/i.test(s))return "ESPN";
 
-      if(joined.includes("netflix")) return "NETFLIX";
-      if(joined.includes("prime video") || joined.includes("amazon prime")) return "PRIME";
-      if(joined.includes("peacock") && !joined.includes("nbc")) return "PEACOCK_EXCLUSIVE";
-      if(joined.includes("nfl network") || joined.includes("nfln")) return "NFL_NETWORK";
-      if(joined.includes("espn")) return "ESPN";
-      if(joined.includes("cbs") || joined.includes("paramount")) return "CBS";
-      if(joined.includes("nbc")) return "NBC";
+      // Parent-network token matching intentionally ignores channel numbers:
+      // FOX30 / FOX 5, ABC7, CBS2, NBC4, etc.
+      if(/\bcbs\s*\d*\b/i.test(s))return "CBS";
+      if(/\bnbc\s*\d*\b/i.test(s))return "NBC";
+      if(/\babc\s*\d*\b/i.test(s))return "ABC";
+      if(isNationalFoxBroadcast(game))return "FOX_NATIONAL";
+      if(/\bfox\s*\d*\b/i.test(s))return "FOX_LOCAL";
 
-      // FOX must distinguish the national streaming product from a local affiliate.
-      if(isNationalFoxBroadcast(game)) return "FOX_NATIONAL";
-      if(names.some(name=>/fox/i.test(name))) return "FOX_LOCAL";
-
-      return "UNKNOWN";
+      const affiliateParent=classifyLocalAffiliate(names);
+      return affiliateParent||"UNKNOWN";
     }
 
     function baseProvidersForNetwork(game){
@@ -1087,6 +1167,9 @@ const DIRECTV_ZIP_KEY="nflLauncher.directv.zip.v3";
     let diagnosticsEnabled = localStorage.getItem("nflLauncher.diagnostics") === "true";
     let preferredProvider = localStorage.getItem(PREFERRED_PROVIDER_KEY) || "auto";
 let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
+    let directvNflPackageEnabled=localStorage.getItem(DIRECTV_NFL_PACKAGE_KEY)==="true";
+    let directvPublicSchedule=new Map();
+    let directvPublicScheduleStatus="NOT_LOADED";
     let tvCastEnabled = localStorage.getItem(TV_CAST_ENABLED_KEY) === "true";
     let selectedTvDeviceId = localStorage.getItem(TV_CAST_DEVICE_KEY) || "";
     let discoveredTvDevices = [];
@@ -1175,6 +1258,9 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
         allGames = cached.length ? cached : normalizeFallback(FALLBACK_SCHEDULE);
       }
       renderSchedule();
+      // DIRECTV enrichment runs only after ESPN has populated allGames.
+      // It is non-blocking and always transitions diagnostics away from NOT_LOADED.
+      
     }
 
     // Pulls ESPN data and normalizes it into this app's simple game model.
@@ -1376,16 +1462,57 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       return providerKeys[0];
     }
 
+    function getDirectvDiagnostic(game){
+      const dtv=getDirectvEligibility(game);
+      const labels={NO_ZIP:"NO ZIP",THIRD_PARTY:"THIRD PARTY",NFL_PACKAGE:"NFL PACKAGE",NFL_PACKAGE_LOCKED:"PACKAGE LOCKED",NETWORK_INCLUDED:"NETWORK INCLUDED",LOCAL_INCLUDED:"LOCAL INCLUDED",LOCAL_UNVERIFIED:"LOCAL UNVERIFIED",UNVERIFIED:"NO MATCH"};
+      return {valid:dtv.eligible,state:labels[dtv.type]||dtv.type,reason:dtv.reason,broadcasts:getBroadcastNames(game)};
+    }
+
+    function renderDirectvDiagnostic(game){
+      const d=getDirectvDiagnostic(game);
+      const zip=String(directvZip||"").trim();
+      const zipDisplay=/^\d{5}$/.test(zip)?zip:(zip?`${zip} (INVALID)`:"NOT SET");
+      const dtvDetected=getProviderKeysForGame(game).includes("directv");
+      const dtvEnabled=enabledProviders.includes("directv");
+      const dtvRendered=getEnabledProviderKeysForGame(game).includes("directv");
+      return `<div class="dtv-diagnostic-block">
+        <div class="diag-row dtv-diag">
+          <span class="diag-confidence ${d.valid?"":"diag-rejected"}">DTV ${escapeHtml(d.state)}</span>
+          <span>${escapeHtml(d.reason)}</span>
+        </div>
+        <div class="diag-summary">
+          <span class="diag-label">ZIP</span><span>${escapeHtml(zipDisplay)}</span>
+          <span class="diag-label">NFL ACCESS</span><span>${directvNflPackageEnabled?"ON":"OFF"}</span>
+          <span class="diag-label">DETECT</span><span>${dtvDetected?"YES":"NO"}</span>
+          <span class="diag-label">SETTING</span><span>${dtvEnabled?"ENABLED":"DISABLED"}</span>
+          <span class="diag-label">RENDER</span><span>${dtvRendered?"YES":"NO"}</span>
+        </div>
+      </div>`;
+    }
+
     function renderProviderDiagnostics(game){
       if(!diagnosticsEnabled)return "";
       const labels={3:"VERIFIED",2:"STRONG",1:"INFERRED"};
       const rows=getProviderEvidenceForGame(game);
       const broadcasts=getBroadcastNames(game);
+      const networkClass=classifyBroadcastNetwork(game);
+      const affiliate=classifyLocalAffiliate(broadcasts);
+      const detected=getProviderKeysForGame(game);
+      const finalKeys=getEnabledProviderKeysForGame(game);
+
       return `<div class="provider-diagnostics show">
         <div class="diag-title">PROVIDER DIAGNOSTICS</div>
-        <div><b>ESPN broadcasts:</b> ${escapeHtml(broadcasts.join(" · ")||"none")}</div>
-        <div><b>Network class:</b> ${escapeHtml(classifyBroadcastNetwork(game))}</div>
-        ${rows.map(e=>`<div class="diag-row"><span class="diag-confidence">${labels[e.confidence]||"?"}</span><span><b>${escapeHtml(providerIconLabel(e.provider))}</b> · ${escapeHtml(e.source)} · ${escapeHtml(e.reason)}</span></div>`).join("")}
+        <div class="diag-summary">
+          <span class="diag-label">ESPN</span><span>${escapeHtml(broadcasts.join(" · ")||"none")}</span>
+          <span class="diag-label">CLASS</span><span>${escapeHtml(networkClass)} · classifier v3</span>
+          ${affiliate?`<span class="diag-label">AFFILIATE</span><span>${escapeHtml(affiliate)}</span>`:""}
+          <span class="diag-label">DETECTED</span><span>${escapeHtml(detected.map(providerIconLabel).join(" · ")||"none")}</span>
+          <span class="diag-label">ENABLED</span><span>${escapeHtml(finalKeys.map(providerIconLabel).join(" · ")||"none")}</span>
+        </div>
+        <div class="diag-provider-list">
+          ${rows.map(e=>`<div class="diag-row"><span class="diag-confidence">${labels[e.confidence]||"?"}</span><span><b>${escapeHtml(providerIconLabel(e.provider))}</b> · ${escapeHtml(e.source)} · ${escapeHtml(e.reason)}</span></div>`).join("")}
+        </div>
+        <div class="diag-dtv-summary">${renderDirectvDiagnostic(game)}</div>
       </div>`;
     }
 
@@ -1477,22 +1604,15 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
 
     function readEnabledProviders(){
       try{
-        const saved = JSON.parse(localStorage.getItem(PROVIDER_PREF_KEY) || "null");
+        const saved=JSON.parse(localStorage.getItem(PROVIDER_PREF_KEY)||"null");
         if(Array.isArray(saved)){
-          let providers = saved.filter(key => DEFAULT_ENABLED_PROVIDERS.includes(key));
-
-          // One-time migration for installs that saved provider preferences before
-          // DIRECTV support existed. Without this, DIRECTV detection succeeds but
-          // is silently removed by the user's older saved provider filter.
-          if(localStorage.getItem(PROVIDER_MIGRATION_V2_KEY) !== "true"){
-            if(!providers.includes("directv")) providers.push("directv");
-            localStorage.setItem(PROVIDER_PREF_KEY, JSON.stringify(providers));
-            localStorage.setItem(PROVIDER_MIGRATION_V2_KEY, "true");
-          }
-          return providers;
+          const valid=saved.filter(key=>DEFAULT_ENABLED_PROVIDERS.includes(key));
+          return valid.length?valid:[...DEFAULT_ENABLED_PROVIDERS];
         }
-      }catch(err){}
-      return [...DEFAULT_ENABLED_PROVIDERS];
+      }catch(_){}
+      const fresh=[...DEFAULT_ENABLED_PROVIDERS];
+      localStorage.setItem(PROVIDER_PREF_KEY,JSON.stringify(fresh));
+      return fresh;
     }
 
     function saveEnabledProviders(){
@@ -1576,13 +1696,154 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       return false;
     }
 
+    function runDiagnosticSelfTest(){
+      const results=[];
+      const push=(status,label,detail,items=[])=>results.push({status,label,detail,items});
+
+      push(typeof classifyBroadcastNetwork==="function"?"pass":"fail","Network classifier","classifier v3 available");
+      push(Array.isArray(allGames)&&allGames.length?"pass":"warn","ESPN schedule",`${allGames.length||0} games loaded`);
+
+      const contradictions=allGames.filter(game=>{
+        const dtv=getDirectvEligibility(game);
+        const detected=getProviderKeysForGame(game).includes("directv");
+        return dtv.eligible!==detected;
+      });
+      push(contradictions.length?"fail":"pass","DTV eligibility → detection",contradictions.length?`${contradictions.length} contradiction(s)`:"consistent");
+
+      const renderContradictions=allGames.filter(game=>{
+        const detected=getProviderKeysForGame(game).includes("directv");
+        const final=getEnabledProviderKeysForGame(game).includes("directv");
+        return detected&&enabledProviders.includes("directv")&&!final;
+      });
+      push(renderContradictions.length?"fail":"pass","DTV detection → render",renderContradictions.length?`${renderContradictions.length} contradiction(s)`:"consistent");
+
+      const unknown=allGames.filter(g=>classifyBroadcastNetwork(g)==="UNKNOWN");
+      push(
+        unknown.length?"warn":"pass",
+        "Unknown networks",
+        unknown.length?`${unknown.length} game(s) need review`:"none",
+        unknown.map(g=>({
+          week:(()=>{
+            const key=scheduleWeekKey(g);
+            const parts=String(key||"").split(":").map(Number);
+            const type=parts[0],week=parts[1];
+            if(type===1)return `PRE ${week}`;
+            if(type===2)return `WEEK ${week}`;
+            if(type===3)return `POST ${week}`;
+            return "UNKNOWN WEEK";
+          })(),
+          matchup:`${g.awayAbbr||"?"} @ ${g.homeAbbr||"?"}`,
+          date:localGameDate(g),
+          broadcasts:getBroadcastNames(g).join(" · ")||"none"
+        }))
+      );
+
+      const enabledInvalid=enabledProviders.filter(k=>!PROVIDER_LINKS[k]);
+      push(enabledInvalid.length?"fail":"pass","Provider settings",enabledInvalid.length?`Unknown keys: ${enabledInvalid.join(", ")}`:"valid");
+
+      const el=document.querySelector("#diagnosticSelfTestResults");
+      if(el){
+        el.innerHTML=results.map(r=>`
+          <div class="selftest-item">
+            <div><span class="selftest-${r.status}">${r.status.toUpperCase()}</span> · <b>${escapeHtml(r.label)}</b> · ${escapeHtml(r.detail)}</div>
+            ${Array.isArray(r.items)&&r.items.length?`<div class="selftest-detail-list">${r.items.map(item=>`
+              <div class="selftest-detail-row">
+                <span class="selftest-week">${escapeHtml(item.week)}</span>
+                <span class="selftest-matchup">${escapeHtml(item.matchup)}</span>
+                <span class="selftest-date">${escapeHtml(item.date)}</span>
+                <span class="selftest-broadcast">${escapeHtml(item.broadcasts)}</span>
+              </div>`).join("")}</div>`:""}
+          </div>`).join("");
+        el.classList.add("show");
+      }
+      showToast(results.some(r=>r.status==="fail")?"Diagnostics found an issue":"Diagnostic self test complete");
+    }
+
+    function refreshDerivedData(){
+      // Preserve all user-controlled Settings. Clear only derived schedule/data caches.
+      [
+        "nflLauncher.scheduleCache.v1",
+        "nflLauncher.scheduleCache.v2",
+        "nflLauncher.scheduleCache.v3",
+        "nflLauncher.providerEvidence.v1"
+      ].forEach(key=>localStorage.removeItem(key));
+      showToast("Refreshing schedule data");
+      fetchSchedule();
+    }
+
+    function buildProviderTestList(){
+      const list=document.querySelector("#providerTestList");
+      if(!list)return;
+      const ordered=DEFAULT_ENABLED_PROVIDERS.filter(k=>PROVIDER_LINKS[k]);
+      list.innerHTML=ordered.map(key=>{
+        const p=PROVIDER_LINKS[key];
+        const mobile=DEVICE.isAndroid
+          ? `Android · ${p.androidPackage||"web fallback"}`
+          : DEVICE.isIOS
+            ? `iOS · ${p.ios||p.iosUniversal||"web fallback"}`
+            : "Desktop · web";
+        return `<div class="provider-test-row">
+          <div><div class="provider-test-name">${escapeHtml(p.label)}</div><div class="provider-test-meta">${escapeHtml(mobile)}</div></div>
+          <button class="provider-test-open" type="button" data-provider-test="${escapeHtml(key)}">OPEN</button>
+        </div>`;
+      }).join("");
+      list.querySelectorAll("[data-provider-test]").forEach(btn=>btn.addEventListener("click",()=>{
+        const key=btn.dataset.providerTest;
+        const p=PROVIDER_LINKS[key];
+        const fakeGame={id:"provider-test",awayAbbr:"TEST",homeAbbr:"TEST",dateTime:new Date().toISOString()};
+        openProvider(key,fakeGame);
+      }));
+    }
+
+    function openProviderTestScreen(){
+      buildProviderTestList();
+      const modal=document.querySelector("#providerTestModal");
+      if(!modal)return;
+      modal.classList.add("open");
+      modal.setAttribute("aria-hidden","false");
+      document.body.classList.add("provider-test-open");
+    }
+
+    function closeProviderTestScreen(){
+      const modal=document.querySelector("#providerTestModal");
+      if(!modal)return;
+      modal.classList.remove("open");
+      modal.setAttribute("aria-hidden","true");
+      document.body.classList.remove("provider-test-open");
+    }
+
+    document.addEventListener("click",event=>{
+      const target=event.target;
+      if(target?.closest?.("#providerTestClose") || target?.closest?.("#providerTestDone")){
+        event.preventDefault();
+        event.stopPropagation();
+        closeProviderTestScreen();
+        return;
+      }
+      if(target?.id==="providerTestModal"){
+        closeProviderTestScreen();
+      }
+    });
+
+    document.addEventListener("keydown",event=>{
+      if(event.key==="Escape" && document.querySelector("#providerTestModal.open")){
+        closeProviderTestScreen();
+      }
+    });
+
     function initSettingsControls(){
+      document.querySelector("#runDiagnosticSelfTest")?.addEventListener("click",runDiagnosticSelfTest);
+      document.querySelector("#refreshDerivedData")?.addEventListener("click",refreshDerivedData);
+      document.querySelector("#openProviderTest")?.addEventListener("click",openProviderTestScreen);
+
       const syncButtons = () => {
         document.querySelectorAll(".settings-provider[data-provider]").forEach(btn => {
           btn.classList.toggle("active", enabledProviders.includes(btn.dataset.provider));
         });
       };
       syncButtons();
+      const dtvPkg=document.querySelector("#directvNflPackage");
+      if(dtvPkg){dtvPkg.checked=directvNflPackageEnabled;dtvPkg.addEventListener("change",()=>{directvNflPackageEnabled=dtvPkg.checked;localStorage.setItem(DIRECTV_NFL_PACKAGE_KEY,String(directvNflPackageEnabled));renderSchedule();});}
       const diagnosticsEl=document.querySelector("#diagnosticsEnabled");
       if(diagnosticsEl){
         diagnosticsEl.checked=diagnosticsEnabled;
@@ -1662,42 +1923,97 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       );
     }
 
-    // Verified from stable DIRECTV-owned public schedule/guide pages.
-    // Sources used to maintain this table:
-    // directv.com/sports-info/football/nfl
-    // directv.com/insider/nfl-games-today-on-tv/
-    // directv.com/guide/ game-specific listings
-    const DIRECTV_PUBLIC_PAGE_VERIFIED=[
-      // High-confidence DIRECTV-carried feeds. Public-page presence alone is
-      // not enough: entries should have channel/market evidence or observed
-      // authenticated-app confirmation.
-      ["2026-08-22","BUF","CLE"],
-      ["2026-08-22","NYG","MIA"],
-      ["2026-08-22","PHI","NE"],
-      ["2026-08-22","NO","LAR"],
-      ["2026-08-22","DAL","ARI"],
-      ["2026-08-23","SEA","TEN"],
-      ["2026-08-27","PIT","BUF"],
-      ["2026-08-27","SF","LV"],   // authenticated DIRECTV app observed
-      ["2026-08-27","LAR","LAC"]  // authenticated DIRECTV app observed
-    ];
-    const DIRECTV_PUBLIC_ONLY_EXCLUSIONS=[
-      ["2026-08-27","NE","CLE"] // public web surfaced it; authenticated app did not
-    ];
-
-    function isDirectvExcluded(game){
-      const d=localGameDate(game);
-      return DIRECTV_PUBLIC_ONLY_EXCLUSIONS.some(x=>x[0]===d&&matchup(game,x[1],x[2]));
+    function directvScheduleKey(game){
+      return `${localGameDate(game)}|${String(game.awayAbbr||"").toUpperCase()}|${String(game.homeAbbr||"").toUpperCase()}`;
     }
 
-    function isDirectvGame(game){
-      if(!/^\d{5}$/.test(directvZip))return false;
-      if(isDirectvExcluded(game))return false;
-      const d=localGameDate(game);
-      // DIRECTV is enrichment-only. ESPN creates the game and describes broadcasts,
-      // but can never create a DTV result. DTV requires separate verification.
-      return DIRECTV_PUBLIC_PAGE_VERIFIED.some(x=>x[0]===d&&matchup(game,x[1],x[2]));
+    function normalizeDirectvNetworkLabel(value){
+      const s=String(value||"");
+      if(/\bnetflix\b/i.test(s)) return "NETFLIX";
+      if(/\b(?:amazon\s+)?prime(?:\s+video)?\b/i.test(s)) return "PRIME";
+      if(/\bpeacock\b/i.test(s)) return "PEACOCK";
+      if(/\bnfl\s*(?:network|net)\b|\bnfln\b/i.test(s)) return "NFL_NETWORK";
+      if(/\bespn(?:2|news|u)?\b/i.test(s)) return "ESPN";
+      if(/\babc\b/i.test(s)) return "ABC";
+      if(/\bcbs\b|\bparamount\+?\b/i.test(s)) return "CBS";
+      if(/\bnbc\b/i.test(s)) return "NBC";
+      if(/\bfox\b/i.test(s)) return "FOX";
+      return "UNKNOWN";
     }
+
+    function readDirectvPublicScheduleCache(){
+      try{
+        const saved=JSON.parse(localStorage.getItem(DIRECTV_PUBLIC_SCHEDULE_CACHE_KEY)||"null");
+        if(!saved||Date.now()-Number(saved.savedAt||0)>DIRECTV_PUBLIC_SCHEDULE_TTL_MS)return false;
+        directvPublicSchedule=new Map(saved.entries||[]);
+        directvPublicScheduleStatus="CACHE";
+        return directvPublicSchedule.size>0;
+      }catch(_){return false}
+    }
+
+    function cacheDirectvPublicSchedule(){
+      try{
+        localStorage.setItem(DIRECTV_PUBLIC_SCHEDULE_CACHE_KEY,JSON.stringify({
+          savedAt:Date.now(),
+          entries:Array.from(directvPublicSchedule.entries())
+        }));
+      }catch(_){}
+    }
+
+    function parseDirectvPublicScheduleHtml(html){
+      // DIRECTV's public schedule/editorial pages expose matchup + network text.
+      // Parse conservatively: only create a record when both team names and a
+      // recognizable DIRECTV-carried/third-party network appear close together.
+      const text=String(html||"").replace(/\s+/g," ");
+      let added=0;
+      allGames.forEach(game=>{
+        const away=String(game.awayTeam||"").replace(/[.*+?^${}()|[\]\\]/g,"\\$&");
+        const home=String(game.homeTeam||"").replace(/[.*+?^${}()|[\]\\]/g,"\\$&");
+        if(!away||!home)return;
+        const matchup=new RegExp(`${away}.{0,120}(?:at|@).{0,40}${home}.{0,180}(CBS|FOX|NBC|ABC|ESPN(?:2)?|NFL Network|NFL Net|Prime Video|Amazon Prime|Netflix|Peacock)`,"i");
+        const reverse=new RegExp(`${home}.{0,120}(?:vs\\.?|versus).{0,40}${away}.{0,180}(CBS|FOX|NBC|ABC|ESPN(?:2)?|NFL Network|NFL Net|Prime Video|Amazon Prime|Netflix|Peacock)`,"i");
+        const hit=text.match(matchup)||text.match(reverse);
+        if(hit){
+          directvPublicSchedule.set(directvScheduleKey(game),{
+            network:String(hit[1]||""),
+            networkClass:normalizeDirectvNetworkLabel(hit[1]),
+            source:"DIRECTV public schedule"
+          });
+          added++;
+        }
+      });
+      return added;
+    }
+
+    async function loadDirectvPublicSchedule(){
+      // Disabled: DIRECTV blocks cross-origin public schedule reads from standalone HTML.
+      directvPublicScheduleStatus="DISABLED";
+    }
+
+    function getDirectvPublicScheduleMatch(game){
+      return directvPublicSchedule.get(directvScheduleKey(game))||null;
+    }
+
+    function getDirectvEligibility(game){
+      const zip=String(directvZip||"").trim();
+      const networkClass=typeof classifyBroadcastNetwork==="function"?classifyBroadcastNetwork(game):"";
+      if(!/^\d{5}$/.test(zip))return {eligible:false,type:"NO_ZIP",reason:"DIRECTV detection requires a saved 5-digit ZIP.",zip,networkClass};
+      if(["CBS","NBC","FOX_LOCAL","FOX_NATIONAL","ABC","ESPN"].includes(networkClass)){
+        return {eligible:true,type:"NETWORK_INCLUDED",reason:`${networkClass} is treated as an included DIRECTV NFL network for saved market ZIP ${zip}.`,zip,networkClass};
+      }
+      if(networkClass==="NFL_NETWORK"){
+        return directvNflPackageEnabled
+          ? {eligible:true,type:"NFL_PACKAGE",reason:"NFL Network detected and DIRECTV NFL/Sports Package setting is ON.",zip,networkClass}
+          : {eligible:false,type:"NFL_PACKAGE_LOCKED",reason:"NFL Network detected; enable DIRECTV NFL/Sports Package if your plan includes NFL Network.",zip,networkClass};
+      }
+      if(["PRIME","NETFLIX","PEACOCK_EXCLUSIVE"].includes(networkClass)){
+        return {eligible:false,type:"THIRD_PARTY",reason:`${networkClass} requires a separate streaming subscription and does not qualify as DTV.`,zip,networkClass};
+      }
+      return {eligible:false,type:"UNVERIFIED",reason:"No reusable DIRECTV network/package rule qualifies this game.",zip,networkClass};
+    }
+
+    function getDirectvEntitlementType(game){ return getDirectvEligibility(game).type; }
+    function isDirectvGame(game){ return getDirectvEligibility(game).eligible; }
 
     function localGameDate(g){const d=new Date(g.dateTime);return Number.isNaN(d.getTime())?"":`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;}
     function matchup(g,a,h){return String(g.awayAbbr||"").toUpperCase()===a&&String(g.homeAbbr||"").toUpperCase()===h;}
@@ -1719,9 +2035,8 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
     }
 
     function getEnabledProviderKeysForGame(game){
-      return getProviderKeysForGame(game).filter(key =>
-        enabledProviders.includes(key) || (key === "nflnetwork" && enabledProviders.includes("nflplus"))
-      );
+      const detected=getProviderKeysForGame(game);
+      return detected.filter(key=>enabledProviders.includes(key));
     }
 
     function renderFantasyBlock(game){
@@ -1949,9 +2264,12 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       const evidence=[];
       const classified=baseProvidersForNetwork(game);
       classified.providers.forEach(provider=>{
-        const confidence = ["PRIME","NETFLIX","NFL_NETWORK"].includes(classified.networkClass)
+        let confidence = ["PRIME","NETFLIX","NFL_NETWORK"].includes(classified.networkClass)
           ? PROVIDER_CONFIDENCE.VERIFIED
           : PROVIDER_CONFIDENCE.STRONG;
+        if(provider==="nflplus" && classified.networkClass!=="NFL_NETWORK"){
+          confidence=PROVIDER_CONFIDENCE.INFERRED;
+        }
         evidence.push(providerEvidence(provider,confidence,"Network matrix",`${classified.networkClass} distribution`,getBroadcastNames(game)));
       });
       const names=getBroadcastNames(game);
@@ -1982,9 +2300,9 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
         evidence.push(providerEvidence("nflplus",PROVIDER_CONFIDENCE.STRONG,"ESPN","NFL Network/NFL+ broadcast metadata",names));
       }
 
-      // DIRECTV is enrichment-only: ESPN never creates DTV evidence by itself.
-      if(isDirectvGame(game)){
-        evidence.push(providerEvidence("directv",PROVIDER_CONFIDENCE.VERIFIED,"DIRECTV public verification","Matchup passed verified DIRECTV rule",names));
+      const dtv=getDirectvEligibility(game);
+      if(dtv.eligible){
+        evidence.push(providerEvidence("directv",PROVIDER_CONFIDENCE.VERIFIED,dtv.type==="NFL_PACKAGE"?"DIRECTV NFL Package":"DIRECTV verification",dtv.reason,getBroadcastNames(game)));
       }
       return evidence;
     }
@@ -2012,12 +2330,13 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       if(isNetflixGame(game) && !keys.includes("netflix")) keys.push("netflix");
 
       // DIRECTV is enrichment-only and requires separate verification.
-      if(isDirectvGame(game)) keys.push("directv");
 
-      // NFL+ is conditional. NFL Network is a direct qualifying signal; for other
-      // networks we avoid assuming universal NFL+ availability until local/device
-      // eligibility is positively established.
-      if(networkClass==="NFL_NETWORK" && !keys.includes("nflplus")) keys.push("nflplus");
+      // NFL+ restored to the broader distribution behavior used before the
+      // conservative matrix pass. Network/location/device restrictions may still
+      // apply at playback time; NFL Network remains a direct qualifying signal.
+      if(!keys.includes("nflplus") && ["CBS","NBC","FOX_NATIONAL","FOX_LOCAL","ESPN","NFL_NETWORK","PRIME","NETFLIX","PEACOCK_EXCLUSIVE"].includes(networkClass)){
+        keys.push("nflplus");
+      }
 
       // Unknown broadcasts retain a conservative fallback rather than manufacturing
       // a full distribution set from a loose substring.
@@ -2025,6 +2344,8 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
         const fallback=providerFromNetwork(game.network);
         if(fallback && fallback!=="nflplus") keys.push(fallback);
       }
+
+      if(getDirectvEligibility(game).eligible) keys.push("directv");
 
       const seen=new Set();
       return keys.filter(key=>PROVIDER_LINKS[key]&&!seen.has(key)&&seen.add(key));
@@ -2403,5 +2724,20 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
     document.querySelector("#refreshBtn").addEventListener("click", fetchSchedule);
     fetchSchedule();
   </script>
+
+  <div id="providerTestModal" class="provider-test-modal" aria-hidden="true">
+    <div class="provider-test-panel">
+      <div class="provider-test-header">
+        <div>
+          <div class="provider-test-title">Provider App Test</div>
+          <div class="provider-test-subtitle">Tests app-launch routing independently of game detection.</div>
+        </div>
+        <button id="providerTestClose" class="provider-test-close" type="button" aria-label="Close provider app test">×</button>
+      </div>
+      <div id="providerTestList" class="provider-test-list"></div>
+      <button id="providerTestDone" class="provider-test-done" type="button">DONE</button>
+    </div>
+  </div>
+
 </body>
 </html>
