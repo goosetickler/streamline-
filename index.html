@@ -996,6 +996,7 @@
       word-break:break-word;
       opacity:.9;
     }
+    .provider-test-pass{margin-left:5px;color:#20df8f;font-size:.55rem;font-weight:1000}
 
   </style>
 </head>
@@ -1186,6 +1187,7 @@ const DIRECTV_ZIP_KEY="nflLauncher.directv.zip.v3";
     const TV_CAST_DEVICE_KEY = "nflLauncher.tvCast.device.v1";
     const FANTASY_CACHE_PREFIX = "nflLauncher.realFantasy.v2.";
     const DEFAULT_ENABLED_PROVIDERS = ["youtubetv","hulu","paramount","directv","peacock","netflix","fox","espn","prime","nflplus"];
+    const APP_LINK_TEST_PASSED = new Set(["youtubetv","paramount","fox","prime"]);
 
     // Deep link notes:
     // - Mobile launches are native-app-first; HTTPS is fallback only.
@@ -1209,7 +1211,7 @@ const DIRECTV_ZIP_KEY="nflLauncher.directv.zip.v3";
       },
       peacock: {
         label:"Peacock",
-        web:"https://www.peacocktv.com/sports/nfl",
+        web:"https://www.peacocktv.com/",
         iosUniversal:"https://www.peacocktv.com/deeplink",
         ios:"peacocktv://",
         androidScheme:"peacocktv",
@@ -1217,7 +1219,7 @@ const DIRECTV_ZIP_KEY="nflLauncher.directv.zip.v3";
       },
       espn: {
         label:"ESPN / ABC",
-        web:"https://www.espn.com/watch/",
+        web:"https://www.espn.com/",
         iosUniversal:"https://www.espn.com/watch/",
         ios:"espn://",
         androidScheme:"espn",
@@ -1243,7 +1245,7 @@ const DIRECTV_ZIP_KEY="nflLauncher.directv.zip.v3";
       },
       hulu: {
         label:"Hulu + Live TV",
-        web:"https://www.hulu.com/nfl",
+        web:"https://www.hulu.com/",
         iosUniversal:"https://www.hulu.com/nfl",
         ios:"hulu://",
         androidScheme:"hulu",
@@ -1259,13 +1261,13 @@ const DIRECTV_ZIP_KEY="nflLauncher.directv.zip.v3";
       },
       nflplus: {
         label:"NFL+",
-        web:"https://www.nfl.com/plus/",
+        web:"https://www.nfl.com/",
         iosUniversal:"https://www.nfl.com/plus/",
         ios:"nfl://",
         androidScheme:"nfl",
         androidWeb:"https://www.nfl.com/",androidPackage:"com.gotv.nflgamecenter.us.lite"
       },
-      directv: {label:"DIRECTV",web:"https://stream.directv.com/",iosUniversal:"https://stream.directv.com/",ios:"directv://",androidScheme:"directv",androidPackage:"com.att.tv"},
+      directv: {label:"DIRECTV",web:"https://www.directv.com/stream/",iosUniversal:"https://stream.directv.com/",ios:"directv://",androidScheme:"directv",androidPackage:"com.att.tv"},
       netflix:{label:"Netflix",web:"https://www.netflix.com/",iosUniversal:"https://www.netflix.com/",ios:"nflx://",androidScheme:"nflx",androidPackage:"com.netflix.mediaclient"},
       youtubetv: {
         label:"YouTube TV",
@@ -2240,23 +2242,19 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
     function buildProviderTestList(){
       const list=document.querySelector("#providerTestList");
       if(!list)return;
-
       const ordered=DEFAULT_ENABLED_PROVIDERS.filter(k=>PROVIDER_LINKS[k]);
       const platform=DEVICE.isAndroid?"Android":DEVICE.isIOS?"iOS":"Desktop";
 
       list.innerHTML=ordered.map(key=>{
         const p=PROVIDER_LINKS[key];
-        const url=p.web||p.universal||p.iosUniversal||"";
-        const mode=DEVICE.isAndroid
-          ? "Android App Link"
-          : DEVICE.isIOS
-            ? "iOS Universal Link"
-            : "Desktop web";
+        const url=p.web||"";
+        const mode=DEVICE.isAndroid?"HTTPS App Link / web fallback":DEVICE.isIOS?"HTTPS Universal Link / web fallback":"Desktop web";
+        const packageInfo=DEVICE.isAndroid&&p.androidPackage?` · package ${p.androidPackage}`:"";
 
         return `<div class="provider-test-row">
           <div>
-            <div class="provider-test-name">${escapeHtml(p.label)}</div>
-            <div class="provider-test-meta"><b>${escapeHtml(platform)} · ${escapeHtml(mode)}</b></div>
+            <div class="provider-test-name">${escapeHtml(p.label)} ${APP_LINK_TEST_PASSED.has(key)?'<span class="provider-test-pass">✓ PASSED</span>':""}</div>
+            <div class="provider-test-meta"><b>${escapeHtml(platform)} · ${escapeHtml(mode)}</b>${escapeHtml(packageInfo)}</div>
             <div class="provider-test-url">${escapeHtml(url||"NO URL CONFIGURED")}</div>
           </div>
           <button class="provider-test-open" type="button" data-provider-test="${escapeHtml(key)}">OPEN</button>
@@ -2322,6 +2320,7 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
     });
 
     function initSettingsControls(){
+
       document.querySelector("#runDiagnosticSelfTest")?.addEventListener("click",runDiagnosticSelfTest);
       document.querySelector("#refreshDerivedData")?.addEventListener("click",refreshDerivedData);
       document.querySelector("#openProviderTest")?.addEventListener("click",openProviderTestScreen);
@@ -2943,21 +2942,21 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
     // iOS: native scheme first, then Universal Link/web fallback.
     // Desktop: ordinary HTTPS.
     async function openProvider(providerKey, game){
-      const provider = PROVIDER_LINKS[providerKey] || PROVIDER_LINKS.nflplus;
-      if(tvCastEnabled && selectedTvDeviceId){
-        const handledByTv = await tryWatchOnSelectedTv(provider, game);
-        if(handledByTv) return;
+      const provider=PROVIDER_LINKS[providerKey]||PROVIDER_LINKS.nflplus;
+      if(tvCastEnabled&&selectedTvDeviceId){
+        const handledByTv=await tryWatchOnSelectedTv(provider,game);
+        if(handledByTv)return;
         showToast("TV launch unavailable - opening on phone");
       }
-      const gameWebUrl = getProviderGameWebUrl(providerKey,provider,game);
-      const canonicalUrl = DEVICE.isIOS ? (provider.iosUniversal || gameWebUrl || provider.web) : (gameWebUrl || provider.web);
-      const targetUrl = addTracking(canonicalUrl, game.id);
+      const gameWebUrl=getProviderGameWebUrl(providerKey,provider,game);
+      const canonicalUrl=DEVICE.isIOS?(provider.iosUniversal||gameWebUrl||provider.web):(gameWebUrl||provider.web);
+      const targetUrl=addTracking(canonicalUrl,game.id);
       showToast(`Opening ${provider.label}`);
-      if(DEVICE.isAndroid || DEVICE.isIOS){
-        window.location.href = targetUrl;
+      if(DEVICE.isAndroid||DEVICE.isIOS){
+        window.location.href=targetUrl;
         return;
       }
-      window.open(targetUrl, "_blank", "noopener,noreferrer");
+      window.open(targetUrl,"_blank","noopener,noreferrer");
     }
 
     function launchIOSAppFirst(provider, webUrl){
