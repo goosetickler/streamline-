@@ -101,9 +101,13 @@
       font-size:.86rem;
       cursor:pointer;
       min-height:44px;
+      -webkit-tap-highlight-color:transparent;
+      touch-action:manipulation;
+      transition:transform .08s ease,background-color .08s ease,border-color .08s ease;
     }
-    .refresh:active{transform:scale(.98)}
-    .refresh:focus,.watch:focus{outline:3px solid rgba(83,183,255,.45);outline-offset:2px}
+    .refresh:active{transform:scale(.96);background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.22)}
+    .refresh:focus{outline:none}
+    .refresh:focus-visible,.watch:focus-visible{outline:3px solid rgba(83,183,255,.45);outline-offset:2px}
 
     .week-bar{
       margin-top:16px;
@@ -120,13 +124,17 @@
     .week-title{font-weight:1000;letter-spacing:-.02em;font-size:.98rem}
     .week-copy{color:var(--muted);font-size:.98rem;font-weight:750;text-align:right}
     .sort-tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:10px}
-    .sort-tab{border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.06);color:var(--muted);height:36px;font-size:.7rem;font-weight:1000;letter-spacing:.04em;text-transform:uppercase;cursor:pointer}
+    .sort-tab{border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.06);color:var(--muted);height:36px;font-size:.7rem;font-weight:1000;letter-spacing:.04em;text-transform:uppercase;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation;transition:transform .08s ease,filter .08s ease,background-color .08s ease,border-color .08s ease}
     .sort-tab.active{background:linear-gradient(135deg,var(--green),var(--accent));color:#07111d;border-color:transparent}
-    .sort-tab:focus{outline:3px solid rgba(83,183,255,.45);outline-offset:2px}
+    .sort-tab:active{transform:scale(.96);filter:brightness(1.16)}
+    .sort-tab:focus{outline:none}
+    .sort-tab:focus-visible{outline:3px solid rgba(83,183,255,.45);outline-offset:2px}
 
     .header-actions{display:flex;align-items:center;gap:8px;flex:0 0 auto}
-    .settings-btn{border:1px solid var(--line);color:var(--text);background:rgba(255,255,255,.07);border-radius:14px;padding:9px 10px;font-weight:1000;font-size:.86rem;cursor:pointer;min-height:44px;min-width:44px;display:grid;place-items:center}
-    .settings-btn:focus{outline:3px solid rgba(83,183,255,.45);outline-offset:2px}
+    .settings-btn{border:1px solid var(--line);color:var(--text);background:rgba(255,255,255,.07);border-radius:14px;padding:9px 10px;font-weight:1000;font-size:.86rem;cursor:pointer;min-height:44px;min-width:44px;display:grid;place-items:center;-webkit-tap-highlight-color:transparent;touch-action:manipulation;transition:transform .08s ease,background-color .08s ease,border-color .08s ease}
+    .settings-btn:active{transform:scale(.94);background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.22)}
+    .settings-btn:focus{outline:none}
+    .settings-btn:focus-visible{outline:3px solid rgba(83,183,255,.45);outline-offset:2px}
     .settings-icon{font-size:1rem;line-height:1}
     .settings-overlay{position:fixed;inset:0;z-index:5000;background:rgba(0,0,0,.48);display:none;align-items:flex-end;justify-content:center;padding:18px}
     .settings-overlay.open{display:flex}
@@ -330,7 +338,8 @@
     .provider-icon.fox{background:#003c7e;color:white}
     .provider-icon.hulu{background:#1ce783;color:#07111d}
     .provider-icon.nflnetwork,.provider-icon.nflplus{background:#013369;color:white}
-    .provider-icon.youtubetv{background:#ff0033;color:white}
+    .provider-icon.youtubetv,.provider-icon.sundayticket{background:#ff0033;color:white}
+    .provider-icon.sundayticket{width:38px;font-size:.48rem}
     .provider-icon:focus{outline:3px solid rgba(83,183,255,.45);outline-offset:2px}
     .lower-row{display:flex;align-items:center;justify-content:space-between;gap:10px;position:relative;z-index:1}
     .game-info{min-width:0;display:flex;flex-wrap:wrap;align-items:center;gap:6px;color:var(--muted);font-size:.78rem;font-weight:750}
@@ -998,7 +1007,40 @@
     }
     .provider-test-pass{margin-left:5px;color:#20df8f;font-size:.55rem;font-weight:1000}
 
-  </style>
+    /* Release 4.4: consistent rounded press feedback for Settings controls. */
+    .settings-sheet button,
+    .provider-test-panel button{
+      -webkit-tap-highlight-color:transparent;
+      touch-action:manipulation;
+      transform-origin:center;
+      transition:transform .08s ease,filter .08s ease,background-color .08s ease,border-color .08s ease;
+    }
+    .settings-sheet button:active:not(:disabled),
+    .provider-test-panel button:active:not(:disabled){
+      transform:scale(.96);
+      filter:brightness(1.14);
+    }
+    .settings-sheet button:focus,
+    .provider-test-panel button:focus{outline:none}
+    .settings-sheet button:focus-visible,
+    .provider-test-panel button:focus-visible{
+      outline:3px solid rgba(83,183,255,.45);
+      outline-offset:2px;
+    }
+    .settings-sheet button:disabled,
+    .provider-test-panel button:disabled{transform:none;filter:none}
+
+  
+    .local-first-bar{display:flex;justify-content:flex-end;align-items:center;gap:10px;margin-top:10px;padding:0 2px;color:#aeb9cf;font-size:12px;font-weight:800;letter-spacing:.04em;text-transform:uppercase}
+    .local-first-copy{display:flex;flex-direction:column;align-items:flex-end;line-height:1.1}
+    .local-first-copy small{font-size:10px;font-weight:600;letter-spacing:0;text-transform:none;color:#7f8aa3;margin-top:3px}
+    .local-first-switch{position:relative;display:inline-flex;width:44px;height:26px;flex:0 0 auto}
+    .local-first-switch input{opacity:0;width:0;height:0}
+    .local-first-track{position:absolute;inset:0;border-radius:999px;background:#202633;border:1px solid #3a4250;transition:.18s}
+    .local-first-track:before{content:"";position:absolute;width:18px;height:18px;left:3px;top:3px;border-radius:50%;background:#c8d0df;transition:.18s}
+    .local-first-switch input:checked + .local-first-track{background:linear-gradient(135deg,#4ee8ba,#48b8ff);border-color:transparent}
+    .local-first-switch input:checked + .local-first-track:before{transform:translateX(18px);background:#07131d}
+</style>
 </head>
 <body>
   <div class="wrap">
@@ -1076,7 +1118,7 @@
           <button class="settings-provider active" data-provider="prime">Prime</button>
           <button class="settings-provider active" data-provider="nflplus">NFL+</button>
         </div>
-        <p class="settings-hint">Selected services appear as watch options on each game card and are saved on this device.</p>
+        <p class="settings-hint">Choose the services you use. Saved on this device.</p>
         <div class="preferred-provider-row">
           <label for="preferredProvider" class="preferred-provider-label">Preferred Service</label>
           <select id="preferredProvider" class="preferred-provider-select" aria-label="Preferred streaming service">
@@ -1095,11 +1137,34 @@
         </div>
       </div>
       <div class="settings-section">
-        <h3 class="settings-section-title">DIRECTV</h3><div class="tv-device-controls"><input id="directvZip" class="tv-device-select" maxlength="5" inputmode="numeric" placeholder="ZIP Code"><button id="directvZipSave" class="tv-scan-btn">Save ZIP</button></div><div class="dtv-package-setting"><div><div class="tv-cast-label">DIRECTV NFL / Sports Package</div><div class="tv-cast-detail">Include NFL Network games that require an additional DIRECTV sports entitlement.</div></div><label class="tv-switch"><input id="directvNflPackage" type="checkbox"><span class="tv-switch-track"></span></label></div><p id="directvZipHint" class="settings-hint">Verified-first DIRECTV detection. ZIP provides market context; local-network affiliation alone will not create a DTV result.</p></div><div class="settings-section"><h3 class="settings-section-title">Diagnostics</h3>
+        <h3 class="settings-section-title">Local Availability</h3>
+        <div class="tv-cast-toggle">
+          <div class="tv-cast-copy">
+            <div class="tv-cast-label">Local Game Sorting</div>
+            <div class="tv-cast-detail">Put games available in your area first. All games stay visible.</div>
+          </div>
+          <label class="tv-switch" aria-label="Enable Local Game Sorting">
+            <input id="localGamesFilterToggle" type="checkbox">
+            <span class="tv-switch-track"></span>
+          </label>
+        </div>
+        <div class="tv-cast-toggle" style="margin-top:8px">
+          <div class="tv-cast-copy">
+            <div class="tv-cast-label">NFL Sunday Ticket</div>
+            <div class="tv-cast-detail">Show Sunday Ticket for confirmed out-of-market Sunday afternoon games.</div>
+          </div>
+          <label class="tv-switch" aria-label="Enable NFL Sunday Ticket">
+            <input id="sundayTicketEnabled" type="checkbox">
+            <span class="tv-switch-track"></span>
+          </label>
+        </div>
+      </div>
+      <div class="settings-section">
+        <h3 class="settings-section-title">Location & DIRECTV</h3><div class="tv-device-controls"><input id="directvZip" class="tv-device-select" maxlength="5" inputmode="numeric" placeholder="ZIP Code"><button id="directvZipSave" class="tv-scan-btn">Save ZIP</button></div><div class="tv-device-controls" style="margin-top:8px"><div id="directvMarketStatus" class="tv-device-select" style="display:flex;align-items:center;cursor:default">Market: not detected</div><button id="directvLocate" class="tv-scan-btn" type="button">Use location</button></div><div class="dtv-package-setting"><div><div class="tv-cast-label">NFL Network on DIRECTV</div><div class="tv-cast-detail">Enable if your DIRECTV plan includes NFL Network.</div></div><label class="tv-switch"><input id="directvNflPackage" type="checkbox"><span class="tv-switch-track"></span></label></div><p id="directvZipHint" class="settings-hint">Your ZIP or location identifies local CBS/FOX availability. Results are cached on this device.</p></div><div class="settings-section"><h3 class="settings-section-title">Diagnostics</h3>
         <div class="tv-cast-toggle">
           <div class="tv-cast-copy">
             <div class="tv-cast-label">Provider diagnostics</div>
-            <div class="tv-cast-detail">Shows why each viewing option was detected. Intended for testing false positives.</div>
+            <div class="tv-cast-detail">Show availability evidence on game cards.</div>
           </div>
           <label class="tv-switch" aria-label="Enable provider diagnostics">
             <input id="diagnosticsEnabled" type="checkbox">
@@ -1118,8 +1183,8 @@
         <div class="tv-cast-row">
           <div class="tv-cast-toggle">
             <div class="tv-cast-copy">
-              <div class="tv-cast-label">Send WATCH to a nearby TV</div>
-              <div class="tv-cast-detail">When enabled, WATCH tries the selected TV first instead of immediately opening the provider app on this phone.</div>
+              <div class="tv-cast-label">Watch on nearby TV</div>
+              <div class="tv-cast-detail">Try the selected TV before opening the provider on this device.</div>
             </div>
             <label class="tv-switch" aria-label="Enable TV casting">
               <input id="tvCastEnabled" type="checkbox">
@@ -1127,12 +1192,12 @@
             </label>
           </div>
           <div class="tv-device-controls">
-            <select id="tvDeviceSelect" class="tv-device-select" aria-label="Nearby smart TV">
-              <option value="">Scan for a nearby TV...</option>
+            <select id="tvDeviceSelect" class="tv-device-select" aria-label="TV or casting method">
+              <option value="">Find a TV or casting method...</option>
             </select>
-            <button id="tvScanBtn" class="tv-scan-btn" type="button">Scan Wi-Fi</button>
+            <button id="tvScanBtn" class="tv-scan-btn" type="button">Find TVs</button>
           </div>
-          <p id="tvCastHint" class="settings-hint">Browser security does not expose a raw Wi-Fi device list. Scan uses supported browser casting APIs when available; otherwise the system cast/device picker is used at WATCH time.</p>
+          <p id="tvCastHint" class="settings-hint">Finds remembered Bluetooth devices and supported browser/system casting methods. Browser security may still show a device picker when WATCH is pressed.</p>
         </div>
       </div>
     
@@ -1166,7 +1231,7 @@
     const MAX_GAMES_TO_SHOW = 18;
     const SCHEDULE_CACHE_KEY = "nflLauncher.schedule.v2";
     const PROVIDER_PREF_KEY = "nflLauncher.enabledProviders.settings.v5";
-    const APP_DATA_VERSION = 18;
+    const APP_DATA_VERSION = 21;
     const APP_DATA_VERSION_KEY = "nflLauncher.appDataVersion";
     const SEASON_CACHE_KEY="nflLauncher.seasonSchedule.v1";
     const SEASON_CACHE_TTL_MS=12*60*60*1000;
@@ -1179,12 +1244,23 @@
     const PREFERRED_PROVIDER_KEY = "nflLauncher.preferredProvider.v1";
     const NEW_PROVIDER_FILTER_MIGRATION_KEY = "nflLauncher.providers.peacockNetflixDefaultOn.v1";
 const DIRECTV_ZIP_KEY="nflLauncher.directv.zip.v3";
+    const DIRECTV_MARKET_KEY="nflLauncher.directv.market.v1";
+    const DIRECTV_MARKET_SOURCE_KEY="nflLauncher.directv.marketSource.v1";
     const DIRECTV_NFL_PACKAGE_KEY="nflLauncher.directv.nflPackage.v1";
-    const DIRECTV_PUBLIC_SCHEDULE_CACHE_KEY="nflLauncher.directv.publicSchedule.v1";
-    const DIRECTV_PUBLIC_SCHEDULE_TTL_MS=6*60*60*1000;
+    const SUNDAY_TICKET_KEY="nflLauncher.sundayTicket.v1";
+    const LOCAL_FIRST_KEY="nflLauncher.localFirst.v1"; // Release 3.6: retained storage key for Local Game Sorting compatibility.
+    const WEEKLY_COVERAGE_CACHE_KEY="nflLauncher.weeklyCoverage.v1";
+    const WEEKLY_COVERAGE_CACHE_TTL_MS=12*60*60*1000;
+    const WEEKLY_COVERAGE_FEED_URL="https://goosetickler.github.io/streamline-/local-coverage-2026.json";
+    // Release 3.3 cleanup: legacy DIRECTV public-schedule cache is intentionally disabled.
+    // Standalone HTML cannot reliably read DIRECTV's public schedule cross-origin, and
+    // current eligibility is driven by ESPN metadata + local market rules instead.
+    // const DIRECTV_PUBLIC_SCHEDULE_CACHE_KEY="nflLauncher.directv.publicSchedule.v1";
+    // const DIRECTV_PUBLIC_SCHEDULE_TTL_MS=6*60*60*1000;
     const PROVIDER_MIGRATION_V2_KEY = "nflLauncher.providers.migrated.directv.v2";
     const TV_CAST_ENABLED_KEY = "nflLauncher.tvCast.enabled.v1";
     const TV_CAST_DEVICE_KEY = "nflLauncher.tvCast.device.v1";
+    const TV_CAST_DEVICES_KEY = "nflLauncher.tvCast.devices.v2";
     const FANTASY_CACHE_PREFIX = "nflLauncher.realFantasy.v2.";
     const DEFAULT_ENABLED_PROVIDERS = ["youtubetv","hulu","paramount","directv","peacock","netflix","fox","espn","prime","nflplus"];
     const APP_LINK_TEST_PASSED = new Set(["youtubetv","paramount","fox","prime"]);
@@ -1276,6 +1352,14 @@ const DIRECTV_ZIP_KEY="nflLauncher.directv.zip.v3";
         ios:"youtubetv://",
         androidScheme:"youtubetv",
         androidPackage:"com.google.android.apps.youtube.unplugged"
+      },
+      sundayticket: {
+        label:"NFL Sunday Ticket",
+        web:"https://tv.youtube.com/",
+        iosUniversal:"https://tv.youtube.com/",
+        ios:"youtubetv://",
+        androidScheme:"youtubetv",
+        androidPackage:"com.google.android.apps.youtube.unplugged"
       }
     };
 
@@ -1299,11 +1383,17 @@ const DIRECTV_ZIP_KEY="nflLauncher.directv.zip.v3";
     // - Paramount+ maps to NFL on CBS games.
     // - FOX maps to games televised on FOX via FOX Sports / FOX One.
     // - NFL+ is included as a mobile/local/primetime fallback where eligible.
+    // Release 1 provider distribution rules.
+    // NFL+ is intentionally limited to live local/primetime windows and NFL Network;
+    // it is NOT a general live option for Sunday-afternoon CBS/FOX games.
+    // Paramount+ is included as an inferred option for CBS, subject to the user's
+    // local CBS market availability.
     const NETWORK_DISTRIBUTION = Object.freeze({
-      CBS: ["youtubetv","hulu","nflplus"],
+      CBS: ["paramount","youtubetv","hulu"],
       NBC: ["youtubetv","hulu","nflplus"],
-      FOX_NATIONAL: ["fox","youtubetv","hulu","nflplus"],
-      FOX_LOCAL: ["youtubetv","hulu","nflplus"],
+      FOX_NATIONAL: ["fox","youtubetv","hulu"],
+      FOX_REGIONAL: ["fox","youtubetv","hulu"],
+      FOX_LOCAL: ["youtubetv","hulu"],
       ESPN: ["espn","youtubetv","hulu","nflplus"],
       ABC: ["espn","youtubetv","hulu","nflplus"],
       NFL_NETWORK: ["nflplus","youtubetv","hulu"],
@@ -1312,23 +1402,645 @@ const DIRECTV_ZIP_KEY="nflLauncher.directv.zip.v3";
       PEACOCK_EXCLUSIVE: ["peacock","nflplus"]
     });
 
-    const LOCAL_AFFILIATE_PARENT_RULES = [
-      {pattern:/\bWUSA(?:9)?\b/i,parent:"CBS"},
-      {pattern:/\bKPIX\b/i,parent:"CBS"},
-      {pattern:/\bWCBS\b/i,parent:"CBS"},
-      {pattern:/\bKCBS\b/i,parent:"CBS"},
-      {pattern:/\bWBAL(?:-TV)?\b/i,parent:"NBC"},
-      {pattern:/\bKUSA(?:-TV)?\b|\b9NEWS\b/i,parent:"NBC"},
-      {pattern:/\bKPNX\b|\b12NEWS\b/i,parent:"NBC"},
-      {pattern:/\bKNBC\b|\bWMAQ\b|\bWNBC\b/i,parent:"NBC"},
-      {pattern:/\bKITR\b|\bKABC\b|\bWABC\b|\bWPVI\b|\bWLS\b|\bKGO\b/i,parent:"ABC"},
-      {pattern:/\bKSWB\b|\bKTTV\b|\bWNYW\b|\bWFLD\b/i,parent:"FOX_LOCAL"}
+    // Release 3.5: expanded static CBS/FOX affiliate directory for nationwide market recognition.
+    // CBS callsigns are cross-checked against CBS News' affiliate directory (updated Mar. 25, 2026).
+    // FOX callsigns are seeded from the maintained usa-local-epg local-affiliate list and are used
+    // only as market/affiliate evidence; weekly NFL station selection still must be proven separately.
+    const NATIONAL_LOCAL_AFFILIATES = [
+      {parent:'CBS',state:'AK',city:'Anchorage',callsign:'KYES'},
+      {parent:'CBS',state:'AK',city:'Fairbanks',callsign:'KXDF'},
+      {parent:'CBS',state:'AL',city:'Birmingham',callsign:'WIAT'},
+      {parent:'CBS',state:'AL',city:'Dothan',callsign:'WTVY'},
+      {parent:'CBS',state:'AL',city:'Huntsville',callsign:'WHNT'},
+      {parent:'CBS',state:'AL',city:'Mobile',callsign:'WKRG'},
+      {parent:'CBS',state:'AL',city:'Montgomery',callsign:'WAKA'},
+      {parent:'CBS',state:'AR',city:'Fort Smith',callsign:'KFSM'},
+      {parent:'CBS',state:'AR',city:'Little Rock',callsign:'KTHV'},
+      {parent:'CBS',state:'AZ',city:'Phoenix',callsign:'KPHO'},
+      {parent:'CBS',state:'AZ',city:'Tucson',callsign:'KOLD'},
+      {parent:'CBS',state:'AZ',city:'Yuma',callsign:'KYMA'},
+      {parent:'CBS',state:'CA',city:'Bakersfield',callsign:'KBAK'},
+      {parent:'CBS',state:'CA',city:'Chico',callsign:'KHSL'},
+      {parent:'CBS',state:'CA',city:'Eureka',callsign:'KVIQ'},
+      {parent:'CBS',state:'CA',city:'Fresno',callsign:'KGPE'},
+      {parent:'CBS',state:'CA',city:'Los Angeles',callsign:'KCBS'},
+      {parent:'CBS',state:'CA',city:'Monterey',callsign:'KION'},
+      {parent:'CBS',state:'CA',city:'Palm Springs',callsign:'KPSP'},
+      {parent:'CBS',state:'CA',city:'Sacramento',callsign:'KOVR'},
+      {parent:'CBS',state:'CA',city:'San Diego',callsign:'KFMB'},
+      {parent:'CBS',state:'CA',city:'San Francisco',callsign:'KPIX'},
+      {parent:'CBS',state:'CA',city:'Santa Barbara',callsign:'KEYT'},
+      {parent:'CBS',state:'CO',city:'Colorado Springs',callsign:'KKTV'},
+      {parent:'CBS',state:'CO',city:'Denver',callsign:'KCNC'},
+      {parent:'CBS',state:'CO',city:'Grand Junction',callsign:'KREX'},
+      {parent:'CBS',state:'CT',city:'Hartford',callsign:'WFSB'},
+      {parent:'CBS',state:'DC',city:'Washington',callsign:'WUSA'},
+      {parent:'CBS',state:'FL',city:'Fort Myers',callsign:'WINK'},
+      {parent:'CBS',state:'FL',city:'Gainesville',callsign:'WGFL'},
+      {parent:'CBS',state:'FL',city:'Jacksonville',callsign:'WJAX'},
+      {parent:'CBS',state:'FL',city:'Miami',callsign:'WFOR'},
+      {parent:'CBS',state:'FL',city:'Orlando',callsign:'WKMG'},
+      {parent:'CBS',state:'FL',city:'Panama City',callsign:'WECP'},
+      {parent:'CBS',state:'FL',city:'Tallahassee',callsign:'WCTV'},
+      {parent:'CBS',state:'FL',city:'Tampa',callsign:'WTSP'},
+      {parent:'CBS',state:'FL',city:'West Palm Beach',callsign:'WPEC'},
+      {parent:'CBS',state:'GA',city:'Albany',callsign:'WSWG'},
+      {parent:'CBS',state:'GA',city:'Atlanta',callsign:'WUPA'},
+      {parent:'CBS',state:'GA',city:'Augusta',callsign:'WRDW'},
+      {parent:'CBS',state:'GA',city:'Columbus',callsign:'WRBL'},
+      {parent:'CBS',state:'GA',city:'Macon',callsign:'WMAZ'},
+      {parent:'CBS',state:'GA',city:'Savannah',callsign:'WTOC'},
+      {parent:'CBS',state:'HI',city:'Honolulu',callsign:'KGMB'},
+      {parent:'CBS',state:'IA',city:'Cedar Rapids',callsign:'KGAN'},
+      {parent:'CBS',state:'IA',city:'Davenport',callsign:'WHBF'},
+      {parent:'CBS',state:'IA',city:'Des Moines',callsign:'KCCI'},
+      {parent:'CBS',state:'IA',city:'Ottumwa',callsign:'KTVO'},
+      {parent:'CBS',state:'IA',city:'Sioux City',callsign:'KPTH'},
+      {parent:'CBS',state:'ID',city:'Boise',callsign:'KBOI'},
+      {parent:'CBS',state:'ID',city:'Idaho Falls',callsign:'KIFI'},
+      {parent:'CBS',state:'ID',city:'Lewiston',callsign:'KLEW'},
+      {parent:'CBS',state:'ID',city:'Twin Falls',callsign:'KMVT'},
+      {parent:'CBS',state:'IL',city:'Champaign',callsign:'WCIA'},
+      {parent:'CBS',state:'IL',city:'Chicago',callsign:'WBBM'},
+      {parent:'CBS',state:'IL',city:'Peoria',callsign:'WMBD'},
+      {parent:'CBS',state:'IL',city:'Quincy',callsign:'KHQA'},
+      {parent:'CBS',state:'IL',city:'Rockford',callsign:'WIFR'},
+      {parent:'CBS',state:'IN',city:'Evansville',callsign:'WEVV'},
+      {parent:'CBS',state:'IN',city:'Fort Wayne',callsign:'WANE'},
+      {parent:'CBS',state:'IN',city:'Indianapolis',callsign:'WTTV'},
+      {parent:'CBS',state:'IN',city:'Lafayette',callsign:'WLFI'},
+      {parent:'CBS',state:'IN',city:'South Bend',callsign:'WSBT'},
+      {parent:'CBS',state:'IN',city:'Terre Haute',callsign:'WTHI'},
+      {parent:'CBS',state:'KS',city:'Topeka',callsign:'WIBW'},
+      {parent:'CBS',state:'KS',city:'Wichita',callsign:'KWCH'},
+      {parent:'CBS',state:'KY',city:'Bowling Green',callsign:'WNKY'},
+      {parent:'CBS',state:'KY',city:'Lexington',callsign:'WKYT'},
+      {parent:'CBS',state:'KY',city:'Louisville',callsign:'WLKY'},
+      {parent:'CBS',state:'LA',city:'Baton Rouge',callsign:'WAFB'},
+      {parent:'CBS',state:'LA',city:'Lafayette',callsign:'KLFY'},
+      {parent:'CBS',state:'LA',city:'Monroe',callsign:'KNOE'},
+      {parent:'CBS',state:'LA',city:'New Orleans',callsign:'WWL'},
+      {parent:'CBS',state:'LA',city:'Shreveport',callsign:'KSLA'},
+      {parent:'CBS',state:'MA',city:'Boston',callsign:'WBZ'},
+      {parent:'CBS',state:'MA',city:'Springfield',callsign:'WSHM'},
+      {parent:'CBS',state:'MD',city:'Baltimore',callsign:'WJZ'},
+      {parent:'CBS',state:'MD',city:'Salisbury',callsign:'WBOC'},
+      {parent:'CBS',state:'ME',city:'Bangor',callsign:'WABI'},
+      {parent:'CBS',state:'ME',city:'Portland',callsign:'WGME'},
+      {parent:'CBS',state:'ME',city:'Presque Isle',callsign:'WAGM'},
+      {parent:'CBS',state:'MI',city:'Alpena',callsign:'WBKB'},
+      {parent:'CBS',state:'MI',city:'Detroit',callsign:'WWJ'},
+      {parent:'CBS',state:'MI',city:'Grand Rapids',callsign:'WWMT'},
+      {parent:'CBS',state:'MI',city:'Lansing',callsign:'WLNS'},
+      {parent:'CBS',state:'MI',city:'Marquette',callsign:'WZMQ'},
+      {parent:'CBS',state:'MI',city:'Traverse City',callsign:'WWTV'},
+      {parent:'CBS',state:'MN',city:'Duluth',callsign:'KBJR'},
+      {parent:'CBS',state:'MN',city:'Mankato',callsign:'KEYC'},
+      {parent:'CBS',state:'MN',city:'Minneapolis',callsign:'WCCO'},
+      {parent:'CBS',state:'MN',city:'Rochester',callsign:'KIMT'},
+      {parent:'CBS',state:'MO',city:'Columbia',callsign:'KRCG'},
+      {parent:'CBS',state:'MO',city:'Joplin',callsign:'KOAM'},
+      {parent:'CBS',state:'MO',city:'Kansas City',callsign:'KCTV'},
+      {parent:'CBS',state:'MO',city:'Springfield',callsign:'KOLR'},
+      {parent:'CBS',state:'MO',city:'St Joseph',callsign:'KCJO'},
+      {parent:'CBS',state:'MO',city:'St Louis',callsign:'KMOV'},
+      {parent:'CBS',state:'MS',city:'Biloxi',callsign:'WLOX'},
+      {parent:'CBS',state:'MS',city:'Columbus',callsign:'WCBI'},
+      {parent:'CBS',state:'MS',city:'Greenwood',callsign:'WXVT'},
+      {parent:'CBS',state:'MS',city:'Hattiesburg',callsign:'WHLT'},
+      {parent:'CBS',state:'MS',city:'Jackson',callsign:'WJTV'},
+      {parent:'CBS',state:'MS',city:'Meridian',callsign:'WMDN'},
+      {parent:'CBS',state:'MT',city:'Billings',callsign:'KTVQ'},
+      {parent:'CBS',state:'MT',city:'Butte',callsign:'KXLF'},
+      {parent:'CBS',state:'MT',city:'Great Falls',callsign:'KRTV'},
+      {parent:'CBS',state:'MT',city:'Helena',callsign:'KXLH'},
+      {parent:'CBS',state:'MT',city:'Missoula',callsign:'KPAX'},
+      {parent:'CBS',state:'NC',city:'Charlotte',callsign:'WBTV'},
+      {parent:'CBS',state:'NC',city:'Greensboro',callsign:'WFMY'},
+      {parent:'CBS',state:'NC',city:'Greenville',callsign:'WNCT'},
+      {parent:'CBS',state:'NC',city:'Raleigh',callsign:'WNCN'},
+      {parent:'CBS',state:'NC',city:'Wilmington',callsign:'WWAY'},
+      {parent:'CBS',state:'ND',city:'Fargo',callsign:'KXJB'},
+      {parent:'CBS',state:'ND',city:'Minot',callsign:'KXMC'},
+      {parent:'CBS',state:'NE',city:'Lincoln',callsign:'KOLN'},
+      {parent:'CBS',state:'NE',city:'North Platte',callsign:'KNPL'},
+      {parent:'CBS',state:'NE',city:'Omaha',callsign:'KMTV'},
+      {parent:'CBS',state:'NM',city:'Albuquerque',callsign:'KRQE'},
+      {parent:'CBS',state:'NV',city:'Las Vegas',callsign:'KLAS'},
+      {parent:'CBS',state:'NV',city:'Reno',callsign:'KTVN'},
+      {parent:'CBS',state:'NY',city:'Albany',callsign:'WRGB'},
+      {parent:'CBS',state:'NY',city:'Binghamton',callsign:'WBNG'},
+      {parent:'CBS',state:'NY',city:'Buffalo',callsign:'WIVB'},
+      {parent:'CBS',state:'NY',city:'Elmira',callsign:'WENY'},
+      {parent:'CBS',state:'NY',city:'New York',callsign:'WCBS'},
+      {parent:'CBS',state:'NY',city:'Rochester',callsign:'WROC'},
+      {parent:'CBS',state:'NY',city:'Syracuse',callsign:'WKOF'},
+      {parent:'CBS',state:'NY',city:'Utica',callsign:'WKTV'},
+      {parent:'CBS',state:'NY',city:'Watertown',callsign:'WWNY'},
+      {parent:'CBS',state:'OH',city:'Cincinnati',callsign:'WKRC'},
+      {parent:'CBS',state:'OH',city:'Cleveland',callsign:'WOIO'},
+      {parent:'CBS',state:'OH',city:'Columbus',callsign:'WBNS'},
+      {parent:'CBS',state:'OH',city:'Dayton',callsign:'WHIO'},
+      {parent:'CBS',state:'OH',city:'Lima',callsign:'WOHL'},
+      {parent:'CBS',state:'OH',city:'Toledo',callsign:'WTOL'},
+      {parent:'CBS',state:'OH',city:'Youngstown',callsign:'WKBN'},
+      {parent:'CBS',state:'OK',city:'Oklahoma City',callsign:'KWTV'},
+      {parent:'CBS',state:'OK',city:'Tulsa',callsign:'KOTV'},
+      {parent:'CBS',state:'OR',city:'Bend',callsign:'KBNZ'},
+      {parent:'CBS',state:'OR',city:'Eugene',callsign:'KVAL'},
+      {parent:'CBS',state:'OR',city:'Medford',callsign:'KTVL'},
+      {parent:'CBS',state:'OR',city:'Portland',callsign:'KOIN'},
+      {parent:'CBS',state:'PA',city:'Erie',callsign:'WSEE'},
+      {parent:'CBS',state:'PA',city:'Harrisburg',callsign:'WHP'},
+      {parent:'CBS',state:'PA',city:'Johnstown',callsign:'WTAJ'},
+      {parent:'CBS',state:'PA',city:'Philadelphia',callsign:'KYW'},
+      {parent:'CBS',state:'PA',city:'Pittsburgh',callsign:'KDKA'},
+      {parent:'CBS',state:'PA',city:'Wilkes Barre',callsign:'WYOU'},
+      {parent:'CBS',state:'RI',city:'Providence',callsign:'WPRI'},
+      {parent:'CBS',state:'SC',city:'Charleston',callsign:'WCSC'},
+      {parent:'CBS',state:'SC',city:'Columbia',callsign:'WLTX'},
+      {parent:'CBS',state:'SC',city:'Greenville',callsign:'WSPA'},
+      {parent:'CBS',state:'SC',city:'Myrtle Beach',callsign:'WBTW'},
+      {parent:'CBS',state:'SD',city:'Rapid City',callsign:'KCLO'},
+      {parent:'CBS',state:'SD',city:'Sioux Falls',callsign:'KELO'},
+      {parent:'CBS',state:'TN',city:'Chattanooga',callsign:'WDEF'},
+      {parent:'CBS',state:'TN',city:'Knoxville',callsign:'WVLT'},
+      {parent:'CBS',state:'TN',city:'Memphis',callsign:'WREG'},
+      {parent:'CBS',state:'TN',city:'Nashville',callsign:'WTVF'},
+      {parent:'CBS',state:'TN',city:'Tri Cities',callsign:'WJHL'},
+      {parent:'CBS',state:'TX',city:'Abilene',callsign:'KTAB'},
+      {parent:'CBS',state:'TX',city:'Amarillo',callsign:'KFDA'},
+      {parent:'CBS',state:'TX',city:'Austin',callsign:'KEYE'},
+      {parent:'CBS',state:'TX',city:'Beaumont',callsign:'KFDM'},
+      {parent:'CBS',state:'TX',city:'Corpus Christi',callsign:'KZTV'},
+      {parent:'CBS',state:'TX',city:'Dallas',callsign:'KTVT'},
+      {parent:'CBS',state:'TX',city:'El Paso',callsign:'KDBC'},
+      {parent:'CBS',state:'TX',city:'Harlingen',callsign:'KVEO'},
+      {parent:'CBS',state:'TX',city:'Houston',callsign:'KHOU'},
+      {parent:'CBS',state:'TX',city:'Lubbock',callsign:'KLBK'},
+      {parent:'CBS',state:'TX',city:'Odessa',callsign:'KOSA'},
+      {parent:'CBS',state:'TX',city:'San Angelo',callsign:'KLST'},
+      {parent:'CBS',state:'TX',city:'San Antonio',callsign:'KENS'},
+      {parent:'CBS',state:'TX',city:'Sherman',callsign:'KXII'},
+      {parent:'CBS',state:'TX',city:'Tyler',callsign:'KYTX'},
+      {parent:'CBS',state:'TX',city:'Waco',callsign:'KWTX'},
+      {parent:'CBS',state:'TX',city:'Wichita Falls',callsign:'KAUZ'},
+      {parent:'CBS',state:'UT',city:'Salt Lake City',callsign:'KUTV'},
+      {parent:'CBS',state:'VT',city:'Burlington',callsign:'WCAX'},
+      {parent:'CBS',state:'VA',city:'Charlottesville',callsign:'WCAV'},
+      {parent:'CBS',state:'VA',city:'Norfolk',callsign:'WTKR'},
+      {parent:'CBS',state:'VA',city:'Richmond',callsign:'WTVR'},
+      {parent:'CBS',state:'VA',city:'Roanoke',callsign:'WDBJ'},
+      {parent:'CBS',state:'WA',city:'Seattle',callsign:'KIRO'},
+      {parent:'CBS',state:'WA',city:'Spokane',callsign:'KREM'},
+      {parent:'CBS',state:'WA',city:'Yakima',callsign:'KIMA'},
+      {parent:'CBS',state:'WI',city:'Green Bay',callsign:'WFRV'},
+      {parent:'CBS',state:'WI',city:'La Crosse',callsign:'WKBT'},
+      {parent:'CBS',state:'WI',city:'Madison',callsign:'WISC'},
+      {parent:'CBS',state:'WI',city:'Milwaukee',callsign:'WDJT'},
+      {parent:'CBS',state:'WI',city:'Wausau',callsign:'WSAW'},
+      {parent:'CBS',state:'WV',city:'Charleston',callsign:'WOWK'},
+      {parent:'CBS',state:'WV',city:'Clarksburg',callsign:'WDTV'},
+      {parent:'CBS',state:'WV',city:'Wheeling',callsign:'WTRF'},
+      {parent:'CBS',state:'WY',city:'Cheyenne',callsign:'KGWN'},
+      {parent:'FOX_LOCAL',state:'AK',city:'Anchorage',callsign:'KTBY'},
+      {parent:'FOX_LOCAL',state:'AK',city:'Fairbanks',callsign:'KATN'},
+      {parent:'FOX_LOCAL',state:'AL',city:'Birmingham',callsign:'WBRC'},
+      {parent:'FOX_LOCAL',state:'AL',city:'Dothan',callsign:'WDFX'},
+      {parent:'FOX_LOCAL',state:'AL',city:'Huntsville',callsign:'WZDX'},
+      {parent:'FOX_LOCAL',state:'AL',city:'Mobile',callsign:'WALA'},
+      {parent:'FOX_LOCAL',state:'AL',city:'Montgomery',callsign:'WCOV'},
+      {parent:'FOX_LOCAL',state:'AR',city:'Fort Smith',callsign:'KFTA'},
+      {parent:'FOX_LOCAL',state:'AR',city:'Jonesboro',callsign:'KJNB'},
+      {parent:'FOX_LOCAL',state:'AR',city:'Little Rock',callsign:'KLRT'},
+      {parent:'FOX_LOCAL',state:'AZ',city:'Phoenix',callsign:'KSAZ'},
+      {parent:'FOX_LOCAL',state:'AZ',city:'Tucson',callsign:'KMSB'},
+      {parent:'FOX_LOCAL',state:'AZ',city:'Yuma',callsign:'KECY'},
+      {parent:'FOX_LOCAL',state:'CA',city:'Bakersfield',callsign:'KBFX'},
+      {parent:'FOX_LOCAL',state:'CA',city:'Chico',callsign:'KCVU'},
+      {parent:'FOX_LOCAL',state:'CA',city:'Eureka',callsign:'KBVU'},
+      {parent:'FOX_LOCAL',state:'CA',city:'Fresno',callsign:'KMPH'},
+      {parent:'FOX_LOCAL',state:'CA',city:'Los Angeles',callsign:'KTTV'},
+      {parent:'FOX_LOCAL',state:'CA',city:'Monterey',callsign:'KCBA'},
+      {parent:'FOX_LOCAL',state:'CA',city:'Palm Springs',callsign:'KDFX'},
+      {parent:'FOX_LOCAL',state:'CA',city:'Sacramento',callsign:'KTXL'},
+      {parent:'FOX_LOCAL',state:'CA',city:'San Diego',callsign:'KSWB'},
+      {parent:'FOX_LOCAL',state:'CA',city:'San Francisco',callsign:'KTVU'},
+      {parent:'FOX_LOCAL',state:'CA',city:'Santa Barbara',callsign:'KKFX'},
+      {parent:'FOX_LOCAL',state:'CO',city:'Colorado Springs',callsign:'KXRM'},
+      {parent:'FOX_LOCAL',state:'CO',city:'Denver',callsign:'KDVR'},
+      {parent:'FOX_LOCAL',state:'CO',city:'Grand Junction',callsign:'KFQX'},
+      {parent:'FOX_LOCAL',state:'CT',city:'Hartford',callsign:'WTIC'},
+      {parent:'FOX_LOCAL',state:'DC',city:'Washington',callsign:'WTTG'},
+      {parent:'FOX_LOCAL',state:'FL',city:'Fort Myers',callsign:'WFTX'},
+      {parent:'FOX_LOCAL',state:'FL',city:'Gainesville',callsign:'WOGX'},
+      {parent:'FOX_LOCAL',state:'FL',city:'Jacksonville',callsign:'WFOX'},
+      {parent:'FOX_LOCAL',state:'FL',city:'Miami',callsign:'WSVN'},
+      {parent:'FOX_LOCAL',state:'FL',city:'Orlando',callsign:'WOFL'},
+      {parent:'FOX_LOCAL',state:'FL',city:'Panama City',callsign:'WPGX'},
+      {parent:'FOX_LOCAL',state:'FL',city:'Tallahassee',callsign:'WTWC'},
+      {parent:'FOX_LOCAL',state:'FL',city:'Tampa',callsign:'WTVT'},
+      {parent:'FOX_LOCAL',state:'FL',city:'West Palm Beach',callsign:'WFLX'},
+      {parent:'FOX_LOCAL',state:'GA',city:'Albany',callsign:'WFXL'},
+      {parent:'FOX_LOCAL',state:'GA',city:'Atlanta',callsign:'WAGA'},
+      {parent:'FOX_LOCAL',state:'GA',city:'Augusta',callsign:'WFXG'},
+      {parent:'FOX_LOCAL',state:'GA',city:'Columbus',callsign:'WXTX'},
+      {parent:'FOX_LOCAL',state:'GA',city:'Macon',callsign:'WGXA'},
+      {parent:'FOX_LOCAL',state:'GA',city:'Savannah',callsign:'WTGS'},
+      {parent:'FOX_LOCAL',state:'HI',city:'Honolulu',callsign:'KHON'},
+      {parent:'FOX_LOCAL',state:'IA',city:'Cedar Rapids',callsign:'KFXA'},
+      {parent:'FOX_LOCAL',state:'IA',city:'Davenport',callsign:'KLJB'},
+      {parent:'FOX_LOCAL',state:'IA',city:'Des Moines',callsign:'KDSM'},
+      {parent:'FOX_LOCAL',state:'IA',city:'Ottumwa',callsign:'KYOU'},
+      {parent:'FOX_LOCAL',state:'IA',city:'Sioux City',callsign:'KPTH'},
+      {parent:'FOX_LOCAL',state:'ID',city:'Boise',callsign:'KNIN'},
+      {parent:'FOX_LOCAL',state:'ID',city:'Idaho Falls',callsign:'KXPI'},
+      {parent:'FOX_LOCAL',state:'ID',city:'Twin Falls',callsign:'KSVT'},
+      {parent:'FOX_LOCAL',state:'IL',city:'Champaign',callsign:'WCCU'},
+      {parent:'FOX_LOCAL',state:'IL',city:'Chicago',callsign:'WFLD'},
+      {parent:'FOX_LOCAL',state:'IL',city:'Peoria',callsign:'WYZZ'},
+      {parent:'FOX_LOCAL',state:'IL',city:'Quincy',callsign:'WGEM'},
+      {parent:'FOX_LOCAL',state:'IL',city:'Rockford',callsign:'WQRF'},
+      {parent:'FOX_LOCAL',state:'IL',city:'Springfield',callsign:'WRSP'},
+      {parent:'FOX_LOCAL',state:'IN',city:'Evansville',callsign:'WEVV'},
+      {parent:'FOX_LOCAL',state:'IN',city:'Fort Wayne',callsign:'WFFT'},
+      {parent:'FOX_LOCAL',state:'IN',city:'Indianapolis',callsign:'WXIN'},
+      {parent:'FOX_LOCAL',state:'IN',city:'Lafayette',callsign:'WPBI'},
+      {parent:'FOX_LOCAL',state:'IN',city:'South Bend',callsign:'WSBT'},
+      {parent:'FOX_LOCAL',state:'IN',city:'Terre Haute',callsign:'WTHI'},
+      {parent:'FOX_LOCAL',state:'KS',city:'Topeka',callsign:'KTMJ'},
+      {parent:'FOX_LOCAL',state:'KS',city:'Wichita',callsign:'KSAS'},
+      {parent:'FOX_LOCAL',state:'KY',city:'Bowling Green',callsign:'WBKO'},
+      {parent:'FOX_LOCAL',state:'KY',city:'Lexington',callsign:'WDKY'},
+      {parent:'FOX_LOCAL',state:'KY',city:'Louisville',callsign:'WDRB'},
+      {parent:'FOX_LOCAL',state:'LA',city:'Baton Rouge',callsign:'WGMB'},
+      {parent:'FOX_LOCAL',state:'LA',city:'Lafayette',callsign:'KADN'},
+      {parent:'FOX_LOCAL',state:'LA',city:'Monroe',callsign:'KARD'},
+      {parent:'FOX_LOCAL',state:'LA',city:'New Orleans',callsign:'WVUE'},
+      {parent:'FOX_LOCAL',state:'LA',city:'Shreveport',callsign:'KMSS'},
+      {parent:'FOX_LOCAL',state:'MA',city:'Boston',callsign:'WFXT'},
+      {parent:'FOX_LOCAL',state:'MA',city:'Springfield',callsign:'WGGB'},
+      {parent:'FOX_LOCAL',state:'MD',city:'Baltimore',callsign:'WBFF'},
+      {parent:'FOX_LOCAL',state:'MD',city:'Salisbury',callsign:'WBOC'},
+      {parent:'FOX_LOCAL',state:'ME',city:'Bangor',callsign:'WFVX'},
+      {parent:'FOX_LOCAL',state:'ME',city:'Portland',callsign:'WPFO'},
+      {parent:'FOX_LOCAL',state:'ME',city:'Presque Isle',callsign:'WAGM'},
+      {parent:'FOX_LOCAL',state:'MI',city:'Alpena',callsign:'WBKB'},
+      {parent:'FOX_LOCAL',state:'MI',city:'Detroit',callsign:'WJBK'},
+      {parent:'FOX_LOCAL',state:'MI',city:'Flint',callsign:'WSMH'},
+      {parent:'FOX_LOCAL',state:'MI',city:'Grand Rapids',callsign:'WXMI'},
+      {parent:'FOX_LOCAL',state:'MI',city:'Lansing',callsign:'WSYM'},
+      {parent:'FOX_LOCAL',state:'MI',city:'Marquette',callsign:'WLUC'},
+      {parent:'FOX_LOCAL',state:'MI',city:'Traverse City',callsign:'WFQX'},
+      {parent:'FOX_LOCAL',state:'MN',city:'Duluth',callsign:'KQDS'},
+      {parent:'FOX_LOCAL',state:'MN',city:'Mankato',callsign:'KEYC'},
+      {parent:'FOX_LOCAL',state:'MN',city:'Minneapolis',callsign:'KMSP'},
+      {parent:'FOX_LOCAL',state:'MN',city:'Rochester',callsign:'KXLT'},
+      {parent:'FOX_LOCAL',state:'MO',city:'Columbia',callsign:'KQFX'},
+      {parent:'FOX_LOCAL',state:'MO',city:'Joplin',callsign:'KFJX'},
+      {parent:'FOX_LOCAL',state:'MO',city:'Kansas City',callsign:'WDAF'},
+      {parent:'FOX_LOCAL',state:'MO',city:'Springfield',callsign:'KRBK'},
+      {parent:'FOX_LOCAL',state:'MO',city:'St Joseph',callsign:'KNPN'},
+      {parent:'FOX_LOCAL',state:'MO',city:'St Louis',callsign:'KTVI'},
+      {parent:'FOX_LOCAL',state:'MS',city:'Biloxi',callsign:'WXXV'},
+      {parent:'FOX_LOCAL',state:'MS',city:'Columbus',callsign:'WLOV'},
+      {parent:'FOX_LOCAL',state:'MS',city:'Greenwood',callsign:'WABG'},
+      {parent:'FOX_LOCAL',state:'MS',city:'Hattiesburg',callsign:'WHPM'},
+      {parent:'FOX_LOCAL',state:'MS',city:'Jackson',callsign:'WDBD'},
+      {parent:'FOX_LOCAL',state:'MS',city:'Meridian',callsign:'WGBC'},
+      {parent:'FOX_LOCAL',state:'MT',city:'Billings',callsign:'KHMT'},
+      {parent:'FOX_LOCAL',state:'MT',city:'Butte',callsign:'KWYB'},
+      {parent:'FOX_LOCAL',state:'MT',city:'Great Falls',callsign:'KFBB'},
+      {parent:'FOX_LOCAL',state:'MT',city:'Helena',callsign:'KHBB'},
+      {parent:'FOX_LOCAL',state:'MT',city:'Missoula',callsign:'KTMF'},
+      {parent:'FOX_LOCAL',state:'NC',city:'Charlotte',callsign:'WJZY'},
+      {parent:'FOX_LOCAL',state:'NC',city:'Greensboro',callsign:'WGHP'},
+      {parent:'FOX_LOCAL',state:'NC',city:'Greenville',callsign:'WYDO'},
+      {parent:'FOX_LOCAL',state:'NC',city:'Raleigh',callsign:'WRAZ'},
+      {parent:'FOX_LOCAL',state:'NC',city:'Wilmington',callsign:'WSFX'},
+      {parent:'FOX_LOCAL',state:'ND',city:'Fargo',callsign:'KVRR'},
+      {parent:'FOX_LOCAL',state:'ND',city:'Minot',callsign:'KFYR'},
+      {parent:'FOX_LOCAL',state:'NE',city:'Lincoln',callsign:'KFXL'},
+      {parent:'FOX_LOCAL',state:'NE',city:'North Platte',callsign:'KIIT'},
+      {parent:'FOX_LOCAL',state:'NE',city:'Omaha',callsign:'KPTM'},
+      {parent:'FOX_LOCAL',state:'NM',city:'Albuquerque',callsign:'KRQE'},
+      {parent:'FOX_LOCAL',state:'NV',city:'Las Vegas',callsign:'KVVU'},
+      {parent:'FOX_LOCAL',state:'NV',city:'Reno',callsign:'KRXI'},
+      {parent:'FOX_LOCAL',state:'NY',city:'Albany',callsign:'WXXA'},
+      {parent:'FOX_LOCAL',state:'NY',city:'Binghamton',callsign:'WICZ'},
+      {parent:'FOX_LOCAL',state:'NY',city:'Buffalo',callsign:'WUTV'},
+      {parent:'FOX_LOCAL',state:'NY',city:'Elmira',callsign:'WYDC'},
+      {parent:'FOX_LOCAL',state:'NY',city:'New York',callsign:'WNYW'},
+      {parent:'FOX_LOCAL',state:'NY',city:'Rochester',callsign:'WUHF'},
+      {parent:'FOX_LOCAL',state:'NY',city:'Syracuse',callsign:'WSYT'},
+      {parent:'FOX_LOCAL',state:'NY',city:'Utica',callsign:'WFXV'},
+      {parent:'FOX_LOCAL',state:'NY',city:'Watertown',callsign:'WNYF'},
+      {parent:'FOX_LOCAL',state:'OH',city:'Cincinnati',callsign:'WXIX'},
+      {parent:'FOX_LOCAL',state:'OH',city:'Cleveland',callsign:'WJW'},
+      {parent:'FOX_LOCAL',state:'OH',city:'Columbus',callsign:'WTTE'},
+      {parent:'FOX_LOCAL',state:'OH',city:'Dayton',callsign:'WRGT'},
+      {parent:'FOX_LOCAL',state:'OH',city:'Lima',callsign:'WLIO'},
+      {parent:'FOX_LOCAL',state:'OH',city:'Toledo',callsign:'WUPW'},
+      {parent:'FOX_LOCAL',state:'OH',city:'Youngstown',callsign:'WYFX'},
+      {parent:'FOX_LOCAL',state:'OK',city:'Oklahoma City',callsign:'KOKH'},
+      {parent:'FOX_LOCAL',state:'OK',city:'Tulsa',callsign:'KOKI'},
+      {parent:'FOX_LOCAL',state:'OR',city:'Bend',callsign:'KFXO'},
+      {parent:'FOX_LOCAL',state:'OR',city:'Eugene',callsign:'KLSR'},
+      {parent:'FOX_LOCAL',state:'OR',city:'Medford',callsign:'KMVU'},
+      {parent:'FOX_LOCAL',state:'OR',city:'Portland',callsign:'KPTV'},
+      {parent:'FOX_LOCAL',state:'PA',city:'Erie',callsign:'WFXP'},
+      {parent:'FOX_LOCAL',state:'PA',city:'Harrisburg',callsign:'WPMT'},
+      {parent:'FOX_LOCAL',state:'PA',city:'Johnstown',callsign:'WWCP'},
+      {parent:'FOX_LOCAL',state:'PA',city:'Philadelphia',callsign:'WTXF'},
+      {parent:'FOX_LOCAL',state:'PA',city:'Pittsburgh',callsign:'WPGH'},
+      {parent:'FOX_LOCAL',state:'PA',city:'Wilkes Barre',callsign:'WOLF'},
+      {parent:'FOX_LOCAL',state:'RI',city:'Providence',callsign:'WNAC'},
+      {parent:'FOX_LOCAL',state:'SC',city:'Charleston',callsign:'WTAT'},
+      {parent:'FOX_LOCAL',state:'SC',city:'Columbia',callsign:'WACH'},
+      {parent:'FOX_LOCAL',state:'SC',city:'Greenville',callsign:'WHNS'},
+      {parent:'FOX_LOCAL',state:'SC',city:'Myrtle Beach',callsign:'WFXB'},
+      {parent:'FOX_LOCAL',state:'SD',city:'Rapid City',callsign:'KEVN'},
+      {parent:'FOX_LOCAL',state:'SD',city:'Sioux Falls',callsign:'KDLT'},
+      {parent:'FOX_LOCAL',state:'TN',city:'Chattanooga',callsign:'WTVC'},
+      {parent:'FOX_LOCAL',state:'TN',city:'Knoxville',callsign:'WTNZ'},
+      {parent:'FOX_LOCAL',state:'TN',city:'Memphis',callsign:'WHBQ'},
+      {parent:'FOX_LOCAL',state:'TN',city:'Nashville',callsign:'WZTV'},
+      {parent:'FOX_LOCAL',state:'TN',city:'Tri Cities',callsign:'WEMT'},
+      {parent:'FOX_LOCAL',state:'TX',city:'Abilene',callsign:'KXVA'},
+      {parent:'FOX_LOCAL',state:'TX',city:'Amarillo',callsign:'KCIT'},
+      {parent:'FOX_LOCAL',state:'TX',city:'Austin',callsign:'KTBC'},
+      {parent:'FOX_LOCAL',state:'TX',city:'Beaumont',callsign:'KBTV'},
+      {parent:'FOX_LOCAL',state:'TX',city:'Corpus Christi',callsign:'KSCC'},
+      {parent:'FOX_LOCAL',state:'TX',city:'Dallas',callsign:'KDFW'},
+      {parent:'FOX_LOCAL',state:'TX',city:'El Paso',callsign:'KFOX'},
+      {parent:'FOX_LOCAL',state:'TX',city:'Harlingen',callsign:'KFXV'},
+      {parent:'FOX_LOCAL',state:'TX',city:'Houston',callsign:'KRIV'},
+      {parent:'FOX_LOCAL',state:'TX',city:'Laredo',callsign:'KXOF'},
+      {parent:'FOX_LOCAL',state:'TX',city:'Lubbock',callsign:'KJTV'},
+      {parent:'FOX_LOCAL',state:'TX',city:'Odessa',callsign:'KPEJ'},
+      {parent:'FOX_LOCAL',state:'TX',city:'San Angelo',callsign:'KIDY'},
+      {parent:'FOX_LOCAL',state:'TX',city:'San Antonio',callsign:'KABB'},
+      {parent:'FOX_LOCAL',state:'TX',city:'Sherman',callsign:'KXII'},
+      {parent:'FOX_LOCAL',state:'TX',city:'Tyler',callsign:'KFXK'},
+      {parent:'FOX_LOCAL',state:'TX',city:'Waco',callsign:'KWKT'},
+      {parent:'FOX_LOCAL',state:'TX',city:'Wichita Falls',callsign:'KJTL'},
+      {parent:'FOX_LOCAL',state:'UT',city:'Salt Lake City',callsign:'KSTU'},
+      {parent:'FOX_LOCAL',state:'VA',city:'Charlottesville',callsign:'WCAV'},
+      {parent:'FOX_LOCAL',state:'VA',city:'Harrisonburg',callsign:'WSVF'},
+      {parent:'FOX_LOCAL',state:'VA',city:'Norfolk',callsign:'WVBT'},
+      {parent:'FOX_LOCAL',state:'VA',city:'Richmond',callsign:'WRLH'},
+      {parent:'FOX_LOCAL',state:'VA',city:'Roanoke',callsign:'WFXR'},
+      {parent:'FOX_LOCAL',state:'VT',city:'Burlington',callsign:'WFFF'},
+      {parent:'FOX_LOCAL',state:'WA',city:'Seattle',callsign:'KCPQ'},
+      {parent:'FOX_LOCAL',state:'WA',city:'Spokane',callsign:'KAYU'},
+      {parent:'FOX_LOCAL',state:'WA',city:'Yakima',callsign:'KFFX'},
+      {parent:'FOX_LOCAL',state:'WI',city:'Green Bay',callsign:'WLUK'},
+      {parent:'FOX_LOCAL',state:'WI',city:'La Crosse',callsign:'WLAX'},
+      {parent:'FOX_LOCAL',state:'WI',city:'Madison',callsign:'WMSN'},
+      {parent:'FOX_LOCAL',state:'WI',city:'Milwaukee',callsign:'WITI'},
+      {parent:'FOX_LOCAL',state:'WI',city:'Wausau',callsign:'WZAW'},
+      {parent:'FOX_LOCAL',state:'WV',city:'Charleston',callsign:'WVAH'},
+      {parent:'FOX_LOCAL',state:'WV',city:'Clarksburg',callsign:'WVFX'},
+      {parent:'FOX_LOCAL',state:'WV',city:'Wheeling',callsign:'WTOV'},
+      {parent:'FOX_LOCAL',state:'WY',city:'Cheyenne',callsign:'KLWY'}
     ];
 
+    function affiliatePattern(callsign){
+      return new RegExp(`\\b${String(callsign||"").replace(/[.*+?^${}()|[\\]\\]/g,"\\$&")}(?:-TV|-DT)?\\b`,"i");
+    }
+    const LOCAL_AFFILIATE_PARENT_RULES = NATIONAL_LOCAL_AFFILIATES.map(row=>({...row,market:row.city,pattern:affiliatePattern(row.callsign)}));
+
+    function normalizeMarketCompare(value){
+      return String(normalizeMarketName(value)||"").toLowerCase().replace(/\bst\.?\b/g,"saint").replace(/ft\.?/g,"fort").replace(/[^a-z0-9]+/g," " ).trim();
+    }
+    function affiliateCityMatchesMarket(city,market){
+      const c=normalizeMarketCompare(city),m=normalizeMarketCompare(market);
+      if(!c||!m)return false;
+      if(c===m||m.includes(c)||c.includes(m))return true;
+      const cWords=c.split(/\s+/).filter(w=>w.length>2),mWords=new Set(m.split(/\s+/));
+      return cWords.length>0&&cWords.every(w=>mWords.has(w));
+    }
     function classifyLocalAffiliate(names){
-      const joined=names.join(" | ");
-      const hit=LOCAL_AFFILIATE_PARENT_RULES.find(rule=>rule.pattern.test(joined));
+      const joined=names.join(" | "),hit=LOCAL_AFFILIATE_PARENT_RULES.find(rule=>rule.pattern.test(joined));
       return hit?.parent||"";
+    }
+    function getLocalAffiliateMarket(names){
+      const joined=names.join(" | "),hit=LOCAL_AFFILIATE_PARENT_RULES.find(rule=>rule.pattern.test(joined));
+      return hit?.market||"";
+    }
+    function getLocalAffiliateCallsign(names){
+      const joined=names.join(" | "),hit=LOCAL_AFFILIATE_PARENT_RULES.find(rule=>rule.pattern.test(joined));
+      return hit?.callsign||"";
+    }
+    function getLocalStationsForMarket(market){
+      const hits=NATIONAL_LOCAL_AFFILIATES.filter(r=>affiliateCityMatchesMarket(r.city,market));
+      const pick=parent=>hits.find(r=>r.parent===parent)?.callsign||"";
+      return {cbs:pick("CBS"),fox:pick("FOX_LOCAL"),hits};
+    }
+    function validateLocalAffiliateTable(){
+      const issues=[],seen=new Set();
+      NATIONAL_LOCAL_AFFILIATES.forEach(r=>{
+        const key=`${r.parent}|${r.callsign}`;
+        if(!r.city||!r.callsign)issues.push(`Incomplete ${key}`);
+        if(seen.has(key))issues.push(`Duplicate ${key}`);
+        seen.add(key);
+      });
+      const cbsCount=NATIONAL_LOCAL_AFFILIATES.filter(r=>r.parent==="CBS").length;
+      const foxCount=NATIONAL_LOCAL_AFFILIATES.filter(r=>r.parent==="FOX_LOCAL").length;
+      return {ok:issues.length===0,count:NATIONAL_LOCAL_AFFILIATES.length,markets:new Set(NATIONAL_LOCAL_AFFILIATES.map(r=>r.city)).size,cbsCount,foxCount,issues};
+    }
+
+    // Release 3.2: nationwide ZIP-first TV-market estimate with persistent local caching.
+    // Nielsen defines 210 U.S. DMA regions, but the exact ZIP/boundary dataset is
+    // licensed. Streamline therefore uses public market-center coordinates as an
+    // approximation for auto-detection and labels the result accordingly. A user
+    // can always override the estimate by saving a ZIP.
+    const US_TV_MARKET_GIST_API="https://api.github.com/gists/9ee4abc14dd5590434fe273f59cdf07f";
+    const US_TV_MARKET_CENTERS_URL="https://gist.githubusercontent.com/perrydc/9ee4abc14dd5590434fe273f59cdf07f/raw/a9a61694e1612455e4c2c96c7039378757fed21e/dma.json";
+    const US_ZIP_COORDS_URL="https://cdn.jsdelivr.net/npm/zipcodes-us@1.1.3/data/US.txt";
+    const US_TV_MARKET_CACHE_KEY="nflLauncher.tvMarketCenters.v2";
+    const ZIP_MARKET_CACHE_KEY="nflLauncher.zipMarketCache.v1";
+    const ZIP_COORD_CACHE_KEY="nflLauncher.zipCoordCache.v1";
+    // Release 3.7: compact embedded metro ZIP-prefix centroids. These are a fast
+    // offline hint, not an official ZIP→DMA table. Exact cached ZIPs win; unknown
+    // prefixes still fall back to the full public ZIP centroid source.
+    const EMBEDDED_ZIP_PREFIX_HINTS=Object.freeze({
+      "100":[40.7128,-74.0060,"New York","NY"],"101":[40.7128,-74.0060,"New York","NY"],"102":[40.7128,-74.0060,"New York","NY"],
+      "191":[39.9526,-75.1652,"Philadelphia","PA"],"200":[38.9072,-77.0369,"Washington","DC"],"201":[38.9072,-77.0369,"Washington","DC"],
+      "212":[39.2904,-76.6122,"Baltimore","MD"],"303":[33.7490,-84.3880,"Atlanta","GA"],"331":[25.7617,-80.1918,"Miami","FL"],
+      "336":[27.9506,-82.4572,"Tampa-St. Petersburg","FL"],"372":[36.1627,-86.7816,"Nashville","TN"],"282":[35.2271,-80.8431,"Charlotte","NC"],
+      "322":[30.3322,-81.6557,"Jacksonville","FL"],"452":[39.1031,-84.5120,"Cincinnati","OH"],"441":[41.4993,-81.6944,"Cleveland","OH"],
+      "462":[39.7684,-86.1581,"Indianapolis","IN"],"482":[42.3314,-83.0458,"Detroit","MI"],"606":[41.8781,-87.6298,"Chicago","IL"],
+      "532":[43.0389,-87.9065,"Milwaukee","WI"],"551":[44.9537,-93.0900,"Minneapolis-St. Paul","MN"],"554":[44.9778,-93.2650,"Minneapolis-St. Paul","MN"],
+      "641":[39.0997,-94.5786,"Kansas City","MO"],"661":[39.1142,-94.6275,"Kansas City","KS"],"752":[32.7767,-96.7970,"Dallas-Fort Worth","TX"],
+      "761":[32.7555,-97.3308,"Dallas-Fort Worth","TX"],"770":[29.7604,-95.3698,"Houston","TX"],"802":[39.7392,-104.9903,"Denver","CO"],
+      "850":[33.4484,-112.0740,"Phoenix","AZ"],"891":[36.1699,-115.1398,"Las Vegas","NV"],"900":[34.0522,-118.2437,"Los Angeles","CA"],
+      "901":[34.0522,-118.2437,"Los Angeles","CA"],"902":[34.0522,-118.2437,"Los Angeles","CA"],"904":[34.0195,-118.4912,"Los Angeles","CA"],
+      "921":[32.7157,-117.1611,"San Diego","CA"],"920":[32.7157,-117.1611,"San Diego","CA"],"941":[37.7749,-122.4194,"San Francisco","CA"],
+      "940":[37.7749,-122.4194,"San Francisco","CA"],"981":[47.6062,-122.3321,"Seattle-Tacoma","WA"],"980":[47.6062,-122.3321,"Seattle-Tacoma","WA"],
+      "021":[42.3601,-71.0589,"Boston","MA"],"022":[42.3601,-71.0589,"Boston","MA"],"142":[42.8864,-78.8784,"Buffalo","NY"],
+      "152":[40.4406,-79.9959,"Pittsburgh","PA"],"701":[29.9511,-90.0715,"New Orleans","LA"],"543":[44.5133,-88.0133,"Green Bay","WI"]
+    });
+    const MARKET_NAME_ALIASES=Object.freeze({
+      "Dallas-Ft. Worth":"Dallas-Fort Worth",
+      "San Francisco-Oak-San Jose":"San Francisco",
+      "Washington, DC (Hagrstwn)":"Washington",
+      "Boston (Manchester)":"Boston",
+      "Tampa-St. Pete (Sarasota)":"Tampa-St. Petersburg",
+      "Phoenix (Prescott)":"Phoenix",
+      "Miami-Ft. Lauderdale":"Miami",
+      "Cleveland-Akron (Canton)":"Cleveland",
+      "Green Bay-Appleton":"Green Bay"
+    });
+    const NFL_HOME_MARKETS = Object.freeze([
+      {market:"Phoenix",lat:33.4484,lon:-112.0740,teams:["ARI"]},
+      {market:"Atlanta",lat:33.7490,lon:-84.3880,teams:["ATL"]},
+      {market:"Baltimore",lat:39.2904,lon:-76.6122,teams:["BAL"]},
+      {market:"Buffalo",lat:42.8864,lon:-78.8784,teams:["BUF"]},
+      {market:"Charlotte",lat:35.2271,lon:-80.8431,teams:["CAR"]},
+      {market:"Chicago",lat:41.8781,lon:-87.6298,teams:["CHI"]},
+      {market:"Cincinnati",lat:39.1031,lon:-84.5120,teams:["CIN"]},
+      {market:"Cleveland",lat:41.4993,lon:-81.6944,teams:["CLE"]},
+      {market:"Dallas-Fort Worth",lat:32.7767,lon:-96.7970,teams:["DAL"]},
+      {market:"Denver",lat:39.7392,lon:-104.9903,teams:["DEN"]},
+      {market:"Detroit",lat:42.3314,lon:-83.0458,teams:["DET"]},
+      {market:"Green Bay",lat:44.5133,lon:-88.0133,teams:["GB"]},
+      {market:"Houston",lat:29.7604,lon:-95.3698,teams:["HOU"]},
+      {market:"Indianapolis",lat:39.7684,lon:-86.1581,teams:["IND"]},
+      {market:"Jacksonville",lat:30.3322,lon:-81.6557,teams:["JAX"]},
+      {market:"Kansas City",lat:39.0997,lon:-94.5786,teams:["KC"]},
+      {market:"Las Vegas",lat:36.1699,lon:-115.1398,teams:["LV"]},
+      {market:"Los Angeles",lat:34.0522,lon:-118.2437,teams:["LAC","LAR"]},
+      {market:"Miami",lat:25.7617,lon:-80.1918,teams:["MIA"]},
+      {market:"Minneapolis-St. Paul",lat:44.9537,lon:-93.0900,teams:["MIN"]},
+      {market:"Boston",lat:42.3601,lon:-71.0589,teams:["NE"]},
+      {market:"New Orleans",lat:29.9511,lon:-90.0715,teams:["NO"]},
+      {market:"New York",lat:40.7128,lon:-74.0060,teams:["NYG","NYJ"]},
+      {market:"Philadelphia",lat:39.9526,lon:-75.1652,teams:["PHI"]},
+      {market:"Pittsburgh",lat:40.4406,lon:-79.9959,teams:["PIT"]},
+      {market:"San Francisco",lat:37.7749,lon:-122.4194,teams:["SF"]},
+      {market:"Seattle-Tacoma",lat:47.6062,lon:-122.3321,teams:["SEA"]},
+      {market:"Tampa-St. Petersburg",lat:27.9506,lon:-82.4572,teams:["TB"]},
+      {market:"Nashville",lat:36.1627,lon:-86.7816,teams:["TEN"]},
+      {market:"Washington",lat:38.9072,lon:-77.0369,teams:["WSH"]}
+    ]);
+
+    function haversineMiles(aLat,aLon,bLat,bLon){
+      const r=3958.8,toRad=x=>x*Math.PI/180;
+      const dLat=toRad(bLat-aLat),dLon=toRad(bLon-aLon);
+      const q=Math.sin(dLat/2)**2+Math.cos(toRad(aLat))*Math.cos(toRad(bLat))*Math.sin(dLon/2)**2;
+      return 2*r*Math.asin(Math.sqrt(q));
+    }
+    function normalizeMarketName(name){return MARKET_NAME_ALIASES[String(name||"").trim()]||String(name||"").trim();}
+    function validMarketCenters(rows){
+      return Array.isArray(rows)&&rows.length>=180&&rows.every(r=>r&&typeof r.dma==="string"&&Number.isFinite(Number(r.lat))&&Number.isFinite(Number(r.lon)));
+    }
+    async function loadNationalMarketCenters(){
+      try{
+        const cached=JSON.parse(localStorage.getItem(US_TV_MARKET_CACHE_KEY)||"null");
+        if(validMarketCenters(cached))return cached;
+      }catch{}
+      let rows=null;
+      try{
+        const response=await fetch(US_TV_MARKET_GIST_API,{cache:"force-cache",headers:{Accept:"application/vnd.github+json"}});
+        if(response.ok){
+          const payload=await response.json();
+          rows=JSON.parse(payload?.files?.["dma.json"]?.content||"null");
+        }
+      }catch{}
+      if(!validMarketCenters(rows)){
+        const response=await fetch(US_TV_MARKET_CENTERS_URL,{cache:"force-cache"});
+        if(!response.ok)throw new Error(`market data ${response.status}`);
+        rows=await response.json();
+      }
+      if(!validMarketCenters(rows))throw new Error("market data invalid");
+      try{localStorage.setItem(US_TV_MARKET_CACHE_KEY,JSON.stringify(rows));}catch{}
+      return rows;
+    }
+
+    function readJsonCache(key){try{return JSON.parse(localStorage.getItem(key)||"{}")}catch{return {}}}
+    function writeJsonCache(key,value){try{localStorage.setItem(key,JSON.stringify(value))}catch{}}
+
+    // Diagnostics only: inspect local ZIP/market state without fetching or mutating data.
+    function getZipMarketDiagnosticState(){
+      const zip=String(directvZip||"").trim();
+      const zipValid=/^\d{5}$/.test(zip);
+      const marketCache=readJsonCache(ZIP_MARKET_CACHE_KEY);
+      const coordCache=readJsonCache(ZIP_COORD_CACHE_KEY);
+      let marketCenters=[];
+      try{marketCenters=JSON.parse(localStorage.getItem(US_TV_MARKET_CACHE_KEY)||"null")||[];}catch{}
+      const cachedMarket=zipValid?marketCache[zip]||null:null;
+      const cachedCoord=zipValid?coordCache[zip]||null:null;
+      return {
+        zip,zipValid,cachedMarket,cachedCoord,
+        marketCentersValid:validMarketCenters(marketCenters),
+        marketCenterCount:Array.isArray(marketCenters)?marketCenters.length:0,
+        currentMarket:String(directvMarket||"").trim(),
+        currentSource:String(directvMarketSource||"").trim()
+      };
+    }
+    async function lookupZipCoordinates(zip){
+      const z=String(zip||"").trim();
+      if(!/^\d{5}$/.test(z))return null;
+      const cache=readJsonCache(ZIP_COORD_CACHE_KEY);
+      if(cache[z]&&Number.isFinite(cache[z].lat)&&Number.isFinite(cache[z].lon))return cache[z];
+      const hint=EMBEDDED_ZIP_PREFIX_HINTS[z.slice(0,3)];
+      if(hint){
+        const compact={zip:z,city:hint[2],state:hint[3],lat:hint[0],lon:hint[1],source:"embedded ZIP prefix"};
+        cache[z]=compact;writeJsonCache(ZIP_COORD_CACHE_KEY,cache);return compact;
+      }
+      const response=await fetch(US_ZIP_COORDS_URL,{cache:"force-cache"});
+      if(!response.ok)throw new Error(`ZIP data ${response.status}`);
+      const text=await response.text();
+      let hit=null;
+      for(const line of text.split(/\r?\n/)){
+        if(!line)continue;
+        const cols=line.split("\t");
+        if(cols[1]!==z)continue;
+        const lat=Number(cols[9]),lon=Number(cols[10]);
+        if(Number.isFinite(lat)&&Number.isFinite(lon)){hit={zip:z,city:cols[2]||"",state:cols[4]||"",lat,lon};break;}
+      }
+      if(hit){cache[z]=hit;writeJsonCache(ZIP_COORD_CACHE_KEY,cache);}
+      return hit;
+    }
+    async function resolveMarketFromZip(zip){
+      const z=String(zip||"").trim();
+      if(!/^\d{5}$/.test(z))return null;
+      const marketCache=readJsonCache(ZIP_MARKET_CACHE_KEY);
+      if(marketCache[z]?.market)return marketCache[z];
+      const coord=await lookupZipCoordinates(z);
+      if(!coord)return null;
+      const hit=nearestMarketFromRows(coord.lat,coord.lon,await loadNationalMarketCenters());
+      if(!hit)return null;
+      const resolved={zip:z,city:coord.city,state:coord.state,market:hit.market,miles:Math.round(hit.miles*10)/10,confidence:hit.confidence||"",source:"ZIP estimate"};
+      marketCache[z]=resolved;writeJsonCache(ZIP_MARKET_CACHE_KEY,marketCache);
+      return resolved;
+    }
+    function nearestMarketFromRows(lat,lon,rows){
+      let best=null,second=null;
+      rows.forEach(r=>{
+        const miles=haversineMiles(lat,lon,Number(r.lat),Number(r.lon));
+        const hit={market:normalizeMarketName(r.dma),rawMarket:r.dma,lat:Number(r.lat),lon:Number(r.lon),miles};
+        if(!best||miles<best.miles){second=best;best=hit;}else if(!second||miles<second.miles)second=hit;
+      });
+      if(!best)return null;
+      const separation=second?second.miles-best.miles:999;
+      return {...best,secondMiles:second?.miles??null,confidence:separation>=25?"high":separation>=10?"medium":"low"};
+    }
+    async function estimateUsTvMarket(lat,lon){
+      try{return nearestMarketFromRows(lat,lon,await loadNationalMarketCenters());}
+      catch{
+        // Offline/fetch fallback keeps the prior conservative NFL-home-market
+        // behavior only when the user is actually nearby. It must never turn a
+        // distant city into the nearest NFL market.
+        const fallback=nearestMarketFromRows(lat,lon,NFL_HOME_MARKETS.map(m=>({dma:m.market,lat:m.lat,lon:m.lon})));
+        return fallback&&fallback.miles<=70?{...fallback,confidence:"fallback"}:null;
+      }
+    }
+    function marketTeams(market){return NFL_HOME_MARKETS.find(m=>m.market===market)?.teams||[];}
+    function gameMatchesMarketTeam(game,market){
+      const teams=marketTeams(market);
+      return teams.includes(String(game.awayAbbr||"").toUpperCase())||teams.includes(String(game.homeAbbr||"").toUpperCase());
     }
 
     const STREAMING_RIGHTS_SCHEMA=1;
@@ -1361,7 +2073,7 @@ const DIRECTV_ZIP_KEY="nflLauncher.directv.zip.v3";
         if(/\bnetflix\b/i.test(names))add(date,g.awayAbbr,g.homeAbbr,"netflix","ESPN explicit Netflix");
         if(/\bpeacock\b/i.test(names))add(date,g.awayAbbr,g.homeAbbr,"peacock","ESPN explicit Peacock");
         if(/\bparamount\s*\+?\b/i.test(names))add(date,g.awayAbbr,g.homeAbbr,"paramount","ESPN explicit Paramount+");
-        if(cls==="FOX_NATIONAL")add(date,g.awayAbbr,g.homeAbbr,"fox","ESPN explicit national FOX","STRONG");
+        if(["FOX_NATIONAL","FOX_REGIONAL"].includes(cls))add(date,g.awayAbbr,g.homeAbbr,"fox",cls==="FOX_REGIONAL"?"ESPN regional FOX":"ESPN explicit national FOX","STRONG");
       });
       return out;
     }
@@ -1374,13 +2086,16 @@ const DIRECTV_ZIP_KEY="nflLauncher.directv.zip.v3";
       if(provider==="prime") return /\bprime(?: video)?\b/i.test(names);
       if(provider==="netflix") return /\bnetflix\b/i.test(names);
       if(provider==="peacock") return /\bpeacock\b/i.test(names) || cls==="NBC";
-      if(provider==="fox") return cls==="FOX_NATIONAL";
-      if(provider==="paramount") return /\bparamount\s*\+?\b/i.test(names);
+      if(provider==="fox") return ["FOX_NATIONAL","FOX_REGIONAL"].includes(cls);
+      // Paramount+ carries the local CBS NFL feed. The exact local-market game
+      // still depends on the user's market, so this is an inferred rule rather
+      // than a season-table verification.
+      if(provider==="paramount") return /\bparamount\s*\+?\b/i.test(names) || cls==="CBS";
 
-      // NFL+ reliably includes national/primetime windows; Sunday local games
-      // remain market/device dependent and are not treated as table-verifiable.
+      // NFL+ reliably includes primetime/local games on mobile/tablet plus NFL
+      // Network. Ordinary Sunday-afternoon CBS/FOX games are not included here.
       if(provider==="nflplus"){
-        return ["NFL_NETWORK","ESPN","ABC","PRIME","NETFLIX","PEACOCK_EXCLUSIVE"].includes(cls);
+        return ["NFL_NETWORK","NBC","ESPN","ABC","PRIME","NETFLIX","PEACOCK_EXCLUSIVE"].includes(cls);
       }
       return false;
     }
@@ -1410,7 +2125,7 @@ const DIRECTV_ZIP_KEY="nflLauncher.directv.zip.v3";
           if(table&&!shown){
             issues.push({severity:"ERROR",provider,game:`${game.awayAbbr} @ ${game.homeAbbr}`,date:localGameDate(game),week:scheduleWeekKey(game),reason:"Verified rights table says YES but provider is not detected",broadcasts:getBroadcastNames(game)});
             s.issues++;
-          }else if(shown&&!table && ["prime","netflix","peacock","fox","paramount"].includes(provider)){
+          }else if(shown&&!table && ["prime","netflix","peacock","fox"].includes(provider)){
             issues.push({severity:"WARN",provider,game:`${game.awayAbbr} @ ${game.homeAbbr}`,date:localGameDate(game),week:scheduleWeekKey(game),reason:"Provider shown without a season-table verification record",broadcasts:getBroadcastNames(game)});
             s.issues++;
           }else if(expected&&!shown){
@@ -1498,6 +2213,7 @@ const DIRECTV_ZIP_KEY="nflLauncher.directv.zip.v3";
       if(/\bcbs\s*\d*\b/i.test(s))return "CBS";
       if(/\bnbc\s*\d*\b/i.test(s))return "NBC";
       if(/\babc\s*\d*\b/i.test(s))return "ABC";
+      if(isRegionalFoxBroadcast(game))return "FOX_REGIONAL";
       if(isNationalFoxBroadcast(game))return "FOX_NATIONAL";
       if(/\bfox\s*\d*\b/i.test(s))return "FOX_LOCAL";
 
@@ -1532,12 +2248,18 @@ const DIRECTV_ZIP_KEY="nflLauncher.directv.zip.v3";
     let diagnosticsEnabled = localStorage.getItem("nflLauncher.diagnostics") === "true";
     let preferredProvider = localStorage.getItem(PREFERRED_PROVIDER_KEY) || "auto";
 let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
+    let directvMarket=localStorage.getItem(DIRECTV_MARKET_KEY)||"";
+    let directvMarketSource=localStorage.getItem(DIRECTV_MARKET_SOURCE_KEY)||"";
     let directvNflPackageEnabled=localStorage.getItem(DIRECTV_NFL_PACKAGE_KEY)==="true";
-    let directvPublicSchedule=new Map();
-    let directvPublicScheduleStatus="NOT_LOADED";
+    let sundayTicketEnabled=localStorage.getItem(SUNDAY_TICKET_KEY)==="true";
+    let localFirstEnabled=localStorage.getItem(LOCAL_FIRST_KEY)==="true";
+    let weeklyCoverageData=readWeeklyCoverageCache();
+    // Release 3.3 cleanup: retained only as commented history; no runtime dependency.
+    // let directvPublicSchedule=new Map();
+    // let directvPublicScheduleStatus="NOT_LOADED";
     let tvCastEnabled = localStorage.getItem(TV_CAST_ENABLED_KEY) === "true";
     let selectedTvDeviceId = localStorage.getItem(TV_CAST_DEVICE_KEY) || "";
-    let discoveredTvDevices = [];
+    let discoveredTvDevices = readRememberedTvDevices();
     let liveRefreshTimer = null;
     const scheduleEl = document.querySelector("#schedule");
     const statusEl = document.querySelector("#scheduleStatus");
@@ -1741,6 +2463,21 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       return await res.json();
     }
 
+    // Preserve any game/event URLs ESPN supplies. Most scoreboard responses expose
+    // a game-summary URL; some feeds may also expose watch/live destinations.
+    // Provider launching prefers these exact event URLs before using generic pages.
+    function normalizeEspnSourceLinks(event, competition){
+      const rows=[...(Array.isArray(event?.links)?event.links:[]),...(Array.isArray(competition?.links)?competition.links:[])];
+      const seen=new Set();
+      return rows.map(link=>{
+        const href=String(link?.href||link?.url||"").trim();
+        if(!href||seen.has(href))return null;
+        seen.add(href);
+        const rel=Array.isArray(link?.rel)?link.rel.map(String):[];
+        return {href,text:String(link?.text||link?.shortText||""),rel};
+      }).filter(Boolean);
+    }
+
     // Converts ESPN's nested event structure into the flat fields used by
     // renderGameCard(). Also de-dupes games across season and week requests.
     function normalizeEspn(raw, seen){
@@ -1774,6 +2511,7 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
           awayRecord: away.records?.[0]?.summary || "",
           network: broadcast,
           broadcasts,
+          sourceLinks: normalizeEspnSourceLinks(event,competition),
           status: (event.status?.type?.state || event.status?.type?.name || "scheduled").toLowerCase(),
           statusDetail: event.status?.type?.shortDetail || event.status?.type?.detail || "",
           period: event.status?.period || event.status?.type?.period || "",
@@ -1833,6 +2571,52 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       }
     }
 
+    function readWeeklyCoverageCache(){
+      try{const payload=JSON.parse(localStorage.getItem(WEEKLY_COVERAGE_CACHE_KEY)||"null");return payload&&typeof payload==="object"?payload:null;}catch(err){return null;}
+    }
+    function saveWeeklyCoverageCache(payload){try{localStorage.setItem(WEEKLY_COVERAGE_CACHE_KEY,JSON.stringify(payload));}catch(err){} weeklyCoverageData=payload;}
+    async function refreshWeeklyCoverageData(force=false){
+      const cached=readWeeklyCoverageCache(),savedAt=Number(cached?.savedAt||0);
+      if(!force&&cached&&Date.now()-savedAt<WEEKLY_COVERAGE_CACHE_TTL_MS){weeklyCoverageData=cached;return cached;}
+      try{
+        const res=await fetch(WEEKLY_COVERAGE_FEED_URL,{cache:"no-store"}); if(!res.ok)throw new Error(`coverage ${res.status}`);
+        const body=await res.json(); if(!body||typeof body!=="object"||!body.weeks)throw new Error("invalid coverage payload");
+        const payload={...body,savedAt:Date.now()}; saveWeeklyCoverageCache(payload); return payload;
+      }catch(err){weeklyCoverageData=cached||null;return weeklyCoverageData;}
+    }
+    function gameCoverageKey(game){return `${String(game.awayAbbr||"").toUpperCase()}@${String(game.homeAbbr||"").toUpperCase()}`;}
+    function gameCoverageSlot(game){
+      const d=new Date(game.dateTime);if(Number.isNaN(d.getTime()))return "";
+      const n=classifyBroadcastNetwork(game),parent=n==="CBS"?"CBS":n.startsWith("FOX")?"FOX":"";if(!parent)return "";
+      return `${parent}:${d.getUTCHours()<19?"EARLY":"LATE"}`;
+    }
+    function getWeeklyCoverageAssignment(game){
+      const data=weeklyCoverageData;if(!data?.weeks||!directvMarket)return null;
+      const week=data.weeks[scheduleWeekKey(game)]||data.weeks[String(game.weekNumber||"")]||null;if(!week)return null;
+      const marketKey=Object.keys(week.markets||{}).find(k=>marketsEquivalent(k,directvMarket));if(!marketKey)return null;
+      const slot=gameCoverageSlot(game),a=(week.markets[marketKey]||{})[slot]||null;if(!a)return null;
+      const assignedGame=String(a.game||a.matchup||"").toUpperCase().replace(/\s+/g,""),current=gameCoverageKey(game);
+      return {source:String(a.source||data.source||"weekly coverage feed"),station:String(a.station||""),slot,assignedGame,match:assignedGame===current,conflict:!!assignedGame&&assignedGame!==current,updatedAt:String(data.updatedAt||"")};
+    }
+    function getLocalAvailabilityDiagnostic(game){
+      const n=classifyBroadcastNetwork(game),weekly=getWeeklyCoverageAssignment(game);
+      if(weekly?.match)return {score:5,state:"CONFIRMED LOCAL",source:weekly.source,station:weekly.station,weekly};
+      if(weekly?.conflict)return {score:0,state:"OUT OF MARKET",source:weekly.source,station:weekly.station,weekly};
+      if(["NBC","ABC","ESPN","PRIME","NETFLIX","PEACOCK_EXCLUSIVE","NFL_NETWORK"].includes(n))return {score:4,state:"NATIONAL / STANDARD",source:"network rights",station:"",weekly:null};
+      if(["CBS","FOX_LOCAL","FOX_REGIONAL","FOX_NATIONAL"].includes(n)){
+        const broadcasts=getBroadcastNames(game),affiliateMarket=getLocalAffiliateMarket(broadcasts);
+        if(affiliateMarket&&marketsEquivalent(affiliateMarket,directvMarket))return {score:5,state:"CONFIRMED LOCAL",source:"ESPN affiliate",station:getLocalAffiliateCallsign(broadcasts),weekly:null};
+        if(affiliateMarket&&!marketsEquivalent(affiliateMarket,directvMarket))return {score:0,state:"OUT OF MARKET",source:"ESPN affiliate",station:getLocalAffiliateCallsign(broadcasts),weekly:null};
+        if(directvMarket&&gameMatchesMarketTeam(game,directvMarket))return {score:3,state:"LOCAL EXPECTED",source:"market team",station:"",weekly:null};
+        return {score:1,state:"REGIONAL UNVERIFIED",source:"weekly assignment unavailable",station:"",weekly:null};
+      }
+      return {score:2,state:"UNVERIFIED",source:"provider evidence",station:"",weekly:null};
+    }
+    function localFirstSort(a,b){
+      const da=new Date(a.dateTime),db=new Date(b.dateTime),delta=da-db;if(Math.abs(delta)>30*60*1000)return delta;
+      const sa=getLocalAvailabilityDiagnostic(a).score,sb=getLocalAvailabilityDiagnostic(b).score;return sb-sa||delta||String(a.awayAbbr||"").localeCompare(String(b.awayAbbr||""));
+    }
+
     function getDisplayGames(sourceGames = allGames){
       const now = new Date();
       const cutoff = new Date(now.getTime() - 4 * 60 * 60 * 1000);
@@ -1843,19 +2627,19 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
         : baseAll;
       let selected;
       if(sortMode === "scheduled"){
-        selected = base.filter(g => isScheduledGame(g) && new Date(g.dateTime) >= cutoff).sort(sortByDate);
+        selected = base.filter(g => isScheduledGame(g) && new Date(g.dateTime) >= cutoff).sort(localFirstEnabled?localFirstSort:sortByDate);
       } else if(sortMode === "final"){
         selected = base.filter(isFinalGame).sort((a,b) => new Date(b.dateTime) - new Date(a.dateTime));
       } else if(sortMode === "live"){
         // LIVE is a true filter: do not include scheduled or final games.
-        selected = base.filter(isLiveGame).sort(sortByDate);
+        selected = base.filter(isLiveGame).sort(localFirstEnabled?localFirstSort:sortByDate);
       } else {
         // GAMES is the active schedule, not a duplicate results view.
         // Show scheduled + live games only. Once the week is fully complete,
         // completed games remain exclusively under RESULTS.
         selected = base
           .filter(g => !isFinalGame(g))
-          .sort(sortByDate);
+          .sort(localFirstEnabled?localFirstSort:sortByDate);
       }
       return selected.slice(0, MAX_GAMES_TO_SHOW);
     }
@@ -1909,19 +2693,27 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       return providerKeys[0];
     }
 
+    // Release 3.3 diagnostics: mirrors the active ZIP → market → affiliate → eligibility pipeline.
     function getDirectvDiagnostic(game){
       const dtv=getDirectvEligibility(game);
-      const labels={NO_ZIP:"NO ZIP",THIRD_PARTY:"THIRD PARTY",NFL_PACKAGE:"NFL PACKAGE",NFL_PACKAGE_LOCKED:"PACKAGE LOCKED",NETWORK_INCLUDED:"NETWORK INCLUDED",LOCAL_INCLUDED:"LOCAL INCLUDED",LOCAL_UNVERIFIED:"LOCAL UNVERIFIED",UNVERIFIED:"NO MATCH"};
+      const labels={NO_ZIP:"NO ZIP",NO_LOCATION:"NO LOCATION",THIRD_PARTY:"THIRD PARTY",NFL_PACKAGE:"NFL PACKAGE",NFL_PACKAGE_LOCKED:"PACKAGE LOCKED",NETWORK_INCLUDED:"NETWORK INCLUDED",LOCAL_INCLUDED:"LOCAL INCLUDED",LOCAL_EXPECTED:"LOCAL EXPECTED",LOCAL_UNVERIFIED:"LOCAL UNVERIFIED",OUT_OF_MARKET:"OUT OF MARKET",UNVERIFIED:"NO MATCH"};
       return {valid:dtv.eligible,state:labels[dtv.type]||dtv.type,reason:dtv.reason,broadcasts:getBroadcastNames(game)};
     }
 
     function renderDirectvDiagnostic(game){
       const d=getDirectvDiagnostic(game);
-      const zip=String(directvZip||"").trim();
-      const zipDisplay=/^\d{5}$/.test(zip)?zip:(zip?`${zip} (INVALID)`:"NOT SET");
+      const zipState=getZipMarketDiagnosticState();
+      const zipDisplay=zipState.zipValid?zipState.zip:(zipState.zip?`${zipState.zip} (INVALID)`:"NOT SET");
       const dtvDetected=getProviderKeysForGame(game).includes("directv");
       const dtvEnabled=enabledProviders.includes("directv");
       const dtvRendered=getEnabledProviderKeysForGame(game).includes("directv");
+      const broadcasts=getBroadcastNames(game);
+      const affiliateParent=classifyLocalAffiliate(broadcasts);
+      const affiliateMarket=getLocalAffiliateMarket(broadcasts);
+      const localStations=getLocalStationsForMarket(directvMarket);
+      const gameAffiliate=getLocalAffiliateCallsign(broadcasts);
+      const localAvail=getLocalAvailabilityDiagnostic(game);
+      const weekly=localAvail.weekly;
       return `<div class="dtv-diagnostic-block">
         <div class="diag-row dtv-diag">
           <span class="diag-confidence ${d.valid?"":"diag-rejected"}">DTV ${escapeHtml(d.state)}</span>
@@ -1929,7 +2721,16 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
         </div>
         <div class="diag-summary">
           <span class="diag-label">ZIP</span><span>${escapeHtml(zipDisplay)}</span>
-          <span class="diag-label">NFL ACCESS</span><span>${directvNflPackageEnabled?"ON":"OFF"}</span>
+          <span class="diag-label">MARKET</span><span>${escapeHtml(directvMarket||"NOT SET")}</span>
+          <span class="diag-label">MARKET SOURCE</span><span>${escapeHtml(directvMarketSource||"NOT SET")}</span>
+          <span class="diag-label">LOCAL CBS</span><span>${escapeHtml(localStations.cbs||"not mapped")}</span>
+          <span class="diag-label">LOCAL FOX</span><span>${escapeHtml(localStations.fox||"not mapped")}</span>
+          <span class="diag-label">GAME AFFILIATE</span><span>${escapeHtml(gameAffiliate?(affiliateParent?`${gameAffiliate} · ${affiliateParent}`:gameAffiliate):"none in ESPN data")}</span>
+          <span class="diag-label">AFFILIATE MARKET</span><span>${escapeHtml(affiliateMarket||"none")}</span>
+          <span class="diag-label">LOCAL RESULT</span><span>${escapeHtml(localAvail.state)} · strength ${localAvail.score}/5</span>
+          <span class="diag-label">LOCAL EVIDENCE</span><span>${escapeHtml(localAvail.source||"none")}</span>
+          <span class="diag-label">WEEKLY COVERAGE</span><span>${escapeHtml(weekly?(weekly.match?`${weekly.assignedGame} · local`:`${weekly.assignedGame} · different game`):"not published/cached")}</span>
+          <span class="diag-label">NFL NETWORK ACCESS</span><span>${directvNflPackageEnabled?"ON":"OFF"}</span>
           <span class="diag-label">DETECT</span><span>${dtvDetected?"YES":"NO"}</span>
           <span class="diag-label">SETTING</span><span>${dtvEnabled?"ENABLED":"DISABLED"}</span>
           <span class="diag-label">RENDER</span><span>${dtvRendered?"YES":"NO"}</span>
@@ -1939,33 +2740,48 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
 
     function renderProviderDiagnostics(game){
       if(!diagnosticsEnabled)return "";
-      const labels={3:"VERIFIED",2:"STRONG",1:"INFERRED"};
-      const rows=getProviderEvidenceForGame(game);
       const broadcasts=getBroadcastNames(game);
       const networkClass=classifyBroadcastNetwork(game);
-      const affiliate=classifyLocalAffiliate(broadcasts);
-      const detected=getProviderKeysForGame(game);
-      const finalKeys=getEnabledProviderKeysForGame(game);
+      const providerKeys=getEnabledProviderKeysForGame(game);
+      const localAvail=getLocalAvailabilityDiagnostic(game);
+      const weekly=localAvail.weekly;
+      const localStations=getLocalStationsForMarket(directvMarket);
+      const gameAffiliate=getLocalAffiliateCallsign(broadcasts);
+      const dtv=getDirectvEligibility(game);
+      const dtvRendered=providerKeys.includes("directv");
+      const sundayTicket=getSundayTicketEligibility(game);
+
+      let weeklyLabel="Not available";
+      if(weekly){
+        weeklyLabel=weekly.match
+          ? `${weekly.assignedGame} · local match`
+          : `${weekly.assignedGame} · another game assigned locally`;
+      }
+
+      const marketParts=[];
+      if(directvMarket)marketParts.push(directvMarket);
+      if(localStations.cbs)marketParts.push(`CBS ${localStations.cbs}`);
+      if(localStations.fox)marketParts.push(`FOX ${localStations.fox}`);
+
+      const dtvLabel=dtvRendered
+        ? `Shown · ${dtv.type.replaceAll("_"," ")}`
+        : `Not shown · ${dtv.type.replaceAll("_"," ")}`;
+      const sundayTicketLabel=sundayTicket.eligible
+        ? `Shown · ${sundayTicket.type.replaceAll("_"," ")}`
+        : `${sundayTicketEnabled?"Not shown":"Off"} · ${sundayTicket.type.replaceAll("_"," ")}`;
 
       return `<div class="provider-diagnostics show">
-        <div class="diag-title">PROVIDER DIAGNOSTICS</div>
+        <div class="diag-title">AVAILABILITY DIAGNOSTICS</div>
         <div class="diag-summary">
-          <span class="diag-label">ESPN</span><span>${escapeHtml(broadcasts.join(" · ")||"none")}</span>
-          <span class="diag-label">CLASS</span><span>${escapeHtml(networkClass)} · classifier v3</span>
-          ${affiliate?`<span class="diag-label">AFFILIATE</span><span>${escapeHtml(affiliate)}</span>`:""}
-          <span class="diag-label">DETECTED</span><span>${escapeHtml(detected.map(providerIconLabel).join(" · ")||"none")}</span>
-          <span class="diag-label">ENABLED</span><span>${escapeHtml(finalKeys.map(providerIconLabel).join(" · ")||"none")}</span>
-          <span class="diag-label">VALIDATED</span><span>${escapeHtml(["peacock","paramount","fox","prime","netflix"].filter(k=>providerValidationAllows(game,k)).map(k=>{
-            const r=providerValidation.games?.[providerValidationKey(game)]?.[k];
-            return `${providerIconLabel(k)} (${r?.confidence||"VERIFIED"} · ${r?.source||"rights table"})`;
-          }).join(" · ")||"none")}</span>
-          <span class="diag-label">VALIDATOR</span><span>${escapeHtml(providerValidationStatus)}</span>
-          <span class="diag-label">FOX RULE</span><span>${networkClass==="FOX_NATIONAL"?"Explicit ESPN FOX/FOX One":"No FOX app unless ESPN explicitly says FOX/FOX One"}</span>
+          <span class="diag-label">NETWORK</span><span>${escapeHtml(broadcasts.join(" · ")||networkClass||"unknown")}</span>
+          <span class="diag-label">WATCH OPTIONS</span><span>${escapeHtml(providerKeys.map(providerIconLabel).join(" · ")||"none")}</span>
+          <span class="diag-label">YOUR MARKET</span><span>${escapeHtml(marketParts.join(" · ")||"not set")}</span>
+          <span class="diag-label">LOCAL MATCH</span><span>${escapeHtml(`${localAvail.state} · ${localAvail.score}/5`)}</span>
+          <span class="diag-label">EVIDENCE</span><span>${escapeHtml(localAvail.source||"none")}${gameAffiliate?escapeHtml(` · ESPN affiliate ${gameAffiliate}`):""}</span>
+          <span class="diag-label">WEEKLY COVERAGE</span><span>${escapeHtml(weeklyLabel)}</span>
+          <span class="diag-label">DIRECTV</span><span>${escapeHtml(dtvLabel)}</span>
+          <span class="diag-label">SUNDAY TICKET</span><span>${escapeHtml(sundayTicketLabel)}</span>
         </div>
-        <div class="diag-provider-list">
-          ${rows.map(e=>`<div class="diag-row"><span class="diag-confidence">${labels[e.confidence]||"?"}</span><span><b>${escapeHtml(providerIconLabel(e.provider))}</b> · ${escapeHtml(e.source)} · ${escapeHtml(e.reason)}</span></div>`).join("")}
-        </div>
-        <div class="diag-dtv-summary">${renderDirectvDiagnostic(game)}</div>
       </div>`;
     }
 
@@ -2072,78 +2888,213 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       try{ localStorage.setItem(PROVIDER_PREF_KEY, JSON.stringify(enabledProviders)); }catch(err){}
     }
 
+    function readRememberedTvDevices(){
+      try{
+        const rows=JSON.parse(localStorage.getItem(TV_CAST_DEVICES_KEY)||"[]");
+        if(!Array.isArray(rows))return [];
+        return rows.filter(row=>row&&row.id&&row.name).slice(0,12).map(row=>({
+          id:String(row.id),
+          name:String(row.name),
+          kind:String(row.kind||"remembered"),
+          detail:String(row.detail||"remembered")
+        }));
+      }catch(_){return [];}
+    }
+
+    function saveRememberedTvDevices(){
+      try{
+        const remembered=discoveredTvDevices.filter(device=>device.kind==="bluetooth").slice(0,12);
+        localStorage.setItem(TV_CAST_DEVICES_KEY,JSON.stringify(remembered));
+      }catch(_){}
+    }
+
+    function looksLikeTvDeviceName(name){
+      return /(?:\btv\b|bravia|chromecast|google tv|android tv|fire tv|roku|samsung|lg |webos|vizio|hisense|tcl|sony|shield|onn\.|panasonic|philips)/i.test(String(name||""));
+    }
+
+    function getBrowserCastingMethods(){
+      const methods=[];
+      if("PresentationRequest" in window){
+        methods.push({id:"presentation-picker",name:"TV / display picker",kind:"browser",detail:"browser presentation"});
+      }
+      if("remote" in HTMLMediaElement.prototype){
+        methods.push({id:"provider-cast",name:"Provider cast controls",kind:"browser",detail:"Chromecast / AirPlay when provider supports it"});
+      }
+      methods.push({id:"system-picker",name:DEVICE.isAndroid?"Android cast / screen share":"System cast / screen share",kind:"system",detail:"system fallback"});
+      return methods;
+    }
+
+    function mergeTvDevices(...groups){
+      const out=[];
+      const seen=new Set();
+      groups.flat().forEach(device=>{
+        if(!device?.id||seen.has(device.id))return;
+        seen.add(device.id);
+        out.push(device);
+      });
+      return out;
+    }
+
+    function tvDeviceOptionLabel(device){
+      const suffix=device.kind==="bluetooth"
+        ? (looksLikeTvDeviceName(device.name)?"detected Bluetooth":"Bluetooth · unverified")
+        : device.detail;
+      return `${device.name}${suffix?` · ${suffix}`:""}`;
+    }
+
     function syncTvCastUi(){
       if(tvCastEnabledEl) tvCastEnabledEl.checked = tvCastEnabled;
       if(tvDeviceSelectEl) tvDeviceSelectEl.disabled = !tvCastEnabled;
       if(tvScanBtnEl) tvScanBtnEl.disabled = !tvCastEnabled;
       if(tvDeviceSelectEl){
         const current = selectedTvDeviceId;
-        tvDeviceSelectEl.innerHTML = `<option value="">${discoveredTvDevices.length ? "Choose a TV..." : "Scan for a nearby TV..."}</option>` +
-          discoveredTvDevices.map(device => `<option value="${escapeHtml(device.id)}">${escapeHtml(device.name)}</option>`).join("");
+        tvDeviceSelectEl.innerHTML = `<option value="">${discoveredTvDevices.length ? "Choose a TV or casting method..." : "Find a TV or casting method..."}</option>` +
+          discoveredTvDevices.map(device => `<option value="${escapeHtml(device.id)}">${escapeHtml(tvDeviceOptionLabel(device))}</option>`).join("");
         if(discoveredTvDevices.some(device => device.id === current)) tvDeviceSelectEl.value = current;
       }
     }
 
-    async function scanForSmartTvs(){
-      if(!tvCastEnabled) return;
-      if(tvCastHintEl) tvCastHintEl.textContent = "Looking for cast-capable displays on your network...";
-      discoveredTvDevices = [];
-
-      // Web pages cannot enumerate arbitrary devices on the local Wi-Fi network.
-      // Prefer the Remote Playback API, which lets the browser expose compatible
-      // playback targets through its secure native picker without revealing LAN details.
-      if("remote" in HTMLMediaElement.prototype){
-        discoveredTvDevices = [{ id:"browser-remote-picker", name:"Browser cast / AirPlay device picker" }];
-        if(tvCastHintEl) tvCastHintEl.textContent = "Casting is supported by this browser. Select the device picker; your browser will show compatible TVs when WATCH is pressed.";
-      } else if("presentation" in navigator && "PresentationRequest" in window){
-        discoveredTvDevices = [{ id:"presentation-picker", name:"Browser presentation device picker" }];
-        if(tvCastHintEl) tvCastHintEl.textContent = "A presentation target picker is available. Compatible TVs/displays will be offered by the browser.";
-      } else {
-        discoveredTvDevices = [{ id:"system-picker", name:"System cast / screen-share picker" }];
-        if(tvCastHintEl) tvCastHintEl.textContent = "Direct TV discovery is restricted here. WATCH will try the system/browser cast picker, then fall back to the provider app.";
+    async function getRememberedBluetoothTvDevices(){
+      if(!navigator.bluetooth?.getDevices)return [];
+      try{
+        const devices=await navigator.bluetooth.getDevices();
+        return devices.map(device=>({
+          id:`bt:${device.id}`,
+          name:device.name||"Remembered Bluetooth device",
+          kind:"bluetooth",
+          detail:looksLikeTvDeviceName(device.name)?"remembered TV/device":"remembered Bluetooth device"
+        }));
+      }catch(err){
+        console.warn("Remembered Bluetooth device lookup failed",err);
+        return [];
       }
-      selectedTvDeviceId = discoveredTvDevices[0]?.id || "";
-      localStorage.setItem(TV_CAST_DEVICE_KEY, selectedTvDeviceId);
+    }
+
+    async function requestNearbyBluetoothDevice(){
+      if(!navigator.bluetooth?.requestDevice)return null;
+      try{
+        const device=await navigator.bluetooth.requestDevice({acceptAllDevices:true});
+        if(!device)return null;
+        return {
+          id:`bt:${device.id}`,
+          name:device.name||"Nearby Bluetooth device",
+          kind:"bluetooth",
+          detail:looksLikeTvDeviceName(device.name)?"selected nearby TV/device":"selected Bluetooth device · TV unverified"
+        };
+      }catch(err){
+        if(err?.name!=="NotFoundError"&&err?.name!=="AbortError"&&err?.name!=="NotAllowedError") console.warn("Bluetooth TV lookup failed",err);
+        return null;
+      }
+    }
+
+    async function scanForSmartTvs(event){
+      if(!tvCastEnabled)return;
+      const interactive=!!event?.isTrusted;
+      const oldText=tvScanBtnEl?.textContent||"Find TVs";
+      if(tvScanBtnEl){tvScanBtnEl.disabled=true;tvScanBtnEl.textContent="Finding…";}
+      if(tvCastHintEl)tvCastHintEl.textContent="Checking remembered devices and casting capabilities…";
+
+      const cached=readRememberedTvDevices();
+      const granted=await getRememberedBluetoothTvDevices();
+      let picked=null;
+      // A browser is only allowed to reveal a new Bluetooth device after a user gesture.
+      // Use the Find TVs button for that permission picker; automatic scans only restore
+      // devices the user has already granted to this site.
+      if(interactive&&navigator.bluetooth?.requestDevice){
+        picked=await requestNearbyBluetoothDevice();
+      }
+      const bluetooth=mergeTvDevices(picked?[picked]:[],granted,cached);
+      const methods=getBrowserCastingMethods();
+      discoveredTvDevices=mergeTvDevices(bluetooth,methods);
+      saveRememberedTvDevices();
+
+      const preferred=discoveredTvDevices.find(device=>device.id===selectedTvDeviceId)
+        || discoveredTvDevices.find(device=>device.id==="presentation-picker")
+        || discoveredTvDevices.find(device=>device.id==="provider-cast")
+        || discoveredTvDevices.find(device=>device.id==="system-picker")
+        || discoveredTvDevices[0];
+      selectedTvDeviceId=preferred?.id||"";
+      localStorage.setItem(TV_CAST_DEVICE_KEY,selectedTvDeviceId);
       syncTvCastUi();
-    }
 
-    function getCastableProviderUrl(provider, game){
-      return addTracking(provider.web, game.id);
-    }
-
-    async function tryWatchOnSelectedTv(provider, game){
-      if(!tvCastEnabled || !selectedTvDeviceId) return false;
-      const webUrl = getCastableProviderUrl(provider, game);
-
-      // Remote Playback needs an actual media element with a castable media source.
-      // Provider landing pages generally do not expose the protected NFL stream URL
-      // to this launcher, so use the browser's secure device/presentation picker where possible.
-      if(selectedTvDeviceId === "presentation-picker" && "PresentationRequest" in window){
-        try{
-          const request = new PresentationRequest([webUrl]);
-          await request.start();
-          showToast(`Sent ${provider.label} to TV`);
-          return true;
-        }catch(err){
-          if(err?.name !== "NotAllowedError" && err?.name !== "AbortError") console.warn("TV presentation failed", err);
-          return false;
+      const tvLike=bluetooth.filter(device=>looksLikeTvDeviceName(device.name)).length;
+      if(tvCastHintEl){
+        if(bluetooth.length){
+          tvCastHintEl.textContent=`Found ${bluetooth.length} remembered/selected Bluetooth device${bluetooth.length===1?"":"s"}${tvLike?` (${tvLike} TV-like name${tvLike===1?"":"s"})`:""}. Casting still uses the browser/provider TV picker because web pages cannot directly control arbitrary Bluetooth TVs.`;
+        }else{
+          tvCastHintEl.textContent="No previously authorized Bluetooth TV was found. Browser/system casting methods are ready; your device picker may appear when WATCH is pressed.";
         }
       }
+      if(tvScanBtnEl){tvScanBtnEl.disabled=!tvCastEnabled;tvScanBtnEl.textContent=oldText;}
+    }
 
-      if(selectedTvDeviceId === "browser-remote-picker"){
-        // We cannot attach Remote Playback to a DRM provider page without its media URL.
-        // Opening the provider URL gives Chromecast/AirPlay-capable provider pages/apps
-        // the opportunity to expose their native cast control.
-        showToast("Opening cast-capable provider view");
-        window.open(webUrl, "_blank", "noopener,noreferrer");
+    function getCastableProviderUrl(providerKey,provider,game){
+      const exact=getProviderGameWebUrl(providerKey,provider,game)||provider.web;
+      return addTracking(exact,game.id);
+    }
+
+    async function startPresentationToTv(webUrl,providerLabel){
+      if(!("PresentationRequest" in window))return false;
+      try{
+        const request=new PresentationRequest([webUrl]);
+        await request.start();
+        showToast(`Sent ${providerLabel} to TV`);
+        return true;
+      }catch(err){
+        if(err?.name!=="NotAllowedError"&&err?.name!=="AbortError"&&err?.name!=="NotFoundError") console.warn("TV presentation failed",err);
+        return false;
+      }
+    }
+
+    function confirmProviderCastFallback(providerLabel){
+      return window.confirm(`A direct TV cast session is not available from this browser. Open ${providerLabel} so you can use its Cast / AirPlay controls?`);
+    }
+
+    async function tryWatchOnSelectedTv(providerKey,provider,game){
+      if(!tvCastEnabled||!selectedTvDeviceId)return false;
+      const webUrl=getCastableProviderUrl(providerKey,provider,game);
+
+      if(selectedTvDeviceId==="presentation-picker"){
+        const started=await startPresentationToTv(webUrl,provider.label);
+        if(started)return true;
+        showToast("No TV cast session started");
+        if(confirmProviderCastFallback(provider.label)){
+          window.open(webUrl,"_blank","noopener,noreferrer");
+        }
         return true;
       }
 
-      if(selectedTvDeviceId === "system-picker"){
-        // There is no standard web API that can force the OS screen-cast picker.
-        // Keep the intent TV-first by opening the web player rather than the phone app.
-        showToast("Opening provider for TV casting");
-        window.open(webUrl, "_blank", "noopener,noreferrer");
+      if(selectedTvDeviceId.startsWith("bt:")){
+        const selected=discoveredTvDevices.find(device=>device.id===selectedTvDeviceId);
+        // Bluetooth identifies a nearby/remembered device, but it is not a video-cast
+        // transport. Try the browser presentation path first. Never jump straight to the
+        // provider page: require a second explicit choice if browser casting is unavailable.
+        if("PresentationRequest" in window){
+          showToast(`Trying TV picker${selected?.name?` for ${selected.name}`:""}`);
+          if(await startPresentationToTv(webUrl,provider.label))return true;
+        }
+        showToast(`${selected?.name||"Selected TV"} found, but direct casting is unavailable`);
+        if(confirmProviderCastFallback(provider.label)){
+          window.open(webUrl,"_blank","noopener,noreferrer");
+        }
+        return true;
+      }
+
+      if(selectedTvDeviceId==="provider-cast"){
+        showToast("Provider casting requires the provider's Cast / AirPlay control");
+        if(confirmProviderCastFallback(provider.label)){
+          window.open(webUrl,"_blank","noopener,noreferrer");
+        }
+        return true;
+      }
+
+      if(selectedTvDeviceId==="system-picker"){
+        // Standard web APIs cannot force Android/iOS system screen-cast panels. Keep the
+        // user in Streamline rather than silently opening the provider page.
+        showToast("Open your system Cast / Screen Share panel, then try WATCH again");
+        if(confirmProviderCastFallback(provider.label)){
+          window.open(webUrl,"_blank","noopener,noreferrer");
+        }
         return true;
       }
       return false;
@@ -2154,6 +3105,27 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       const push=(status,label,detail,items=[])=>results.push({status,label,detail,items});
 
       push(typeof classifyBroadcastNetwork==="function"?"pass":"fail","Network classifier","classifier v3 available");
+
+      const zipState=getZipMarketDiagnosticState();
+      push(zipState.zipValid?"pass":"warn","DIRECTV ZIP",zipState.zipValid?`${zipState.zip} saved`:"no valid ZIP saved");
+      push(zipState.currentMarket?"pass":"warn","Current TV market",zipState.currentMarket?`${zipState.currentMarket}${zipState.currentSource?` · ${zipState.currentSource}`:""}`:"not resolved");
+      if(zipState.zipValid){
+        const cacheMatches=zipState.cachedMarket?.market&&(!zipState.currentMarket||zipState.cachedMarket.market===zipState.currentMarket);
+        push(cacheMatches?"pass":"warn","ZIP → market cache",cacheMatches?`${zipState.zip} → ${zipState.cachedMarket.market}`:"saved ZIP has no matching cached market yet");
+        push(zipState.cachedCoord?"pass":"warn","ZIP coordinate cache",zipState.cachedCoord?`${zipState.cachedCoord.city||"unknown city"}, ${zipState.cachedCoord.state||""}`.trim():"coordinates not cached yet");
+      }
+      push(zipState.marketCentersValid?"pass":"warn","National market centers",zipState.marketCentersValid?`${zipState.marketCenterCount} centers cached locally`:"not cached locally; will load on demand");
+
+      const affiliateAudit=validateLocalAffiliateTable();
+      push(affiliateAudit.ok?"pass":"fail","National affiliate directory",affiliateAudit.ok?`${affiliateAudit.cbsCount} CBS + ${affiliateAudit.foxCount} FOX callsigns · ${affiliateAudit.markets} station cities`:affiliateAudit.issues.slice(0,4).join("; "));
+      const coverageWeeks=weeklyCoverageData?.weeks?Object.keys(weeklyCoverageData.weeks).length:0;
+      push(coverageWeeks?"pass":"warn","Weekly local coverage layer",coverageWeeks?`${coverageWeeks} week(s) cached · ${weeklyCoverageData.source||"coverage feed"}`:"waiting for published weekly CBS/FOX assignments");
+      if(zipState.currentMarket){
+        const localStations=getLocalStationsForMarket(zipState.currentMarket);
+        const hasCbs=!!localStations.cbs,hasFox=!!localStations.fox;
+        push(hasCbs&&hasFox?"pass":"warn","Current-market affiliate coverage",hasCbs&&hasFox?`${zipState.currentMarket}: CBS ${localStations.cbs} · FOX ${localStations.fox}`:`${zipState.currentMarket}: ${localStations.cbs||"no CBS mapping"} · ${localStations.fox||"no FOX mapping"}`);
+      }
+
       push(Array.isArray(allGames)&&allGames.length?"pass":"warn","ESPN schedule",`${allGames.length||0} games loaded`);
       const validationFresh=readProviderValidationCache();
       const validationAge=providerValidation.savedAt?Math.round((Date.now()-providerValidation.savedAt)/(24*60*60*1000)):null;
@@ -2228,6 +3200,7 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
     }
 
     async function refreshDerivedData(){
+      await refreshWeeklyCoverageData(true);
       // Preserve user settings; invalidate only downloaded schedule/state data.
       [SEASON_CACHE_KEY,WEEK_STATE_CACHE_KEY,
        "nflLauncher.scheduleCache.v1","nflLauncher.scheduleCache.v2","nflLauncher.scheduleCache.v3",
@@ -2242,7 +3215,7 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
     function buildProviderTestList(){
       const list=document.querySelector("#providerTestList");
       if(!list)return;
-      const ordered=DEFAULT_ENABLED_PROVIDERS.filter(k=>PROVIDER_LINKS[k]);
+      const ordered=[...DEFAULT_ENABLED_PROVIDERS,...(sundayTicketEnabled?["sundayticket"]:[])].filter((k,i,a)=>PROVIDER_LINKS[k]&&a.indexOf(k)===i);
       const platform=DEVICE.isAndroid?"Android":DEVICE.isIOS?"iOS":"Desktop";
 
       list.innerHTML=ordered.map(key=>{
@@ -2331,6 +3304,10 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
         });
       };
       syncButtons();
+      const localGamesFilterToggle=document.querySelector("#localGamesFilterToggle");
+      if(localGamesFilterToggle){localGamesFilterToggle.checked=localFirstEnabled;localGamesFilterToggle.addEventListener("change",()=>{localFirstEnabled=localGamesFilterToggle.checked;localStorage.setItem(LOCAL_FIRST_KEY,String(localFirstEnabled));renderSchedule();});}
+      const sundayTicketToggle=document.querySelector("#sundayTicketEnabled");
+      if(sundayTicketToggle){sundayTicketToggle.checked=sundayTicketEnabled;sundayTicketToggle.addEventListener("change",()=>{sundayTicketEnabled=sundayTicketToggle.checked;localStorage.setItem(SUNDAY_TICKET_KEY,String(sundayTicketEnabled));renderSchedule();});}
       const dtvPkg=document.querySelector("#directvNflPackage");
       if(dtvPkg){dtvPkg.checked=directvNflPackageEnabled;dtvPkg.addEventListener("change",()=>{directvNflPackageEnabled=dtvPkg.checked;localStorage.setItem(DIRECTV_NFL_PACKAGE_KEY,String(directvNflPackageEnabled));renderSchedule();});}
       const diagnosticsEl=document.querySelector("#diagnosticsEnabled");
@@ -2351,8 +3328,52 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
           renderSchedule();
         });
       }
-      const dz=document.querySelector("#directvZip"),ds=document.querySelector("#directvZipSave"),dh=document.querySelector("#directvZipHint"); if(dz)dz.value=directvZip;
-      const saveDz=()=>{const v=String(dz?.value||"").trim();if(!/^\d{5}$/.test(v)){if(dh)dh.textContent="Enter a valid 5-digit ZIP.";return;}directvZip=v;localStorage.setItem(DIRECTV_ZIP_KEY,v);showToast("DIRECTV ZIP saved");renderSchedule();};ds?.addEventListener("click",saveDz);dz?.addEventListener("keydown",e=>{if(e.key==="Enter")saveDz();});
+      const dz=document.querySelector("#directvZip"),ds=document.querySelector("#directvZipSave"),dh=document.querySelector("#directvZipHint"),dl=document.querySelector("#directvLocate"),dm=document.querySelector("#directvMarketStatus"); if(dz)dz.value=directvZip;
+      const syncDtvMarket=()=>{if(dm)dm.textContent=`Market: ${directvMarket||"not detected"}${directvMarketSource?` (${directvMarketSource})`:""}`;};
+      syncDtvMarket();
+      if(directvZip&&!directvMarket){
+        resolveMarketFromZip(directvZip).then(hit=>{
+          if(!hit)return;
+          directvMarket=hit.market;directvMarketSource=`ZIP ${directvZip}${hit.city?` • ${hit.city}, ${hit.state}`:""}`;
+          localStorage.setItem(DIRECTV_MARKET_KEY,directvMarket);localStorage.setItem(DIRECTV_MARKET_SOURCE_KEY,directvMarketSource);
+          syncDtvMarket();renderSchedule();
+        }).catch(()=>{});
+      }
+      const saveDz=async()=>{
+        const v=String(dz?.value||"").trim();
+        if(!/^\d{5}$/.test(v)){if(dh)dh.textContent="Enter a valid 5-digit ZIP.";return;}
+        directvZip=v;localStorage.setItem(DIRECTV_ZIP_KEY,v);
+        directvMarket="";directvMarketSource="";localStorage.removeItem(DIRECTV_MARKET_KEY);localStorage.removeItem(DIRECTV_MARKET_SOURCE_KEY);
+        if(dm)dm.textContent=`Market: resolving ZIP ${v}…`;
+        try{
+          const hit=await resolveMarketFromZip(v);
+          if(!hit)throw new Error("ZIP not found");
+          directvMarket=hit.market;directvMarketSource=`ZIP ${v}${hit.city?` • ${hit.city}, ${hit.state}`:""}`;
+          localStorage.setItem(DIRECTV_MARKET_KEY,directvMarket);localStorage.setItem(DIRECTV_MARKET_SOURCE_KEY,directvMarketSource);
+          syncDtvMarket();showToast(`TV market: ${directvMarket}`);
+          if(dh)dh.textContent=`Saved: ${directvMarket}${hit.city?` · ${hit.city}, ${hit.state}`:""}.`;
+        }catch(err){
+          syncDtvMarket();showToast("Could not resolve ZIP market; location remains available");
+          if(dh)dh.textContent="ZIP saved, but market lookup is unavailable. Try Use location.";
+        }
+        renderSchedule();
+      };
+      ds?.addEventListener("click",saveDz);dz?.addEventListener("keydown",e=>{if(e.key==="Enter")saveDz();});
+      dl?.addEventListener("click",()=>{
+        if(!navigator.geolocation){showToast("Location is not supported by this browser");return;}
+        if(dm)dm.textContent="Market: detecting…";
+        navigator.geolocation.getCurrentPosition(async pos=>{
+          try{
+            const hit=await estimateUsTvMarket(pos.coords.latitude,pos.coords.longitude);
+            if(!hit){throw new Error("No market result");}
+            directvMarket=hit.market;directvMarketSource=`location estimate${hit.confidence?`/${hit.confidence}`:""}`;
+            localStorage.setItem(DIRECTV_MARKET_KEY,directvMarket);localStorage.setItem(DIRECTV_MARKET_SOURCE_KEY,directvMarketSource);
+            syncDtvMarket();showToast(`TV market estimated: ${directvMarket}`);renderSchedule();
+          }catch(err){
+            directvMarket="";directvMarketSource="";localStorage.removeItem(DIRECTV_MARKET_KEY);localStorage.removeItem(DIRECTV_MARKET_SOURCE_KEY);syncDtvMarket();showToast("TV market data unavailable; ZIP entry still works");renderSchedule();
+          }
+        },()=>{syncDtvMarket();showToast("Location permission unavailable; ZIP entry still works")},{enableHighAccuracy:false,timeout:8000,maximumAge:86400000});
+      });
       syncTvCastUi();
       tvCastEnabledEl?.addEventListener("change", () => {
         tvCastEnabled = !!tvCastEnabledEl.checked;
@@ -2364,7 +3385,14 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       tvDeviceSelectEl?.addEventListener("change", () => {
         selectedTvDeviceId = tvDeviceSelectEl.value || "";
         localStorage.setItem(TV_CAST_DEVICE_KEY, selectedTvDeviceId);
+        const selected=discoveredTvDevices.find(device=>device.id===selectedTvDeviceId);
+        if(tvCastHintEl&&selected){
+          tvCastHintEl.textContent=selected.kind==="bluetooth"
+            ? `${selected.name} is remembered through Bluetooth. WATCH will try browser casting first and will ask before opening a provider page if direct casting is unavailable.`
+            : `${selected.name}: ${selected.detail||"casting method ready"}.`;
+        }
       });
+      if(tvCastEnabled) scanForSmartTvs();
       document.querySelectorAll(".settings-provider[data-provider]").forEach(btn => {
         btn.addEventListener("click", () => {
           const key = btn.dataset.provider;
@@ -2395,6 +3423,15 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       settingsOverlayEl?.setAttribute("aria-hidden", "true");
     }
 
+    /*
+     * Release 3.3 LEGACY / DISABLED DIRECTV PUBLIC-SCHEDULE ENRICHMENT
+     * ---------------------------------------------------------------
+     * This block was used by an earlier experiment that parsed DIRECTV public
+     * schedule pages and carried one hard-coded verification matchup. It is no
+     * longer part of provider detection or rendering: standalone HTML cannot
+     * reliably fetch those pages cross-origin, and Release 3.x uses ESPN network
+     * metadata + ZIP/market rules instead. Kept commented for rollback/reference.
+     *
     function isDirectvVerifiedMatchup(game){
       // Secondary DIRECTV schedule evidence. This is intentionally independent
       // of ESPN's single broadcast string, which can omit a national feed when
@@ -2483,22 +3520,42 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       return directvPublicSchedule.get(directvScheduleKey(game))||null;
     }
 
+    */
+
     function getDirectvEligibility(game){
       const zip=String(directvZip||"").trim();
+      const market=String(directvMarket||"").trim();
+      const hasLocation=/^\d{5}$/.test(zip)||!!market;
       const networkClass=typeof classifyBroadcastNetwork==="function"?classifyBroadcastNetwork(game):"";
-      if(!/^\d{5}$/.test(zip))return {eligible:false,type:"NO_ZIP",reason:"DIRECTV detection requires a saved 5-digit ZIP.",zip,networkClass};
-      if(["CBS","NBC","FOX_LOCAL","FOX_NATIONAL","ABC","ESPN"].includes(networkClass)){
-        return {eligible:true,type:"NETWORK_INCLUDED",reason:`${networkClass} is treated as an included DIRECTV NFL network for saved market ZIP ${zip}.`,zip,networkClass};
+
+      if(["PRIME","NETFLIX","PEACOCK_EXCLUSIVE"].includes(networkClass)){
+        return {eligible:false,type:"THIRD_PARTY",reason:`${networkClass} requires a separate streaming subscription and does not qualify as a DIRECTV channel.`,zip,market,networkClass};
       }
       if(networkClass==="NFL_NETWORK"){
         return directvNflPackageEnabled
-          ? {eligible:true,type:"NFL_PACKAGE",reason:"NFL Network detected and DIRECTV NFL/Sports Package setting is ON.",zip,networkClass}
-          : {eligible:false,type:"NFL_PACKAGE_LOCKED",reason:"NFL Network detected; enable DIRECTV NFL/Sports Package if your plan includes NFL Network.",zip,networkClass};
+          ? {eligible:true,type:"NFL_PACKAGE",reason:"NFL Network detected and DIRECTV NFL/Sports Package setting is ON.",zip,market,networkClass}
+          : {eligible:false,type:"NFL_PACKAGE_LOCKED",reason:"NFL Network detected; enable DIRECTV NFL/Sports Package if your plan includes NFL Network.",zip,market,networkClass};
       }
-      if(["PRIME","NETFLIX","PEACOCK_EXCLUSIVE"].includes(networkClass)){
-        return {eligible:false,type:"THIRD_PARTY",reason:`${networkClass} requires a separate streaming subscription and does not qualify as DTV.`,zip,networkClass};
+      if(["NBC","ABC","ESPN"].includes(networkClass)){
+        if(!hasLocation)return {eligible:false,type:"NO_LOCATION",reason:"Save a ZIP or use location before DIRECTV availability is shown.",zip,market,networkClass};
+        return {eligible:true,type:"NETWORK_INCLUDED",reason:`${networkClass} is a standard DIRECTV NFL network; channel availability still depends on package/location.`,zip,market,networkClass};
       }
-      return {eligible:false,type:"UNVERIFIED",reason:"No reusable DIRECTV network/package rule qualifies this game.",zip,networkClass};
+      if(["CBS","FOX_LOCAL","FOX_REGIONAL","FOX_NATIONAL"].includes(networkClass)){
+        if(!hasLocation)return {eligible:false,type:"NO_LOCATION",reason:"Sunday CBS/FOX availability needs ZIP or market context.",zip,market,networkClass};
+        const weekly=getWeeklyCoverageAssignment(game);
+        if(weekly?.match)return {eligible:true,type:"LOCAL_INCLUDED",reason:`Weekly local coverage data assigns ${weekly.assignedGame} to ${weekly.station||market} for this ${weekly.slot||networkClass} window.`,zip,market,networkClass};
+        if(weekly?.conflict)return {eligible:false,type:"OUT_OF_MARKET",reason:`Weekly local coverage data assigns ${weekly.assignedGame} to ${weekly.station||market} in this broadcast window, so this game is out of market.`,zip,market,networkClass};
+        const affiliateMarket=getLocalAffiliateMarket(getBroadcastNames(game));
+        if(market&&affiliateMarket){
+          if(affiliateCityMatchesMarket(affiliateMarket,market))return {eligible:true,type:"LOCAL_INCLUDED",reason:`ESPN identifies a ${networkClass.startsWith("FOX")?"FOX":"CBS"} affiliate in the detected ${market} market.`,zip,market,networkClass};
+          return {eligible:false,type:"OUT_OF_MARKET",reason:`The identified affiliate is ${affiliateMarket}, not ${market}. Out-of-market Sunday afternoon games require a separate YouTube/NFL Sunday Ticket subscription.`,zip,market,networkClass};
+        }
+        if(market&&gameMatchesMarketTeam(game,market)){
+          return {eligible:true,type:"LOCAL_EXPECTED",reason:`This game includes the ${market} home-market team, so local CBS/FOX carriage is expected. Weekly affiliate selection can still vary.`,zip,market,networkClass};
+        }
+        return {eligible:false,type:"LOCAL_UNVERIFIED",reason:"CBS/FOX Sunday game detected, but this standalone app cannot verify the weekly local affiliate selection. If it is not on your local CBS/FOX station, it requires YouTube/NFL Sunday Ticket rather than DIRECTV.",zip,market,networkClass};
+      }
+      return {eligible:false,type:"UNVERIFIED",reason:"No reusable DIRECTV network/package rule qualifies this game.",zip,market,networkClass};
     }
 
     function getDirectvEntitlementType(game){ return getDirectvEligibility(game).type; }
@@ -2515,17 +3572,9 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       const n=String(g.network||"").toLowerCase();
       return n.includes("peacock")||n.includes("nbc")||(localGameDate(g)==="2026-12-27"&&matchup(g,"BAL","GB"));
     }
-    function isDirectvGame(g){
-      if(!/^\d{5}$/.test(directvZip))return false;
-      const d=localGameDate(g),v=[["2026-08-22","BUF","CLE"],["2026-08-22","NYG","MIA"],["2026-08-22","PHI","NE"],["2026-08-22","NO","LAR"],["2026-08-22","DAL","ARI"],["2026-08-23","SEA","TEN"],["2026-08-27","PIT","BUF"],["2026-08-27","LAR","LAC"]];
-      if(v.some(x=>d===x[0]&&matchup(g,x[1],x[2])))return true;
-      const n=String(g.network||"").toLowerCase();
-      return n.includes("nfl network")||n.includes("nfln")||n.includes("espn");
-    }
-
     function getEnabledProviderKeysForGame(game){
       const detected=getProviderKeysForGame(game);
-      return detected.filter(key=>enabledProviders.includes(key));
+      return detected.filter(key=>key==="sundayticket"?sundayTicketEnabled:enabledProviders.includes(key));
     }
 
     function renderFantasyBlock(game){
@@ -2678,8 +3727,11 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
     // Turns an ESPN broadcast string like "CBS" or "FOX" into one or more
     // provider buttons. This is where streaming service detection happens.
     function isParamountPlusGame(game){
-      // CBS alone does not prove Paramount+ streaming availability.
-      return getBroadcastNames(game).some(name=>/\bparamount\s*\+?\b/i.test(String(name)));
+      const names=getBroadcastNames(game);
+      // Paramount+ carries the local NFL on CBS feed. CBS metadata is therefore
+      // a useful inferred signal; explicit Paramount+ metadata remains stronger.
+      return names.some(name=>/\bparamount\s*\+?\b/i.test(String(name))) ||
+             names.some(name=>/\bcbs\s*\d*\b/i.test(String(name)));
     }
 
     function getBroadcastNames(game){
@@ -2688,16 +3740,28 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       return Array.from(new Set(names));
     }
 
+    function isRegionalFoxBroadcast(game){
+      const names=getBroadcastNames(game).map(name=>String(name).trim()).filter(Boolean);
+      const fox=names.some(name=>/\bfox(?:\s+one|\s+network|\s+sports)?\b/i.test(name));
+      if(!fox)return false;
+      const d=new Date(game.dateTime);
+      if(Number.isNaN(d.getTime()))return false;
+      // Regular-season Sunday afternoon FOX is a regional distribution even when
+      // ESPN labels the parent network simply as "FOX" or "FOX One".
+      const localDay=d.getDay();
+      const h=d.getHours();
+      const sundayAfternoon=localDay===0 && h>=9 && h<18;
+      const status=String(game.seasonType||game.season?.type||"").toLowerCase();
+      const looksPostseason=/post|playoff|wild|division|conference|super/.test(status);
+      return sundayAfternoon && !looksPostseason;
+    }
+
     function isNationalFoxBroadcast(game){
       const names=getBroadcastNames(game).map(name=>String(name).trim()).filter(Boolean);
-      return names.some(name=>{
-        const n=name.toLowerCase();
-        return n==="fox" ||
-               n==="fox one" ||
-               n==="fox sports" ||
-               n.startsWith("fox sports ") ||
-               n.includes("fox one");
-      });
+      if(isRegionalFoxBroadcast(game))return false;
+      // Reserve NATIONAL for explicit national wording or non-regional FOX windows
+      // (playoffs, special Saturday windows, etc.). Bare Sunday-afternoon FOX is regional.
+      return names.some(name=>/\bfox\b/i.test(name));
     }
 
     const PROVIDER_CONFIDENCE = Object.freeze({
@@ -2718,6 +3782,9 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
           ? PROVIDER_CONFIDENCE.VERIFIED
           : PROVIDER_CONFIDENCE.STRONG;
         if(provider==="nflplus" && classified.networkClass!=="NFL_NETWORK"){
+          confidence=PROVIDER_CONFIDENCE.INFERRED;
+        }
+        if(provider==="paramount" && classified.networkClass==="CBS" && !getBroadcastNames(game).some(name=>/\bparamount\s*\+?\b/i.test(String(name)))){
           confidence=PROVIDER_CONFIDENCE.INFERRED;
         }
         evidence.push(providerEvidence(provider,confidence,"Network matrix",`${classified.networkClass} distribution`,getBroadcastNames(game)));
@@ -2754,6 +3821,10 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       if(dtv.eligible){
         evidence.push(providerEvidence("directv",PROVIDER_CONFIDENCE.VERIFIED,dtv.type==="NFL_PACKAGE"?"DIRECTV NFL Package":"DIRECTV verification",dtv.reason,getBroadcastNames(game)));
       }
+      const sundayTicket=getSundayTicketEligibility(game);
+      if(sundayTicket.eligible){
+        evidence.push(providerEvidence("sundayticket",PROVIDER_CONFIDENCE.VERIFIED,"NFL Sunday Ticket",sundayTicket.reason,getBroadcastNames(game)));
+      }
       ["peacock","paramount","prime"].forEach(key=>{
         const v=getProviderValidation(game,key);
         if(v?.value){
@@ -2776,6 +3847,23 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       return patterns.some(pattern=>haystack.includes(String(pattern).toLowerCase()));
     }
 
+    function isSundayTicketWindow(game){
+      const networkClass=classifyBroadcastNetwork(game);
+      const d=new Date(game?.dateTime);
+      if(Number.isNaN(d.getTime())||d.getDay()!==0)return false;
+      if(Number(game?.seasonType||0)!==2)return false;
+      return ["CBS","FOX_LOCAL","FOX_REGIONAL"].includes(networkClass);
+    }
+
+    function getSundayTicketEligibility(game){
+      if(!sundayTicketEnabled)return {eligible:false,type:"DISABLED",reason:"NFL Sunday Ticket setting is off."};
+      if(!isSundayTicketWindow(game))return {eligible:false,type:"NOT_ELIGIBLE",reason:"Sunday Ticket is for out-of-market regular-season Sunday afternoon CBS/FOX games."};
+      const local=getLocalAvailabilityDiagnostic(game);
+      if(local.state==="OUT OF MARKET")return {eligible:true,type:"OUT_OF_MARKET",reason:"This Sunday CBS/FOX game is confirmed out of market for your detected TV market."};
+      if(local.state==="CONFIRMED LOCAL"||local.state==="LOCAL EXPECTED")return {eligible:false,type:"LOCAL",reason:"This game is local or expected locally, so Sunday Ticket is not needed."};
+      return {eligible:false,type:"UNVERIFIED",reason:"Local coverage is not confirmed yet; Sunday Ticket is not shown until the game is verified out of market."};
+    }
+
     function getProviderKeysForGame(game){
       const {networkClass,providers}=baseProvidersForNetwork(game);
       let keys=[...providers];
@@ -2793,10 +3881,10 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
 
       // DIRECTV is enrichment-only and requires separate verification.
 
-      // NFL+ restored to the broader distribution behavior used before the
-      // conservative matrix pass. Network/location/device restrictions may still
-      // apply at playback time; NFL Network remains a direct qualifying signal.
-      if(!keys.includes("nflplus") && ["CBS","NBC","FOX_NATIONAL","FOX_LOCAL","ESPN","NFL_NETWORK","PRIME","NETFLIX","PEACOCK_EXCLUSIVE"].includes(networkClass)){
+      // NFL+ is limited to live local/primetime regular-season/postseason games
+      // on mobile/tablet plus NFL Network. Do not expose it as a live option for
+      // ordinary Sunday-afternoon CBS/FOX games.
+      if(!keys.includes("nflplus") && ["NBC","ESPN","ABC","NFL_NETWORK","PRIME","NETFLIX","PEACOCK_EXCLUSIVE"].includes(networkClass)){
         keys.push("nflplus");
       }
 
@@ -2808,6 +3896,7 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       }
 
       if(getDirectvEligibility(game).eligible) keys.push("directv");
+      if(getSundayTicketEligibility(game).eligible) keys.push("sundayticket");
 
       const seen=new Set();
       return keys.filter(key=>PROVIDER_LINKS[key]&&!seen.has(key)&&seen.add(key));
@@ -2817,11 +3906,14 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       return `<div class="provider-icons" aria-label="Available streaming options">${providerKeys.map(key => {
         const provider = PROVIDER_LINKS[key];
         const primary = key === primaryKey ? " primary" : "";
-        return `<button class="provider-icon ${key}${primary}" title="${escapeHtml(provider.label)}${key === "directv" && isDirectvVerifiedMatchup(game) ? " · DIRECTV schedule verified" : ""}" aria-label="Open ${escapeHtml(provider.label)}" onclick='openProvider("${key}", ${JSON.stringify(game).replace(/'/g,"&#39;")})'>${providerIconLabel(key)}</button>`;
+        const providerTitle = key === "peacock"
+          ? (classifyBroadcastNetwork(game)==="PEACOCK_EXCLUSIVE" ? "Peacock Exclusive" : "Peacock / NBC")
+          : provider.label;
+        return `<button class="provider-icon ${key}${primary}" title="${escapeHtml(providerTitle)}" aria-label="Open ${escapeHtml(providerTitle)}" onclick='openProvider("${key}", ${JSON.stringify(game).replace(/'/g,"&#39;")})'>${providerIconLabel(key)}</button>`;
       }).join("")}</div>`;
     }
     function providerIconLabel(key){
-      const labels = { prime:"PRIME", peacock:"NBC", espn:"ESPN", paramount:"CBS", directv:"DTV", netflix:"NFLX", fox:"FOX", hulu:"HULU", nflnetwork:"NFL+", nflplus:"NFL+", youtubetv:"YT" };
+      const labels = { prime:"PRIME", peacock:"NBC", espn:"ESPN", paramount:"CBS", directv:"DTV", netflix:"NFLX", fox:"FOX", hulu:"HULU", nflnetwork:"NFL+", nflplus:"NFL+", youtubetv:"YT", sundayticket:"ST" };
       return labels[key] || key.toUpperCase();
     }
     function getGameResult(game){
@@ -2915,26 +4007,77 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       return hit ? NETWORK_TO_PROVIDER[hit] : "nflplus";
     }
 
-    function getProviderGameWebUrl(providerKey,provider,game){
-      const id=encodeURIComponent(String(game?.id||""));
+    const PROVIDER_GAME_HOSTS={
+      espn:["espn.com"],
+      prime:["primevideo.com","amazon.com"],
+      peacock:["peacocktv.com"],
+      paramount:["paramountplus.com"],
+      fox:["foxsports.com","fox.com"],
+      hulu:["hulu.com"],
+      nflnetwork:["nfl.com"],
+      nflplus:["nfl.com"],
+      directv:["directv.com"],
+      netflix:["netflix.com"],
+      youtubetv:["tv.youtube.com","youtube.com"],
+      sundayticket:["tv.youtube.com","youtube.com"]
+    };
 
-      // These providers have stable event/sports URL patterns that can accept
-      // game context. If a provider changes the route, provider.web remains the
-      // safe fallback.
-      const candidates={
-        espn: id ? `https://www.espn.com/watch/player/_/eventCalendarId/${id}` : "",
-        nflplus: id ? `https://www.nfl.com/games/${encodeURIComponent(String(game.awayAbbr||"").toLowerCase())}-at-${encodeURIComponent(String(game.homeAbbr||"").toLowerCase())}-${localGameDate(game)}` : "",
-        nflnetwork: provider.web,
-        netflix: provider.web,
-        prime: provider.web,
-        paramount: provider.web,
-        peacock: provider.web,
-        fox: provider.web,
-        directv: provider.web,
-        youtubetv: provider.web,
-        hulu: provider.web
+    function sourceLinkMatchesProvider(link,providerKey){
+      if(!link?.href)return false;
+      try{
+        const host=new URL(link.href).hostname.toLowerCase().replace(/^www\./,"");
+        return (PROVIDER_GAME_HOSTS[providerKey]||[]).some(domain=>host===domain||host.endsWith(`.${domain}`));
+      }catch(_){return false;}
+    }
+
+    function findProviderSourceGameUrl(providerKey,game){
+      const links=Array.isArray(game?.sourceLinks)?game.sourceLinks:[];
+      const providerLinks=links.filter(link=>sourceLinkMatchesProvider(link,providerKey));
+      if(!providerLinks.length)return "";
+      const score=link=>{
+        const rel=(link.rel||[]).join(" ").toLowerCase();
+        const text=String(link.text||"").toLowerCase();
+        if(/watch|stream|live/.test(`${rel} ${text}`))return 3;
+        if(/event|summary|game/.test(`${rel} ${text}`))return 2;
+        return 1;
       };
-      return candidates[providerKey]||provider.web;
+      return providerLinks.sort((a,b)=>score(b)-score(a))[0]?.href||"";
+    }
+
+    function getNflGamePageUrl(game){
+      const away=encodeURIComponent(String(game?.awayAbbr||"").toLowerCase());
+      const home=encodeURIComponent(String(game?.homeAbbr||"").toLowerCase());
+      const date=localGameDate(game);
+      return away&&home&&date?`https://www.nfl.com/games/${away}-at-${home}-${date}`:"";
+    }
+
+    function getProviderGameWebUrl(providerKey,provider,game){
+      // Highest priority: an exact provider/game URL already attached to the game.
+      // This supports future feeds without another launcher rewrite.
+      const explicit=String(game?.providerUrls?.[providerKey]||((providerKey==="sundayticket")?(game?.providerUrls?.youtubetv||game?.providerUrls?.youtube):"")||"").trim();
+      if(explicit)return explicit;
+
+      // Next use a provider-specific event URL supplied by ESPN/source metadata.
+      const sourceUrl=findProviderSourceGameUrl(providerKey,game);
+      if(sourceUrl)return sourceUrl;
+
+      const id=encodeURIComponent(String(game?.id||""));
+      if(providerKey==="espn"){
+        // ESPN scoreboard event IDs have a stable game-detail route. Prefer an
+        // exact watch link from source metadata above whenever ESPN supplies one.
+        return id?`https://www.espn.com/nfl/game/_/gameId/${id}`:provider.web;
+      }
+      if(providerKey==="nflplus"||providerKey==="nflnetwork"){
+        // NFL's game page is matchup-specific and can hand off to NFL/NFL+ where
+        // the user's entitlement/device supports live playback.
+        return getNflGamePageUrl(game)||provider.web;
+      }
+
+      // Prime, Netflix, Paramount+, Peacock, FOX, Hulu, DIRECTV and YouTube TV do
+      // not expose stable public per-game URLs in ESPN's normal scoreboard feed.
+      // When no exact event link is available, retain the provider's safest live/
+      // sports landing page rather than manufacturing a brittle URL.
+      return provider.web;
     }
 
     // Mobile launch policy:
@@ -2944,19 +4087,24 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
     async function openProvider(providerKey, game){
       const provider=PROVIDER_LINKS[providerKey]||PROVIDER_LINKS.nflplus;
       if(tvCastEnabled&&selectedTvDeviceId){
-        const handledByTv=await tryWatchOnSelectedTv(provider,game);
+        const handledByTv=await tryWatchOnSelectedTv(providerKey,provider,game);
         if(handledByTv)return;
         showToast("TV launch unavailable - opening on phone");
       }
-      const gameWebUrl=getProviderGameWebUrl(providerKey,provider,game);
-      const canonicalUrl=DEVICE.isIOS?(provider.iosUniversal||gameWebUrl||provider.web):(gameWebUrl||provider.web);
-      const targetUrl=addTracking(canonicalUrl,game.id);
+      const gameWebUrl=getProviderGameWebUrl(providerKey,provider,game)||provider.web;
+      const trackedWebUrl=addTracking(gameWebUrl,game.id);
       showToast(`Opening ${provider.label}`);
-      if(DEVICE.isAndroid||DEVICE.isIOS){
-        window.location.href=targetUrl;
+      if(DEVICE.isAndroid){
+        window.location.href=getPlatformUrl(provider,trackedWebUrl,game);
         return;
       }
-      window.open(targetUrl,"_blank","noopener,noreferrer");
+      if(DEVICE.isIOS){
+        // A game-specific HTTPS Universal Link preserves the event destination;
+        // iOS opens the provider app when that provider claims the URL, otherwise Safari.
+        window.location.href=trackedWebUrl;
+        return;
+      }
+      window.open(trackedWebUrl,"_blank","noopener,noreferrer");
     }
 
     function launchIOSAppFirst(provider, webUrl){
@@ -3016,7 +4164,7 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       // Android receives the provider's normal HTTPS/App Link but explicitly
       // targets the installed package. If the app cannot handle it, Chrome uses
       // the browser fallback URL.
-      const target=provider.androidWeb || webUrl;
+      const target=webUrl || provider.androidWeb || provider.web;
       try{
         const u=new URL(target);
         return `intent://${u.host}${u.pathname}${u.search}#Intent;scheme=https;package=${provider.androidPackage};action=android.intent.action.VIEW;category=android.intent.category.BROWSABLE;S.browser_fallback_url=${encodeURIComponent(webUrl)};end`;
@@ -3234,6 +4382,25 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       return false;
     }
 
+    async function autoDetectMarketOnColdOpen(){
+      if(directvMarket||directvZip||!navigator.geolocation)return false;
+      if(sessionStorage.getItem("nflLauncher.coldMarketAttempted")==="true")return false;
+      sessionStorage.setItem("nflLauncher.coldMarketAttempted","true");
+      return await new Promise(resolve=>{
+        navigator.geolocation.getCurrentPosition(async pos=>{
+          try{
+            const hit=await estimateUsTvMarket(pos.coords.latitude,pos.coords.longitude);
+            if(!hit){resolve(false);return;}
+            directvMarket=hit.market;
+            directvMarketSource=`automatic location${hit.confidence?`/${hit.confidence}`:""}`;
+            localStorage.setItem(DIRECTV_MARKET_KEY,directvMarket);
+            localStorage.setItem(DIRECTV_MARKET_SOURCE_KEY,directvMarketSource);
+            renderSchedule();resolve(true);
+          }catch(_){resolve(false);}
+        },()=>resolve(false),{enableHighAccuracy:false,timeout:6500,maximumAge:7*24*60*60*1000});
+      });
+    }
+
     async function bootstrapSchedule(){
       const cached=readSeasonScheduleCache();
 
@@ -3273,6 +4440,8 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
     weekPrevBtnEl?.addEventListener("click",()=>scrollWeekTimeline(-1));
     weekNextBtnEl?.addEventListener("click",()=>scrollWeekTimeline(1));
     initSortControls();
+    refreshWeeklyCoverageData(false).then(()=>{if(localFirstEnabled)renderSchedule();}).catch(()=>{});
+    autoDetectMarketOnColdOpen().catch(()=>{});
     initSettingsControls();
     document.querySelector("#refreshBtn").addEventListener("click", async()=>{showToast("Updating game data");await refreshCurrentWeekState();});
     bootstrapSchedule();
