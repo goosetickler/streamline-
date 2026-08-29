@@ -929,6 +929,74 @@
       }
     }
 
+    /* Special timeline periods: same compact pill language as KICKOFF */
+    .week-chip.special-week{
+      border-radius:12px !important;
+      border:1px solid rgba(255,255,255,.08);
+      background:linear-gradient(180deg,rgba(31,48,67,.95),rgba(20,32,46,.95));
+      min-width:90px;
+      padding:8px 11px !important;
+    }
+    .week-chip.special-week .week-chip-meta{
+      display:block;
+      font-size:.48rem;
+      font-weight:1000;
+      letter-spacing:.08em;
+      margin-bottom:2px;
+      opacity:.9;
+    }
+    .week-chip.special-week .week-chip-title{
+      font-weight:1000;
+    }
+    .week-chip.special-week .week-chip-range{
+      display:block !important;
+      margin-top:2px;
+      font-size:.48rem;
+      font-weight:800;
+      opacity:.78;
+      white-space:nowrap;
+    }
+    .week-chip.wild-card{background:linear-gradient(180deg,rgba(29,50,70,.98),rgba(19,34,49,.98))}
+    .week-chip.divisional{background:linear-gradient(180deg,rgba(33,52,72,.98),rgba(21,36,51,.98))}
+    .week-chip.conference{background:linear-gradient(180deg,rgba(74,60,31,.96),rgba(45,39,25,.96))}
+    .week-chip.pro-bowl{background:linear-gradient(180deg,rgba(35,54,75,.98),rgba(23,38,54,.98))}
+    .week-chip.super-bowl{background:linear-gradient(180deg,rgba(88,67,28,.98),rgba(52,41,23,.98));border-color:rgba(255,211,107,.22)}
+
+
+    .week-chip.special-week{
+      min-width:104px !important;
+      min-height:48px !important;
+      border-width:1px !important;
+      border-style:solid !important;
+    }
+    .week-chip.special-week .week-chip-range{
+      display:block !important;
+      visibility:visible !important;
+      opacity:.88 !important;
+      height:auto !important;
+      font-size:.48rem !important;
+      margin-top:2px !important;
+    }
+    .week-chip.special-week.wild-card,
+    .week-chip.special-week.divisional,
+    .week-chip.special-week.pro-bowl{
+      border-color:rgba(88,191,255,.35) !important;
+    }
+    .week-chip.special-week.conference,
+    .week-chip.special-week.super-bowl{
+      border-color:rgba(255,211,107,.4) !important;
+    }
+
+
+    .provider-test-url{
+      margin-top:3px;
+      font-size:.55rem;
+      color:var(--accent);
+      overflow-wrap:anywhere;
+      word-break:break-word;
+      opacity:.9;
+    }
+
   </style>
 </head>
 <body>
@@ -1097,10 +1165,12 @@
     const MAX_GAMES_TO_SHOW = 18;
     const SCHEDULE_CACHE_KEY = "nflLauncher.schedule.v2";
     const PROVIDER_PREF_KEY = "nflLauncher.enabledProviders.settings.v5";
-    const APP_DATA_VERSION = 12;
+    const APP_DATA_VERSION = 18;
     const APP_DATA_VERSION_KEY = "nflLauncher.appDataVersion";
     const SEASON_CACHE_KEY="nflLauncher.seasonSchedule.v1";
     const SEASON_CACHE_TTL_MS=12*60*60*1000;
+    const PROVIDER_VALIDATION_CACHE_KEY="nflLauncher.providerValidation.v2";
+    const PROVIDER_VALIDATION_TTL_MS=7*24*60*60*1000;
     const WEEK_STATE_CACHE_KEY="nflLauncher.weekState.v1";
     const PREGAME_REFRESH_MS=5*60*1000;
     const LIVE_REFRESH_MS=30*1000;
@@ -1228,8 +1298,8 @@ const DIRECTV_ZIP_KEY="nflLauncher.directv.zip.v3";
     // - FOX maps to games televised on FOX via FOX Sports / FOX One.
     // - NFL+ is included as a mobile/local/primetime fallback where eligible.
     const NETWORK_DISTRIBUTION = Object.freeze({
-      CBS: ["paramount","youtubetv","hulu","nflplus"],
-      NBC: ["peacock","youtubetv","hulu","nflplus"],
+      CBS: ["youtubetv","hulu","nflplus"],
+      NBC: ["youtubetv","hulu","nflplus"],
       FOX_NATIONAL: ["fox","youtubetv","hulu","nflplus"],
       FOX_LOCAL: ["youtubetv","hulu","nflplus"],
       ESPN: ["espn","youtubetv","hulu","nflplus"],
@@ -1258,6 +1328,159 @@ const DIRECTV_ZIP_KEY="nflLauncher.directv.zip.v3";
       const hit=LOCAL_AFFILIATE_PARENT_RULES.find(rule=>rule.pattern.test(joined));
       return hit?.parent||"";
     }
+
+    const STREAMING_RIGHTS_SCHEMA=1;
+    const STREAMING_RIGHTS_CACHE_KEY="nflLauncher.streamingRights.v1";
+    const STREAMING_RIGHTS_2026={
+      prime:[
+        ["2026-08-27","NE","CLE"],["2026-09-17","DET","BUF"],["2026-09-24","ATL","GB"],["2026-10-01","PIT","CLE"],["2026-10-08","TB","DAL"],["2026-10-15","SEA","DEN"],["2026-10-22","NE","CHI"],["2026-10-29","CAR","GB"],["2026-11-05","JAX","BAL"],["2026-11-12","WSH","NYG"],["2026-11-19","IND","HOU"],["2026-11-27","DEN","PIT"],["2026-12-03","KC","LAR"],["2026-12-10","MIN","NE"],["2026-12-17","SF","LAC"],["2026-12-24","HOU","PHI"],["2026-12-31","BAL","CIN"]
+      ],
+      netflix:[
+        ["2026-09-10","LAR","SF"],["2026-11-25","GB","LAR"],
+        ["2026-12-25","GB","CHI"],["2026-12-25","BUF","DEN"]
+        // Netflix also owns one Week 18 game; matchup is TBD and is intentionally
+        // not assigned until ESPN/NFL publish the selected game.
+      ],
+      peacock:[
+        ["2026-09-09","NE","SEA"],["2026-09-13","DAL","NYG"],["2026-09-20","IND","KC"],["2026-09-27","LAR","DEN"],["2026-10-04","DET","CAR"],["2026-10-11","BAL","ATL"],["2026-10-18","DAL","GB"],["2026-10-25","KC","SEA"],["2026-11-01","PHI","WSH"],["2026-11-08","TB","CHI"],["2026-11-15","PIT","CIN"],["2026-11-22","MIN","SF"],["2026-11-26","KC","BUF"],["2026-11-29","NE","LAC"],["2026-12-06","HOU","PIT"],["2026-12-13","BUF","GB"],["2026-12-20","DET","MIN"],["2026-12-27","JAX","DAL"],["2027-01-03","PHI","SF"]
+      ]
+    };
+    function rightsKey(date,away,home){return `${date}|${String(away).toUpperCase()}|${String(home).toUpperCase()}`;}
+    function currentRightsSeason(){return Number(getSeasonYear?.()||new Date().getFullYear());}
+    function buildSeasonalStreamingRights(season){
+      const out={season,schema:STREAMING_RIGHTS_SCHEMA,generatedAt:Date.now(),games:{}};
+      const add=(date,a,h,p,source,confidence="VERIFIED")=>{
+        const k=rightsKey(date,a,h);out.games[k]||={};out.games[k][p]={value:true,source,confidence};
+      };
+      if(season===2026)Object.entries(STREAMING_RIGHTS_2026).forEach(([p,rows])=>rows.forEach(r=>add(...r,p,`2026 ${p} first-party schedule`)));
+      allGames.forEach(g=>{
+        const names=getBroadcastNames(g).join(" | "),date=localGameDate(g),cls=classifyBroadcastNetwork(g);
+        if(/\bprime(?: video)?\b/i.test(names))add(date,g.awayAbbr,g.homeAbbr,"prime","ESPN explicit Prime");
+        if(/\bnetflix\b/i.test(names))add(date,g.awayAbbr,g.homeAbbr,"netflix","ESPN explicit Netflix");
+        if(/\bpeacock\b/i.test(names))add(date,g.awayAbbr,g.homeAbbr,"peacock","ESPN explicit Peacock");
+        if(/\bparamount\s*\+?\b/i.test(names))add(date,g.awayAbbr,g.homeAbbr,"paramount","ESPN explicit Paramount+");
+        if(cls==="FOX_NATIONAL")add(date,g.awayAbbr,g.homeAbbr,"fox","ESPN explicit national FOX","STRONG");
+      });
+      return out;
+    }
+    const STREAMING_RIGHTS_AUDIT_KEY="nflLauncher.streamingRightsAudit.v1";
+
+    function expectedProviderByRules(game,provider){
+      const cls=classifyBroadcastNetwork(game);
+      const names=getBroadcastNames(game).join(" | ");
+
+      if(provider==="prime") return /\bprime(?: video)?\b/i.test(names);
+      if(provider==="netflix") return /\bnetflix\b/i.test(names);
+      if(provider==="peacock") return /\bpeacock\b/i.test(names) || cls==="NBC";
+      if(provider==="fox") return cls==="FOX_NATIONAL";
+      if(provider==="paramount") return /\bparamount\s*\+?\b/i.test(names);
+
+      // NFL+ reliably includes national/primetime windows; Sunday local games
+      // remain market/device dependent and are not treated as table-verifiable.
+      if(provider==="nflplus"){
+        return ["NFL_NETWORK","ESPN","ABC","PRIME","NETFLIX","PEACOCK_EXCLUSIVE"].includes(cls);
+      }
+      return false;
+    }
+
+    function simulateStreamingRights(){
+      ensureSeasonalStreamingRights();
+      const issues=[];
+      const stats={games:allGames.length,rightsRecords:Object.keys(providerValidation.games||{}).length,providers:{}};
+      const providerKeys=["prime","netflix","peacock","fox","paramount","nflplus"];
+
+      providerKeys.forEach(provider=>{
+        stats.providers[provider]={shown:0,tableVerified:0,ruleExpected:0,issues:0};
+      });
+
+      allGames.forEach(game=>{
+        const detected=getProviderKeysForGame(game);
+        providerKeys.forEach(provider=>{
+          const table=providerValidationAllows(game,provider);
+          const expected=expectedProviderByRules(game,provider);
+          const shown=detected.includes(provider);
+          const s=stats.providers[provider];
+          if(shown)s.shown++;
+          if(table)s.tableVerified++;
+          if(expected)s.ruleExpected++;
+
+          // Log contradictions only; do not auto-change provider behavior.
+          if(table&&!shown){
+            issues.push({severity:"ERROR",provider,game:`${game.awayAbbr} @ ${game.homeAbbr}`,date:localGameDate(game),week:scheduleWeekKey(game),reason:"Verified rights table says YES but provider is not detected",broadcasts:getBroadcastNames(game)});
+            s.issues++;
+          }else if(shown&&!table && ["prime","netflix","peacock","fox","paramount"].includes(provider)){
+            issues.push({severity:"WARN",provider,game:`${game.awayAbbr} @ ${game.homeAbbr}`,date:localGameDate(game),week:scheduleWeekKey(game),reason:"Provider shown without a season-table verification record",broadcasts:getBroadcastNames(game)});
+            s.issues++;
+          }else if(expected&&!shown){
+            issues.push({severity:"WARN",provider,game:`${game.awayAbbr} @ ${game.homeAbbr}`,date:localGameDate(game),week:scheduleWeekKey(game),reason:"Network/provider metadata suggests availability but provider is not shown",broadcasts:getBroadcastNames(game)});
+            s.issues++;
+          }
+        });
+      });
+
+      const audit={generatedAt:Date.now(),season:currentRightsSeason(),stats,issues};
+      try{localStorage.setItem(STREAMING_RIGHTS_AUDIT_KEY,JSON.stringify(audit));}catch(_){}
+      return audit;
+    }
+
+    function formatStreamingRightsAudit(audit){
+      const providerLines=Object.entries(audit.stats.providers).map(([p,s])=>
+        `${providerIconLabel(p)}: shown ${s.shown} · table ${s.tableVerified} · expected ${s.ruleExpected} · issues ${s.issues}`
+      );
+      const issueLines=audit.issues.slice(0,40).map(i=>
+        `${i.severity} · ${providerIconLabel(i.provider)} · ${i.week||"?"} · ${i.game} · ${i.date} · ${i.reason} · ESPN: ${(i.broadcasts||[]).join(" / ")||"none"}`
+      );
+      return {providerLines,issueLines,total:audit.issues.length};
+    }
+
+    function ensureSeasonalStreamingRights({force=false}={}){
+      const season=currentRightsSeason();
+      try{
+        if(!force){
+          const c=JSON.parse(localStorage.getItem(STREAMING_RIGHTS_CACHE_KEY)||"null");
+          if(c?.season===season&&c?.schema===STREAMING_RIGHTS_SCHEMA){
+            providerValidation={savedAt:c.generatedAt||Date.now(),games:c.games||{}};
+            providerValidationStatus="SEASON TABLE";return;
+          }
+        }
+      }catch(_){}
+      const b=buildSeasonalStreamingRights(season);
+      providerValidation={savedAt:b.generatedAt,games:b.games};
+      providerValidationStatus=season===2026?"2026 VERIFIED TABLE":"AUTO-GENERATED";
+      try{localStorage.setItem(STREAMING_RIGHTS_CACHE_KEY,JSON.stringify(b));}catch(_){}
+    }
+    let providerValidation={savedAt:0,games:{}};
+    let providerValidationStatus="NOT_LOADED";
+
+    function providerValidationKey(game){
+      return `${localGameDate(game)}|${String(game.awayAbbr||"").toUpperCase()}|${String(game.homeAbbr||"").toUpperCase()}`;
+    }
+
+    function readProviderValidationCache(){ensureSeasonalStreamingRights();return !!providerValidation.savedAt;}
+
+    function writeProviderValidationCache(){
+      try{localStorage.setItem(PROVIDER_VALIDATION_CACHE_KEY,JSON.stringify(providerValidation));}catch(_){}
+    }
+
+    function getProviderValidation(game,key){
+      return providerValidation.games?.[providerValidationKey(game)]?.[key]||null;
+    }
+
+    function setProviderValidation(game,key,value,source){
+      const k=providerValidationKey(game);
+      providerValidation.games[k] ||= {};
+      providerValidation.games[k][key]={value:!!value,source,checkedAt:Date.now()};
+    }
+
+    // Provider-owned schedules are intentionally refreshed at most weekly.
+    // In standalone-browser mode these sources may be blocked by CORS; failures
+    // never affect startup or live-score polling.
+    async function refreshProviderValidation({force=false}={}){
+      if(force)localStorage.removeItem(STREAMING_RIGHTS_CACHE_KEY);
+      ensureSeasonalStreamingRights({force});
+    }
+
+    function providerValidationAllows(game,key){return providerValidation.games?.[providerValidationKey(game)]?.[key]?.value===true;}
 
     function classifyBroadcastNetwork(game){
       const names=getBroadcastNames(game);
@@ -1730,6 +1953,12 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
           ${affiliate?`<span class="diag-label">AFFILIATE</span><span>${escapeHtml(affiliate)}</span>`:""}
           <span class="diag-label">DETECTED</span><span>${escapeHtml(detected.map(providerIconLabel).join(" · ")||"none")}</span>
           <span class="diag-label">ENABLED</span><span>${escapeHtml(finalKeys.map(providerIconLabel).join(" · ")||"none")}</span>
+          <span class="diag-label">VALIDATED</span><span>${escapeHtml(["peacock","paramount","fox","prime","netflix"].filter(k=>providerValidationAllows(game,k)).map(k=>{
+            const r=providerValidation.games?.[providerValidationKey(game)]?.[k];
+            return `${providerIconLabel(k)} (${r?.confidence||"VERIFIED"} · ${r?.source||"rights table"})`;
+          }).join(" · ")||"none")}</span>
+          <span class="diag-label">VALIDATOR</span><span>${escapeHtml(providerValidationStatus)}</span>
+          <span class="diag-label">FOX RULE</span><span>${networkClass==="FOX_NATIONAL"?"Explicit ESPN FOX/FOX One":"No FOX app unless ESPN explicitly says FOX/FOX One"}</span>
         </div>
         <div class="diag-provider-list">
           ${rows.map(e=>`<div class="diag-row"><span class="diag-confidence">${labels[e.confidence]||"?"}</span><span><b>${escapeHtml(providerIconLabel(e.provider))}</b> · ${escapeHtml(e.source)} · ${escapeHtml(e.reason)}</span></div>`).join("")}
@@ -1924,6 +2153,16 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
 
       push(typeof classifyBroadcastNetwork==="function"?"pass":"fail","Network classifier","classifier v3 available");
       push(Array.isArray(allGames)&&allGames.length?"pass":"warn","ESPN schedule",`${allGames.length||0} games loaded`);
+      const validationFresh=readProviderValidationCache();
+      const validationAge=providerValidation.savedAt?Math.round((Date.now()-providerValidation.savedAt)/(24*60*60*1000)):null;
+      push(validationFresh?"pass":"warn","Streaming rights table",providerValidation.savedAt?`${validationAge} day(s) old · seasonal rights registry`:"not populated");
+      const rightsAudit=simulateStreamingRights();
+      const auditFmt=formatStreamingRightsAudit(rightsAudit);
+      push(rightsAudit.issues.some(i=>i.severity==="ERROR")?"fail":(rightsAudit.issues.length?"warn":"pass"),
+        "Streaming rights simulation",
+        `${rightsAudit.stats.games} games · ${rightsAudit.issues.length} issue(s) logged`,
+        [...auditFmt.providerLines.map(line=>({week:"SUMMARY",matchup:"RIGHTS",date:"",broadcasts:line})),
+         ...auditFmt.issueLines.map(line=>({week:"ISSUE",matchup:"",date:"",broadcasts:line}))]);
       const seasonCache=readSeasonScheduleCache();
       push(seasonCache?.games?.length?"pass":"warn","Season cache",seasonCache?.games?.length?`${seasonCache.games.length} games · ${seasonCache.fresh?"fresh":"stale"}`:"not populated");
       const currentDescriptor=getCurrentWeekDescriptor();
@@ -1994,27 +2233,38 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       showToast("Refreshing full NFL schedule");
       await refreshFullSeasonSchedule({manual:true});
       scheduleScoreRefresh();
+      await refreshProviderValidation({force:true});
+      simulateStreamingRights();
     }
 
     function buildProviderTestList(){
       const list=document.querySelector("#providerTestList");
       if(!list)return;
+
       const ordered=DEFAULT_ENABLED_PROVIDERS.filter(k=>PROVIDER_LINKS[k]);
+      const platform=DEVICE.isAndroid?"Android":DEVICE.isIOS?"iOS":"Desktop";
+
       list.innerHTML=ordered.map(key=>{
         const p=PROVIDER_LINKS[key];
-        const mobile=DEVICE.isAndroid
-          ? `Android HTTPS package intent · ${p.androidPackage||"web fallback"}`
+        const url=p.web||p.universal||p.iosUniversal||"";
+        const mode=DEVICE.isAndroid
+          ? "Android App Link"
           : DEVICE.isIOS
-            ? `iOS · ${p.ios||p.iosUniversal||"web fallback"}`
-            : "Desktop · web";
+            ? "iOS Universal Link"
+            : "Desktop web";
+
         return `<div class="provider-test-row">
-          <div><div class="provider-test-name">${escapeHtml(p.label)}</div><div class="provider-test-meta">${escapeHtml(mobile)}</div></div>
+          <div>
+            <div class="provider-test-name">${escapeHtml(p.label)}</div>
+            <div class="provider-test-meta"><b>${escapeHtml(platform)} · ${escapeHtml(mode)}</b></div>
+            <div class="provider-test-url">${escapeHtml(url||"NO URL CONFIGURED")}</div>
+          </div>
           <button class="provider-test-open" type="button" data-provider-test="${escapeHtml(key)}">OPEN</button>
         </div>`;
       }).join("");
+
       list.querySelectorAll("[data-provider-test]").forEach(btn=>btn.addEventListener("click",()=>{
         const key=btn.dataset.providerTest;
-        const p=PROVIDER_LINKS[key];
         const fakeGame={id:"provider-test",awayAbbr:"TEST",homeAbbr:"TEST",dateTime:new Date().toISOString()};
         openProvider(key,fakeGame);
       }));
@@ -2429,29 +2679,8 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
     // Turns an ESPN broadcast string like "CBS" or "FOX" into one or more
     // provider buttons. This is where streaming service detection happens.
     function isParamountPlusGame(game){
-      // Separate Paramount+ eligibility lookup.
-      // 1) Direct CBS / Paramount broadcast metadata.
-      // 2) Known local CBS preseason simulcasts that ESPN may label only by
-      //    their national NFL Network feed.
-      const n = String(game.network || "").toLowerCase();
-
-      const localCBSPreseason = [
-        // 49ers at Chargers - Aug 20, 2026:
-        // CBS Los Angeles / CBS 8 San Diego local telecast; Paramount+ can
-        // expose the local CBS live station for eligible subscribers/markets.
-        { date:"2026-08-20", away:"SF", home:"LAC" }
-      ];
-
-      if(n.includes("cbs") || n.includes("paramount")) return true;
-
-      const kickoff = new Date(game.dateTime);
-      const localDate = Number.isNaN(kickoff.getTime()) ? "" :
-        `${kickoff.getFullYear()}-${String(kickoff.getMonth()+1).padStart(2,"0")}-${String(kickoff.getDate()).padStart(2,"0")}`;
-      return localCBSPreseason.some(item =>
-        item.date === localDate &&
-        item.away === String(game.awayAbbr || "").toUpperCase() &&
-        item.home === String(game.homeAbbr || "").toUpperCase()
-      );
+      // CBS alone does not prove Paramount+ streaming availability.
+      return getBroadcastNames(game).some(name=>/\bparamount\s*\+?\b/i.test(String(name)));
     }
 
     function getBroadcastNames(game){
@@ -2461,33 +2690,15 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
     }
 
     function isNationalFoxBroadcast(game){
-      if(localGameDate(game)==="2026-08-27" && matchup(game,"SF","LV")) return false;
       const names=getBroadcastNames(game).map(name=>String(name).trim()).filter(Boolean);
-      const normalized=names.map(name=>name.toLowerCase());
-
-      const hasExplicitNational=normalized.some(n =>
-        n==="fox" ||
-        n==="fox sports" ||
-        n==="fox one" ||
-        n.startsWith("fox sports ") ||
-        n.includes("fox one")
-      );
-
-      const hasLocalAffiliate=names.some(name => {
+      return names.some(name=>{
         const n=name.toLowerCase();
-        return (
-          /\bfox\s*\d+\b/i.test(name) ||          // FOX 5 / FOX5
-          /^[kw][a-z0-9]{2,4}$/i.test(name) ||   // KSWB / WFLA-style callsign
-          /^[kw][a-z0-9]{2,4}\s+fox/i.test(name) ||
-          /\b(local|affiliate)\b/i.test(name) ||
-          /\bfox\s+[a-z]{2,}\b/i.test(name) && !n.includes("fox sports") && !n.includes("fox one")
-        );
+        return n==="fox" ||
+               n==="fox one" ||
+               n==="fox sports" ||
+               n.startsWith("fox sports ") ||
+               n.includes("fox one");
       });
-
-      // If ESPN exposes both a generic FOX label and local-affiliate metadata,
-      // treat the matchup as local-only unless another trusted FOX-specific
-      // verifier is added later.
-      return hasExplicitNational && !hasLocalAffiliate;
     }
 
     const PROVIDER_CONFIDENCE = Object.freeze({
@@ -2525,7 +2736,7 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       if(gameHasBroadcast(game,["paramount"])){
         evidence.push(providerEvidence("paramount",PROVIDER_CONFIDENCE.VERIFIED,"ESPN","Paramount+ explicitly identified",names));
       }else if(isParamountPlusGame(game)){
-        evidence.push(providerEvidence("paramount",PROVIDER_CONFIDENCE.STRONG,"CBS/Paramount rule","CBS/Paramount eligibility rule matched",names));
+        evidence.push(providerEvidence("paramount",PROVIDER_CONFIDENCE.STRONG,"CBS/Paramount rule","Paramount+ explicitly identified",names));
       }
       if(gameHasBroadcast(game,["prime video","amazon prime","prime"])){
         evidence.push(providerEvidence("prime",PROVIDER_CONFIDENCE.VERIFIED,"ESPN","Prime Video explicitly identified",names));
@@ -2544,6 +2755,12 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       if(dtv.eligible){
         evidence.push(providerEvidence("directv",PROVIDER_CONFIDENCE.VERIFIED,dtv.type==="NFL_PACKAGE"?"DIRECTV NFL Package":"DIRECTV verification",dtv.reason,getBroadcastNames(game)));
       }
+      ["peacock","paramount","prime"].forEach(key=>{
+        const v=getProviderValidation(game,key);
+        if(v?.value){
+          evidence.push(providerEvidence(key,PROVIDER_CONFIDENCE.VERIFIED,"Season rights table",`${v.source} schedule matched this game`,getBroadcastNames(game)));
+        }
+      });
       return evidence;
     }
 
@@ -2568,6 +2785,12 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       if(isParamountPlusGame(game) && networkClass!=="CBS") keys.push("paramount");
       if(isPeacockGame(game) && !keys.includes("peacock")) keys.push("peacock");
       if(isNetflixGame(game) && !keys.includes("netflix")) keys.push("netflix");
+
+      // Provider-owned schedule validation. These caches refresh weekly and
+      // exist only to validate stream availability, not scores or game state.
+      if(providerValidationAllows(game,"peacock")) keys.push("peacock");
+      if(providerValidationAllows(game,"paramount")) keys.push("paramount");
+            if(providerValidationAllows(game,"prime")) keys.push("prime");
 
       // DIRECTV is enrichment-only and requires separate verification.
 
@@ -2726,21 +2949,15 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
         if(handledByTv) return;
         showToast("TV launch unavailable - opening on phone");
       }
-
-      const webUrl = addTracking(getProviderGameWebUrl(providerKey,provider,game), game.id);
+      const gameWebUrl = getProviderGameWebUrl(providerKey,provider,game);
+      const canonicalUrl = DEVICE.isIOS ? (provider.iosUniversal || gameWebUrl || provider.web) : (gameWebUrl || provider.web);
+      const targetUrl = addTracking(canonicalUrl, game.id);
       showToast(`Opening ${provider.label}`);
-
-      if(DEVICE.isAndroid){
-        window.location.href = buildAndroidAppIntent(provider, webUrl, game);
+      if(DEVICE.isAndroid || DEVICE.isIOS){
+        window.location.href = targetUrl;
         return;
       }
-
-      if(DEVICE.isIOS){
-        launchIOSAppFirst(provider, webUrl);
-        return;
-      }
-
-      window.open(webUrl, "_blank", "noopener,noreferrer");
+      window.open(targetUrl, "_blank", "noopener,noreferrer");
     }
 
     function launchIOSAppFirst(provider, webUrl){
@@ -2852,11 +3069,37 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
     function weekMetaTag(w){const p=postseasonInfo(w);return p?p.tag:(w.type===2&&w.week===1?"KICKOFF":"")}
     function isKickoffWeek(w){return w.type===2&&w.week===1}
     function weekDateRange(w){return w.min&&w.max?`${w.min.toLocaleDateString([],{month:"short",day:"numeric"})} - ${w.max.toLocaleDateString([],{month:"short",day:"numeric"})}`:""}
+    const SPECIAL_WEEK_META={
+      "wild-card":{tag:"PLAYOFFS",label:"WILD CARD",dates:"JAN 16 - 18"},
+      "divisional":{tag:"PLAYOFFS",label:"DIV RD",dates:"JAN 23 - 24"},
+      "conference":{tag:"FINAL FOUR",label:"CONF CHAMP",dates:"JAN 31"},
+      "pro-bowl":{tag:"ALL-STAR",label:"PRO BOWL",dates:"FEB 7"},
+      "super-bowl":{tag:"CHAMPIONSHIP",label:"SUPER BOWL",dates:"FEB 14"}
+    };
+    function specialWeekMetaFor(w){
+      if(!w || w.type!==3)return null;
+      const map={
+        1:{key:"wild-card",...SPECIAL_WEEK_META["wild-card"]},
+        2:{key:"divisional",...SPECIAL_WEEK_META.divisional},
+        3:{key:"conference",...SPECIAL_WEEK_META.conference},
+        4:{key:"pro-bowl",...SPECIAL_WEEK_META["pro-bowl"]},
+        5:{key:"super-bowl",...SPECIAL_WEEK_META["super-bowl"]}
+      };
+      return map[w.week]||null;
+    }
+
     function renderWeekNavigator(){
       buildScheduleWeeks();if(!weekTimelineEl)return;
-      weekTimelineEl.innerHTML=scheduleWeeks.map(w=>`<button class="week-chip ${weekClass(w)}${isKickoffWeek(w)?" kickoff":""}${w.hasGames?"":" future-empty"}${w.key===selectedScheduleWeek?" active":""}" data-week="${w.key}">${weekMetaTag(w)?`<span class="week-chip-meta">${weekMetaTag(w)}</span>`:""}<span class="week-chip-title">${weekLabel(w)}</span>${weekDateRange(w)?`<span class="week-chip-range">${weekDateRange(w)}</span>`:""}</button>`).join("");
+      weekTimelineEl.innerHTML=scheduleWeeks.map(w=>{
+        const special=specialWeekMetaFor(w);
+        const meta=special?.tag||weekMetaTag(w);
+        const label=special?.label||weekLabel(w);
+        const range=special?.dates||weekDateRange(w);
+        return `<button class="week-chip ${weekClass(w)}${special?` special-week ${special.key}`:""}${isKickoffWeek(w)?" kickoff":""}${w.hasGames?"":" future-empty"}${w.key===selectedScheduleWeek?" active":""}" data-week="${w.key}">${meta?`<span class="week-chip-meta">${meta}</span>`:""}<span class="week-chip-title">${label}</span>${range?`<span class="week-chip-range">${range}</span>`:""}</button>`;
+      }).join("");
       weekTimelineEl.querySelectorAll(".week-chip").forEach(b=>b.addEventListener("click",()=>selectScheduleWeek(b.dataset.week)));
       requestAnimationFrame(()=>weekTimelineEl.querySelector(".week-chip.active")?.scrollIntoView({behavior:"smooth",inline:"center",block:"nearest"}));
+
     }
     function selectScheduleWeek(k){
       selectedScheduleWeek=k;
@@ -2981,6 +3224,7 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
         if(games?.length){
           allGames=games;
           writeSeasonScheduleCache(games);
+          ensureSeasonalStreamingRights({force:true});
           renderWeekNavigator();
           renderSchedule();
           await refreshCurrentWeekState();
@@ -2997,6 +3241,7 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       // Instant startup from local season cache.
       if(cached?.games?.length){
         allGames=cached.games;
+        ensureSeasonalStreamingRights();
         renderWeekNavigator();
         renderSchedule();
       }
@@ -3010,6 +3255,8 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
         await refreshCurrentWeekState();
       }
       scheduleScoreRefresh();
+      // Provider schedule validation is non-blocking and at most weekly.
+      ensureSeasonalStreamingRights();
     }
 
     function scheduleLiveRefresh(){
@@ -3037,7 +3284,7 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       <div class="provider-test-header">
         <div>
           <div class="provider-test-title">Provider App Test</div>
-          <div class="provider-test-subtitle">Tests app-launch routing independently of game detection.</div>
+          <div class="provider-test-subtitle">Tests app-launch routing independently of game detection. Platform detection is shown for each link.</div>
         </div>
         <button id="providerTestClose" class="provider-test-close" type="button" aria-label="Close provider app test">×</button>
       </div>
