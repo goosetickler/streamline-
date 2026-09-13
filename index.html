@@ -1241,6 +1241,8 @@
     const WEEKLY_COVERAGE_CACHE_TTL_MS=12*60*60*1000;
     const WEEKLY_COVERAGE_FEED_URL="https://goosetickler.github.io/streamline-/local-coverage-2026.json";
     const FANTASY_CACHE_PREFIX = "gridironGuide.realFantasy.v2.";
+    const LIVE_FANTASY_CACHE_TTL_MS = 90*1000;
+    const fantasyLeaderRequests = new Map();
     const DEFAULT_ENABLED_PROVIDERS = ["youtubetv","hulu","paramount","directv","peacock","netflix","fox","espn","prime","nflplus"];
 
     // Deep link notes:
@@ -2853,7 +2855,8 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
     }
 
     function updateVisibleGameCards(changes){
-      const fantasyRefresh=[];
+      const fantasyRefresh=new Map();
+      const forcedFantasyRefresh=new Map();
       changes.forEach(change=>{
         const card=findVisibleGameCard(change.id);
         if(!card)return;
@@ -2864,7 +2867,11 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
           const replacement=createGameCardElement(change.after);
           if(!replacement)return;
           card.replaceWith(replacement);
-          if(isLiveGame(change.after)||isFinalGame(change.after))fantasyRefresh.push(change.after);
+          if(isLiveGame(change.after)||isFinalGame(change.after)){
+            const needsFinalRefresh=change.statusChanged&&isFinalGame(change.after);
+            const target=(change.scoreChanged||needsFinalRefresh)?forcedFantasyRefresh:fantasyRefresh;
+            target.set(String(change.after.id),change.after);
+          }
           triggerScoreChangeAnimation(replacement,change);
           return;
         }
@@ -2881,12 +2888,15 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
         syncPossessionIndicator(card,"home",change.after.possessionAbbr===change.after.homeAbbr);
         triggerScoreChangeAnimation(card,change);
         if(change.scoreChanged && (isLiveGame(change.after)||isFinalGame(change.after))){
-          fantasyRefresh.push(change.after);
+          forcedFantasyRefresh.set(String(change.after.id),change.after);
+        }else if(isLiveGame(change.after) && !isFantasyCacheFresh(change.after)){
+          fantasyRefresh.set(String(change.after.id),change.after);
         }
       });
 
       updateFilterCounts();
-      if(fantasyRefresh.length)hydrateFantasyBlocks(fantasyRefresh);
+      if(fantasyRefresh.size)hydrateFantasyBlocks([...fantasyRefresh.values()]);
+      if(forcedFantasyRefresh.size)hydrateFantasyBlocks([...forcedFantasyRefresh.values()],{force:true});
     }
 
     function migrateAppData(){
@@ -3124,6 +3134,10 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
     function renderFantasyBlock(game){
       if(!isLiveGame(game) && !isFinalGame(game)) return "";
       const title = "FANTASY LEADERS";
+      const cached = readCachedFantasy(FANTASY_CACHE_PREFIX + game.id);
+      if(cached.length){
+        return `<section class="fantasy-block" id="fantasy-${slug(game.id)}" aria-label="${title}">${renderFantasyLeadersContent(title,cached)}</section>`;
+      }
       return `<section class="fantasy-block" id="fantasy-${slug(game.id)}" aria-label="${title}">
         <div class="fantasy-title">⭐ ${title}</div>
         <div class="fantasy-list">
@@ -3136,39 +3150,66 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       </section>`;
     }
 
-    async function hydrateFantasyBlocks(games){
+    function renderFantasyLeadersContent(title,leaders){
+      return `<div class="fantasy-title">🏆 ${title}</div><div class="fantasy-list">${leaders.slice(0,3).map(renderFantasyPlayer).join("")}</div>`;
+    }
+
+    async function hydrateFantasyBlocks(games,{force=false}={}){
       const fantasyGames = games.filter(game => isLiveGame(game) || isFinalGame(game));
       await Promise.allSettled(fantasyGames.map(async game => {
         const el = document.querySelector(`#fantasy-${slug(game.id)}`);
         if(!el) return;
         const title = "FANTASY LEADERS";
         try{
-          const leaders = await getFantasyLeaders(game);
+          const leaders = await getFantasyLeaders(game,{force});
           if(!leaders.length){ el.innerHTML = renderFantasyUnavailable(title, "No player stats returned"); return; }
-          el.innerHTML = `<div class="fantasy-title">🏆 ${title}</div><div class="fantasy-list">${leaders.slice(0,3).map(renderFantasyPlayer).join("")}</div>`;
+          el.innerHTML = renderFantasyLeadersContent(title,leaders);
         }catch(err){
           el.innerHTML = renderFantasyUnavailable(title, "ESPN stats unavailable");
         }
       }));
     }
 
-    async function getFantasyLeaders(game){
+    async function getFantasyLeaders(game,{force=false}={}){
       const cacheKey = FANTASY_CACHE_PREFIX + game.id;
-      if(isFinalGame(game)){
-        const cached = readCachedFantasy(cacheKey);
-        if(cached.length) return cached;
-      }
-      const summary = await fetchJson(`${ESPN_SUMMARY_BASE}?event=${encodeURIComponent(game.id)}`);
-      const leaders = extractFantasyLeadersFromEspnSummary(summary).slice(0,3);
-      if(isFinalGame(game) && leaders.length) cacheFantasy(cacheKey, leaders);
-      return leaders;
+      const cached = readFantasyCacheRecord(cacheKey);
+      const cacheIsFresh = cached.leaders.length && (isFinalGame(game) || Date.now()-cached.savedAt<LIVE_FANTASY_CACHE_TTL_MS);
+      if(!force && cacheIsFresh) return cached.leaders;
+      if(fantasyLeaderRequests.has(cacheKey)) return fantasyLeaderRequests.get(cacheKey);
+
+      const request = (async()=>{
+        try{
+          const summary = await fetchJson(`${ESPN_SUMMARY_BASE}?event=${encodeURIComponent(game.id)}`);
+          const leaders = extractFantasyLeadersFromEspnSummary(summary).slice(0,3);
+          if(leaders.length) cacheFantasy(cacheKey, leaders);
+          return leaders;
+        }catch(err){
+          if(cached.leaders.length) return cached.leaders;
+          throw err;
+        }
+      })().finally(()=>fantasyLeaderRequests.delete(cacheKey));
+
+      fantasyLeaderRequests.set(cacheKey,request);
+      return request;
+    }
+
+    function readFantasyCacheRecord(key){
+      try{
+        const cached = JSON.parse(localStorage.getItem(key) || "null");
+        return {
+          savedAt:Number(cached?.savedAt)||0,
+          leaders:Array.isArray(cached?.leaders)?cached.leaders:[]
+        };
+      }catch(err){ return {savedAt:0,leaders:[]}; }
     }
 
     function readCachedFantasy(key){
-      try{
-        const cached = JSON.parse(localStorage.getItem(key) || "null");
-        return Array.isArray(cached?.leaders) ? cached.leaders : [];
-      }catch(err){ return []; }
+      return readFantasyCacheRecord(key).leaders;
+    }
+
+    function isFantasyCacheFresh(game){
+      const cached=readFantasyCacheRecord(FANTASY_CACHE_PREFIX+game.id);
+      return Boolean(cached.leaders.length && (isFinalGame(game) || Date.now()-cached.savedAt<LIVE_FANTASY_CACHE_TTL_MS));
     }
 
     function cacheFantasy(key, leaders){
