@@ -180,7 +180,7 @@
     .settings-provider[data-provider="nflplus"].active{background:#013369;color:#fff}
     .settings-hint{margin:10px 0 0;color:var(--muted);font-size:.72rem;font-weight:750;line-height:1.3}
     .settings-version-wrap{border-top:1px solid var(--line);margin-top:14px;padding-top:12px;display:flex;justify-content:center}
-    .settings-version{border:0;background:transparent;color:rgba(170,180,200,.72);padding:8px 14px;border-radius:10px;font-size:.66rem;font-weight:800;letter-spacing:.02em;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+    .settings-version{border:0;background:transparent;color:rgba(170,180,200,.72);padding:8px 14px;border-radius:10px;font-size:.66rem;font-weight:800;letter-spacing:.02em;cursor:default;user-select:none;pointer-events:none}
     /* Release 4.10: Favorite Teams */
     .favorite-team-controls{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px}
     .favorite-team-select,.favorite-team-add{height:42px;border:1px solid var(--line);border-radius:12px;background:#111827;color:var(--text);font:inherit;font-size:.72rem;font-weight:850}
@@ -255,6 +255,33 @@
       width:180px;height:180px;
       background:radial-gradient(circle,rgba(83,183,255,.15),transparent 62%);
       pointer-events:none;
+    }
+
+    /* One-shot feedback for a score detected after the card is already visible. */
+    .game-card.score-change:after{
+      content:"";
+      position:absolute;
+      inset:0;
+      z-index:8;
+      border-radius:inherit;
+      pointer-events:none;
+      animation:score-card-pulse .95s cubic-bezier(.22,.72,.2,1) both;
+    }
+    .team-score.score-changed{
+      animation:score-number-pop .95s cubic-bezier(.22,.72,.2,1) both;
+    }
+    @keyframes score-card-pulse{
+      0%{box-shadow:inset 0 0 0 1px rgba(106,255,183,0),0 0 0 rgba(83,183,255,0);opacity:0}
+      22%{box-shadow:inset 0 0 0 2px rgba(106,255,183,.72),0 0 24px rgba(83,183,255,.30);opacity:1}
+      100%{box-shadow:inset 0 0 0 1px rgba(106,255,183,0),0 0 0 rgba(83,183,255,0);opacity:0}
+    }
+    @keyframes score-number-pop{
+      0%{transform:scale(1);color:inherit;text-shadow:none}
+      28%{transform:scale(1.22);color:var(--green);text-shadow:0 0 14px rgba(106,255,183,.72)}
+      100%{transform:scale(1);color:inherit;text-shadow:none}
+    }
+    @media (prefers-reduced-motion:reduce){
+      .game-card.score-change:after,.team-score.score-changed{animation:none}
     }
 
     .live-details{
@@ -2310,15 +2337,57 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       };
     }
 
+    function dynamicGameFingerprint(game){
+      return JSON.stringify([
+        String(game.homeScore ?? ""),
+        String(game.awayScore ?? ""),
+        String(game.status ?? ""),
+        String(game.statusDetail ?? ""),
+        String(game.period ?? ""),
+        String(game.clock ?? ""),
+        String(game.possessionAbbr ?? ""),
+        String(game.homeTimeouts ?? ""),
+        String(game.awayTimeouts ?? ""),
+        String(game.homeRecord ?? ""),
+        String(game.awayRecord ?? ""),
+        String(game.network ?? ""),
+        game.broadcasts || []
+      ]);
+    }
+
+    function scoreNumber(value){
+      if(value === undefined || value === null || value === "")return 0;
+      const parsed=Number(value);
+      return Number.isFinite(parsed)?parsed:0;
+    }
+
     function mergeWeekState(updates){
-      if(!Array.isArray(updates)||!updates.length)return;
+      if(!Array.isArray(updates)||!updates.length)return [];
       const byId=new Map(updates.map(g=>[String(g.id),g]));
+      const changes=[];
       allGames=allGames.map(game=>{
         // Final games are immutable for our purposes; do not repeatedly rewrite them.
         if(isFinalGame(game))return game;
         const update=byId.get(String(game.id));
-        return update?mergeDynamicGameState(game,update):game;
+        if(!update)return game;
+        const merged=mergeDynamicGameState(game,update);
+        if(dynamicGameFingerprint(game)===dynamicGameFingerprint(merged))return game;
+        const awayScored=scoreNumber(merged.awayScore)>scoreNumber(game.awayScore);
+        const homeScored=scoreNumber(merged.homeScore)>scoreNumber(game.homeScore);
+        changes.push({
+          id:String(game.id),
+          before:game,
+          after:merged,
+          awayScored,
+          homeScored,
+          scoreChanged:awayScored||homeScored,
+          statusChanged:cleanStatus(game.status)!==cleanStatus(merged.status),
+          providerChanged:String(game.network||"")!==String(merged.network||"") ||
+            JSON.stringify(game.broadcasts||[])!==JSON.stringify(merged.broadcasts||[])
+        });
+        return merged;
       });
+      return changes;
     }
 
     function getCurrentWeekDescriptor(){
@@ -2487,6 +2556,11 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
 
     function readWeeklyCoverageCache(){
       try{const payload=JSON.parse(localStorage.getItem(WEEKLY_COVERAGE_CACHE_KEY)||"null");return payload&&typeof payload==="object"?payload:null;}catch(err){return null;}
+    }
+    function weeklyCoverageFingerprint(payload){
+      if(!payload||typeof payload!=="object")return "";
+      const {savedAt,...content}=payload;
+      return JSON.stringify(content);
     }
     function saveWeeklyCoverageCache(payload){try{localStorage.setItem(WEEKLY_COVERAGE_CACHE_KEY,JSON.stringify(payload));}catch(err){} weeklyCoverageData=payload;}
     async function refreshWeeklyCoverageData(force=false){
@@ -2672,19 +2746,19 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
             ${providerKeys.length ? `<button class="watch" aria-label="Open ${escapeHtml(provider.label)} for ${escapeHtml(game.awayAbbr)} at ${escapeHtml(game.homeAbbr)}" onclick='openProvider("${providerKey}", ${JSON.stringify(game).replace(/'/g,"&#39;")})'>${playIcon()} WATCH</button>` : ""}
           </div>`;
       return `
-        <article class="game-card${liveClass}${favoriteClass}${winnerSideClass}" aria-label="${escapeHtml(game.awayTeam)} at ${escapeHtml(game.homeTeam)}">
+        <article class="game-card${liveClass}${favoriteClass}${winnerSideClass}" data-game-id="${escapeHtml(String(game.id))}" aria-label="${escapeHtml(game.awayTeam)} at ${escapeHtml(game.homeTeam)}">
           <div class="game-top">
 
             <div class="time">
               ${formatKickoff(game.dateTime)}
             </div>
 
-            <div class="game-clock-top">
+            <div class="game-clock-top" data-game-field="clock">
               ${isLive ? getClockLine(game) : ""}
             </div>
 
             <div class="badges">
-              <span class="badge ${statusClass}">${displayStatus(game.status)}</span>
+              <span class="badge ${statusClass}" data-game-field="status">${displayStatus(game.status)}</span>
             </div>
           </div>
           <div class="teams-row">
@@ -2699,13 +2773,13 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
                 result.away
             )}
             <div class="center-score">
-                <span class="team-score ${result.away}">
+                <span class="team-score ${result.away}" data-score-side="away">
                     ${game.awayScore ?? ""}
                 </span>
 
                 <span class="vs">@</span>
 
-                <span class="team-score ${result.home}">
+                <span class="team-score ${result.home}" data-score-side="home">
                     ${game.homeScore ?? ""}
                 </span>
             </div>
@@ -2723,6 +2797,98 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
           ${actionRow}
         </article>`;
     }
+
+    function visibleGameSignature(){
+      return getDisplayGames().map(game=>String(game.id)).join("|");
+    }
+
+    function findVisibleGameCard(gameId){
+      const id=String(gameId);
+      return Array.from(scheduleEl.querySelectorAll(".game-card[data-game-id]"))
+        .find(card=>card.dataset.gameId===id) || null;
+    }
+
+    function createGameCardElement(game){
+      const template=document.createElement("template");
+      template.innerHTML=renderGameCard(game).trim();
+      return template.content.firstElementChild;
+    }
+
+    function syncPossessionIndicator(card,side,hasPossession){
+      const row=card.querySelector(`[data-team-side="${side}"]`);
+      if(!row)return;
+      let indicator=row.querySelector(".possession");
+      if(hasPossession && !indicator){
+        indicator=document.createElement("span");
+        indicator.className="possession";
+        indicator.title="Possession";
+        indicator.textContent="🏈";
+        row.appendChild(indicator);
+      }else if(!hasPossession && indicator){
+        indicator.remove();
+      }
+    }
+
+    function triggerScoreChangeAnimation(card,change){
+      if(!card || !change.scoreChanged)return;
+      const changedScores=[];
+      if(change.awayScored)changedScores.push(card.querySelector('[data-score-side="away"]'));
+      if(change.homeScored)changedScores.push(card.querySelector('[data-score-side="home"]'));
+      card.classList.remove("score-change");
+      changedScores.forEach(score=>score?.classList.remove("score-changed"));
+      // Force a style read so a later scoring play can restart the one-shot animation.
+      void card.offsetWidth;
+      card.classList.add("score-change");
+      changedScores.forEach(score=>score?.classList.add("score-changed"));
+      window.setTimeout(()=>{
+        card.classList.remove("score-change");
+        changedScores.forEach(score=>score?.classList.remove("score-changed"));
+      },1050);
+    }
+
+    function animateRenderedScoreChanges(changes){
+      requestAnimationFrame(()=>{
+        changes.forEach(change=>triggerScoreChangeAnimation(findVisibleGameCard(change.id),change));
+      });
+    }
+
+    function updateVisibleGameCards(changes){
+      const fantasyRefresh=[];
+      changes.forEach(change=>{
+        const card=findVisibleGameCard(change.id);
+        if(!card)return;
+
+        const recordsChanged=String(change.before.homeRecord||"")!==String(change.after.homeRecord||"") ||
+          String(change.before.awayRecord||"")!==String(change.after.awayRecord||"");
+        if(change.statusChanged || change.providerChanged || recordsChanged){
+          const replacement=createGameCardElement(change.after);
+          if(!replacement)return;
+          card.replaceWith(replacement);
+          if(isLiveGame(change.after)||isFinalGame(change.after))fantasyRefresh.push(change.after);
+          triggerScoreChangeAnimation(replacement,change);
+          return;
+        }
+
+        const clock=card.querySelector('[data-game-field="clock"]');
+        if(clock)clock.innerHTML=isLiveGame(change.after)?getClockLine(change.after):"";
+
+        const awayScore=card.querySelector('[data-score-side="away"]');
+        const homeScore=card.querySelector('[data-score-side="home"]');
+        if(awayScore)awayScore.textContent=change.after.awayScore ?? "";
+        if(homeScore)homeScore.textContent=change.after.homeScore ?? "";
+
+        syncPossessionIndicator(card,"away",change.after.possessionAbbr===change.after.awayAbbr);
+        syncPossessionIndicator(card,"home",change.after.possessionAbbr===change.after.homeAbbr);
+        triggerScoreChangeAnimation(card,change);
+        if(change.scoreChanged && (isLiveGame(change.after)||isFinalGame(change.after))){
+          fantasyRefresh.push(change.after);
+        }
+      });
+
+      updateFilterCounts();
+      if(fantasyRefresh.length)hydrateFantasyBlocks(fantasyRefresh);
+    }
+
     function migrateAppData(){
       const previous=Number(localStorage.getItem(APP_DATA_VERSION_KEY)||0);
       if(previous===APP_DATA_VERSION)return;
@@ -3393,7 +3559,7 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       const resultClass = result ? ` ${result}` : "";
       if(side === "home"){
         return `
-      <div class="team-row home${resultClass}">
+      <div class="team-row home${resultClass}" data-team-side="home">
           <span class="team-name">
               ${escapeHtml(shortName)}
           </span>
@@ -3407,7 +3573,7 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
 </div>`;
       }
       return `
-      <div class="team-row${resultClass}">
+      <div class="team-row${resultClass}" data-team-side="away">
           <div class="team-stack">
               ${logoHtml}
               ${recordHtml}
@@ -3828,9 +3994,22 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       currentWeekRefreshPromise=(async()=>{
         const updates=await fetchCurrentWeekState();
         if(updates.length){
-          mergeWeekState(updates);
-          renderWeekNavigator();
-          renderSchedule();
+          const beforeSignature=visibleGameSignature();
+          const changes=mergeWeekState(updates);
+          if(changes.length){
+            const afterSignature=visibleGameSignature();
+            if(beforeSignature!==afterSignature){
+              // A game entered or left the active view (for example kickoff in
+              // Live or completion in Games). Rebuild only for that structural change.
+              renderWeekNavigator();
+              renderSchedule();
+              animateRenderedScoreChanges(changes);
+            }else{
+              // Normal live polling patches only changed fields. Existing cards,
+              // scroll position, loaded helmets, and fantasy content stay mounted.
+              updateVisibleGameCards(changes);
+            }
+          }
         }
         scheduleScoreRefresh();
       })().finally(()=>{
@@ -3965,7 +4144,12 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
     // from Settings -> Use location; cold launch never requests GPS permission.
     bootstrapSchedule();
     setTimeout(()=>{
-      refreshWeeklyCoverageData(false).then(()=>{if(localFirstEnabled)renderSchedule();}).catch(()=>{});
+      const beforeCoverage=weeklyCoverageFingerprint(weeklyCoverageData);
+      refreshWeeklyCoverageData(false).then(payload=>{
+        if(localFirstEnabled && weeklyCoverageFingerprint(payload)!==beforeCoverage){
+          renderSchedule();
+        }
+      }).catch(()=>{});
     },1500);
   </script>
 </body>
