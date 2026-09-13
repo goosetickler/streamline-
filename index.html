@@ -180,10 +180,15 @@
     .settings-provider[data-provider="nflplus"].active{background:#013369;color:#fff}
     .settings-hint{margin:10px 0 0;color:var(--muted);font-size:.72rem;font-weight:750;line-height:1.3}
     .settings-version-wrap{border-top:1px solid var(--line);margin-top:14px;padding-top:12px;display:flex;justify-content:center}
-    .settings-version{border:0;background:transparent;color:rgba(170,180,200,.72);padding:8px 14px;border-radius:10px;font-size:.66rem;font-weight:800;letter-spacing:.02em;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
-    .settings-version:active{background:rgba(255,255,255,.055);color:var(--text)}
-    .settings-version:focus{outline:none}
-    .settings-version:focus-visible{outline:2px solid rgba(83,183,255,.42);outline-offset:2px}
+    .settings-version {
+      color: rgba(170,180,200,.72);
+      padding: 8px 14px;
+      font-size: .66rem;
+      font-weight: 800;
+      letter-spacing: .02em;
+      cursor: default;
+      user-select: none;
+    }
     /* Release 4.10: Favorite Teams */
     .favorite-team-controls{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px}
     .favorite-team-select,.favorite-team-add{height:42px;border:1px solid var(--line);border-radius:12px;background:#111827;color:var(--text);font:inherit;font-size:.72rem;font-weight:850}
