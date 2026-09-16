@@ -2208,11 +2208,64 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       }catch(_){}
     }
 
+    // Bundled regular-season safety net. This is intentionally used only when
+    // there is no device cache and ESPN cannot return a season schedule.
+    // Row shape: [event id, kickoff UTC (blank when officially TBD), week,
+    // away abbreviation, home abbreviation, primary network].
+    const EMBEDDED_2026_SCHEDULE=[["401872656","2026-09-10T00:20:00Z",1,"NE","SEA","NBC"],["401872657","2026-09-11T00:35:00Z",1,"SF","LAR","Netflix"],["401872658","2026-09-13T17:00:00Z",1,"ATL","PIT","FOX"],["401872659","2026-09-13T17:00:00Z",1,"BAL","IND","CBS"],["401872660","2026-09-13T17:00:00Z",1,"BUF","HOU","CBS"],["401872661","2026-09-13T17:00:00Z",1,"CHI","CAR","FOX"],["401872922","2026-09-13T17:00:00Z",1,"CLE","JAX","CBS"],["401872923","2026-09-13T17:00:00Z",1,"NO","DET","FOX"],["401872924","2026-09-13T17:00:00Z",1,"NYJ","TEN","CBS"],["401872925","2026-09-13T17:00:00Z",1,"TB","CIN","FOX"],["401872926","2026-09-13T20:25:00Z",1,"ARI","LAC","CBS"],["401872927","2026-09-13T20:25:00Z",1,"GB","MIN","CBS"],["401872928","2026-09-13T20:25:00Z",1,"MIA","LV","FOX"],["401872929","2026-09-13T20:25:00Z",1,"WSH","PHI","FOX"],["401872930","2026-09-14T00:20:00Z",1,"DAL","NYG","NBC"],["401872931","2026-09-15T00:15:00Z",1,"DEN","KC","ESPN/ABC"],["401872932","2026-09-18T00:15:00Z",2,"DET","BUF","Prime Video"],["401872933","2026-09-20T17:00:00Z",2,"CAR","ATL","FOX"],["401872934","2026-09-20T17:00:00Z",2,"CIN","HOU","CBS"],["401872935","2026-09-20T17:00:00Z",2,"CLE","TB","CBS"],["401872936","2026-09-20T17:00:00Z",2,"GB","NYJ","FOX"],["401872937","2026-09-20T17:00:00Z",2,"MIN","CHI","FOX"],["401872938","2026-09-20T17:00:00Z",2,"NO","BAL","CBS"],["401872939","2026-09-20T17:00:00Z",2,"PHI","TEN","FOX"],["401872946","2026-09-20T17:00:00Z",2,"PIT","NE","CBS"],["401872940","2026-09-20T20:05:00Z",2,"JAX","DEN","CBS"],["401872941","2026-09-20T20:05:00Z",2,"LV","LAC","CBS"],["401872942","2026-09-20T20:25:00Z",2,"MIA","SF","FOX"],["401872943","2026-09-20T20:25:00Z",2,"SEA","ARI","FOX"],["401872944","2026-09-20T20:25:00Z",2,"WSH","DAL","FOX"],["401872945","2026-09-21T00:20:00Z",2,"IND","KC","NBC"],["401872947","2026-09-22T00:15:00Z",2,"NYG","LAR","ESPN/ABC"],["401872948","2026-09-25T00:15:00Z",3,"ATL","GB","Prime Video"],["401872949","2026-09-27T17:00:00Z",3,"CAR","CLE","FOX"],["401872950","2026-09-27T17:00:00Z",3,"CIN","PIT","CBS"],["401872951","2026-09-27T17:00:00Z",3,"HOU","IND","CBS"],["401872952","2026-09-27T17:00:00Z",3,"KC","MIA","CBS"],["401872953","2026-09-27T17:00:00Z",3,"LAC","BUF","FOX"],["401872954","2026-09-27T17:00:00Z",3,"NYJ","DET","FOX"],["401872955","2026-09-27T17:00:00Z",3,"SEA","WSH","FOX"],["401872956","2026-09-27T17:00:00Z",3,"TEN","NYG","CBS"],["401872957","2026-09-27T17:00:00Z",3,"NE","JAX","CBS"],["401872958","2026-09-27T20:05:00Z",3,"ARI","SF","FOX"],["401872959","2026-09-27T20:05:00Z",3,"MIN","TB","FOX"],["401872960","2026-09-27T20:25:00Z",3,"BAL","DAL","CBS"],["401872961","2026-09-27T20:25:00Z",3,"LV","NO","CBS"],["401872962","2026-09-28T00:20:00Z",3,"LAR","DEN","NBC"],["401872963","2026-09-29T00:15:00Z",3,"PHI","CHI","ESPN/ABC"],["401872964","2026-10-02T00:15:00Z",4,"PIT","CLE","Prime Video"],["401872965","2026-10-04T13:30:00Z",4,"IND","WSH","NFL Net"],["401872966","2026-10-04T17:00:00Z",4,"ARI","NYG","CBS"],["401872967","2026-10-04T17:00:00Z",4,"DAL","HOU","FOX"],["401872968","2026-10-04T17:00:00Z",4,"GB","TB","FOX"],["401872969","2026-10-04T17:00:00Z",4,"JAX","CIN","CBS"],["401872970","2026-10-04T17:00:00Z",4,"LAR","PHI","FOX"],["401872971","2026-10-04T17:00:00Z",4,"NE","BUF","CBS"],["401872972","2026-10-04T17:00:00Z",4,"NYJ","CHI","FOX"],["401872973","2026-10-04T17:00:00Z",4,"TEN","BAL","CBS"],["401872974","2026-10-04T20:05:00Z",4,"MIA","MIN","FOX"],["401872975","2026-10-04T20:25:00Z",4,"DEN","SF","CBS"],["401872976","2026-10-04T20:25:00Z",4,"KC","LV","CBS"],["401872977","2026-10-04T20:25:00Z",4,"LAC","SEA","CBS"],["401872978","2026-10-05T00:20:00Z",4,"DET","CAR","NBC"],["401872979","2026-10-06T00:15:00Z",4,"ATL","NO","ESPN"],["401872980","2026-10-09T00:15:00Z",5,"TB","DAL","Prime Video"],["401872981","2026-10-11T13:30:00Z",5,"PHI","JAX","NFL Net"],["401872982","2026-10-11T17:00:00Z",5,"CIN","MIA","FOX"],["401872983","2026-10-11T17:00:00Z",5,"CLE","NYJ","CBS"],["401872984","2026-10-11T17:00:00Z",5,"HOU","TEN","CBS"],["401872985","2026-10-11T17:00:00Z",5,"IND","PIT","CBS"],["401872986","2026-10-11T17:00:00Z",5,"LV","NE","CBS"],["401872987","2026-10-11T17:00:00Z",5,"MIN","NO","FOX"],["401872988","2026-10-11T17:00:00Z",5,"NYG","WSH","FOX"],["401872989","2026-10-11T20:05:00Z",5,"DEN","LAC","CBS"],["401872990","2026-10-11T20:25:00Z",5,"CHI","GB","FOX"],["401872991","2026-10-11T20:25:00Z",5,"DET","ARI","FOX"],["401872992","2026-10-11T20:25:00Z",5,"SF","SEA","FOX"],["401872993","2026-10-12T00:20:00Z",5,"BAL","ATL","NBC"],["401872994","2026-10-13T00:15:00Z",5,"BUF","LAR","ESPN/ABC"],["401872995","2026-10-16T00:15:00Z",6,"SEA","DEN","Prime Video"],["401872996","2026-10-18T13:30:00Z",6,"HOU","JAX","NFL Net"],["401872997","2026-10-18T17:00:00Z",6,"BAL","CLE","FOX"],["401872998","2026-10-18T17:00:00Z",6,"CAR","PHI","CBS"],["401872999","2026-10-18T17:00:00Z",6,"CHI","ATL","FOX"],["401873000","2026-10-18T17:00:00Z",6,"NO","NYG","FOX"],["401873001","2026-10-18T17:00:00Z",6,"NYJ","NE","CBS"],["401873002","2026-10-18T17:00:00Z",6,"PIT","TB","CBS"],["401873003","2026-10-18T17:00:00Z",6,"TEN","IND","FOX"],["401873004","2026-10-18T20:05:00Z",6,"ARI","LAR","FOX"],["401873005","2026-10-18T20:25:00Z",6,"BUF","LV","CBS"],["401873006","2026-10-18T20:25:00Z",6,"LAC","KC","CBS"],["401873007","2026-10-19T00:20:00Z",6,"DAL","GB","NBC"],["401873008","2026-10-20T00:15:00Z",6,"WSH","SF","ESPN/ABC"],["401873010","2026-10-23T00:15:00Z",7,"NE","CHI","Prime Video"],["401873011","2026-10-25T13:30:00Z",7,"PIT","NO","NFL Net"],["401873012","2026-10-25T17:00:00Z",7,"CIN","BAL","CBS"],["401873013","2026-10-25T17:00:00Z",7,"CLE","TEN","CBS"],["401873014","2026-10-25T17:00:00Z",7,"IND","MIN","CBS"],["401873015","2026-10-25T17:00:00Z",7,"MIA","NYJ","CBS"],["401873016","2026-10-25T17:00:00Z",7,"NYG","HOU","FOX"],["401873017","2026-10-25T17:00:00Z",7,"SF","ATL","FOX"],["401873018","2026-10-25T17:00:00Z",7,"TB","CAR","FOX"],["401873019","2026-10-25T20:05:00Z",7,"DEN","ARI","CBS"],["401873020","2026-10-25T20:25:00Z",7,"GB","DET","FOX"],["401873021","2026-10-25T20:25:00Z",7,"LAR","LV","FOX"],["401873022","2026-10-26T00:20:00Z",7,"KC","SEA","NBC"],["401873009","2026-10-27T00:15:00Z",7,"DAL","PHI","ESPN/ABC"],["401873023","2026-10-30T00:15:00Z",8,"CAR","GB","Prime Video"],["401873024","2026-11-01T18:00:00Z",8,"ARI","DAL","FOX"],["401873025","2026-11-01T18:00:00Z",8,"ATL","TB","FOX"],["401873026","2026-11-01T18:00:00Z",8,"BAL","BUF","CBS"],["401873027","2026-11-01T18:00:00Z",8,"CLE","PIT","CBS"],["401873028","2026-11-01T18:00:00Z",8,"IND","JAX","CBS"],["401873029","2026-11-01T18:00:00Z",8,"LV","NYJ","FOX"],["401873030","2026-11-01T18:00:00Z",8,"MIN","DET","FOX"],["401873031","2026-11-01T18:00:00Z",8,"TEN","CIN","CBS"],["401873032","2026-11-01T21:05:00Z",8,"LAC","LAR","FOX"],["401873033","2026-11-01T21:25:00Z",8,"KC","DEN","CBS"],["401873034","2026-11-01T21:25:00Z",8,"NE","MIA","CBS"],["401873035","2026-11-02T01:20:00Z",8,"PHI","WSH","NBC"],["401873036","2026-11-03T01:15:00Z",8,"CHI","SEA","ESPN"],["401873037","2026-11-06T01:15:00Z",9,"JAX","BAL","Prime Video"],["401873038","2026-11-08T14:30:00Z",9,"CIN","ATL","NFL Net"],["401873039","2026-11-08T18:00:00Z",9,"CLE","NO","CBS"],["401873040","2026-11-08T18:00:00Z",9,"DAL","IND","FOX"],["401873041","2026-11-08T18:00:00Z",9,"DEN","CAR","CBS"],["401873042","2026-11-08T18:00:00Z",9,"DET","MIA","FOX"],["401873043","2026-11-08T18:00:00Z",9,"LAR","WSH","FOX"],["401873044","2026-11-08T18:00:00Z",9,"NYG","PHI","FOX"],["401873045","2026-11-08T18:00:00Z",9,"NYJ","KC","CBS"],["401873046","2026-11-08T21:05:00Z",9,"HOU","LAC","CBS"],["401873047","2026-11-08T21:05:00Z",9,"LV","SF","CBS"],["401873048","2026-11-08T21:25:00Z",9,"ARI","SEA","FOX"],["401873049","2026-11-08T21:25:00Z",9,"GB","NE","FOX"],["401873050","2026-11-09T01:20:00Z",9,"TB","CHI","NBC"],["401873051","2026-11-10T01:15:00Z",9,"BUF","MIN","ESPN/ABC"],["401873052","2026-11-13T01:15:00Z",10,"WSH","NYG","Prime Video"],["401873053","2026-11-15T14:30:00Z",10,"NE","DET","FOX"],["401873054","2026-11-15T18:00:00Z",10,"BUF","NYJ","CBS"],["401873055","2026-11-15T18:00:00Z",10,"CAR","NO","FOX"],["401873056","2026-11-15T18:00:00Z",10,"HOU","CLE","FOX"],["401873057","2026-11-15T18:00:00Z",10,"JAX","TEN","FOX"],["401873058","2026-11-15T18:00:00Z",10,"KC","ATL","CBS"],["401873059","2026-11-15T18:00:00Z",10,"MIA","IND","CBS"],["401873060","2026-11-15T18:00:00Z",10,"MIN","GB","FOX"],["401873061","2026-11-15T21:05:00Z",10,"LAR","ARI","CBS"],["401873062","2026-11-15T21:05:00Z",10,"SEA","LV","CBS"],["401873063","2026-11-15T21:25:00Z",10,"SF","DAL","FOX"],["401873064","2026-11-16T01:20:00Z",10,"PIT","CIN","NBC"],["401873065","2026-11-17T01:15:00Z",10,"LAC","BAL","ESPN"],["401873066","2026-11-20T01:15:00Z",11,"IND","HOU","Prime Video"],["401873067","2026-11-22T18:00:00Z",11,"ARI","KC","CBS"],["401873068","2026-11-22T18:00:00Z",11,"BAL","CAR","FOX"],["401873069","2026-11-22T18:00:00Z",11,"JAX","NYG","CBS"],["401873070","2026-11-22T18:00:00Z",11,"MIA","BUF","FOX"],["401873071","2026-11-22T18:00:00Z",11,"NO","CHI","FOX"],["401873072","2026-11-22T18:00:00Z",11,"TB","DET","CBS"],["401873073","2026-11-22T18:00:00Z",11,"TEN","DAL","FOX"],["401873074","2026-11-22T21:05:00Z",11,"NYJ","LAC","FOX"],["401873075","2026-11-22T21:25:00Z",11,"LV","DEN","CBS"],["401873076","2026-11-22T21:25:00Z",11,"PIT","PHI","CBS"],["401873077","2026-11-23T01:20:00Z",11,"MIN","SF","NBC"],["401873078","2026-11-24T01:15:00Z",11,"CIN","WSH","ESPN"],["401873079","2026-11-26T01:00:00Z",12,"GB","LAR","Netflix"],["401873081","2026-11-26T18:00:00Z",12,"CHI","DET","CBS"],["401873080","2026-11-26T21:30:00Z",12,"PHI","DAL","FOX"],["401873082","2026-11-27T01:20:00Z",12,"KC","BUF","NBC"],["401873083","2026-11-27T20:00:00Z",12,"DEN","PIT","Prime Video"],["401873084","2026-11-29T18:00:00Z",12,"ATL","MIN","FOX"],["401873085","2026-11-29T18:00:00Z",12,"BAL","HOU","CBS"],["401873086","2026-11-29T18:00:00Z",12,"LV","CLE","FOX"],["401873087","2026-11-29T18:00:00Z",12,"NO","CIN","CBS"],["401873088","2026-11-29T18:00:00Z",12,"NYG","IND","FOX"],["401873089","2026-11-29T18:00:00Z",12,"NYJ","MIA","CBS"],["401873090","2026-11-29T21:05:00Z",12,"TEN","JAX","CBS"],["401873091","2026-11-29T21:25:00Z",12,"SEA","SF","FOX"],["401873092","2026-11-29T21:25:00Z",12,"WSH","ARI","FOX"],["401873093","2026-11-30T01:20:00Z",12,"NE","LAC","NBC"],["401873094","2026-12-01T01:15:00Z",12,"CAR","TB","ESPN"],["401873096","2026-12-04T01:15:00Z",13,"KC","LAR","Prime Video"],["401873095","2026-12-06T18:00:00Z",13,"SF","NYG","FOX"],["401873097","2026-12-06T18:00:00Z",13,"CIN","CLE","CBS"],["401873098","2026-12-06T18:00:00Z",13,"DET","ATL","CBS"],["401873099","2026-12-06T18:00:00Z",13,"GB","NO","FOX"],["401873100","2026-12-06T18:00:00Z",13,"JAX","CHI","FOX"],["401873101","2026-12-06T18:00:00Z",13,"LAC","TB","CBS"],["401873102","2026-12-06T18:00:00Z",13,"WSH","TEN","CBS"],["401873103","2026-12-06T21:05:00Z",13,"MIA","DEN","FOX"],["401873104","2026-12-06T21:05:00Z",13,"PHI","ARI","FOX"],["401873105","2026-12-06T21:25:00Z",13,"BUF","NE","CBS"],["401873106","2026-12-06T21:25:00Z",13,"CAR","MIN","CBS"],["401873107","2026-12-07T01:20:00Z",13,"HOU","PIT","NBC"],["401873108","2026-12-08T01:15:00Z",13,"DAL","SEA","ESPN/ABC"],["401873109","2026-12-11T01:15:00Z",14,"MIN","NE","Prime Video"],["401873110","2026-12-13T18:00:00Z",14,"ATL","CLE","CBS"],["401873111","2026-12-13T18:00:00Z",14,"CHI","MIA","CBS"],["401873112","2026-12-13T18:00:00Z",14,"DEN","NYJ","CBS"],["401873113","2026-12-13T18:00:00Z",14,"HOU","WSH","CBS"],["401873114","2026-12-13T18:00:00Z",14,"IND","PHI","FOX"],["401873115","2026-12-13T18:00:00Z",14,"NO","CAR","CBS"],["401873116","2026-12-13T18:00:00Z",14,"TB","BAL","FOX"],["401873117","2026-12-13T18:00:00Z",14,"TEN","DET","FOX"],["401873118","2026-12-13T21:05:00Z",14,"LAC","LV","CBS"],["401873119","2026-12-13T21:25:00Z",14,"KC","CIN","FOX"],["401873120","2026-12-13T21:25:00Z",14,"LAR","SF","FOX"],["401873121","2026-12-13T21:25:00Z",14,"NYG","SEA","FOX"],["401873122","2026-12-14T01:20:00Z",14,"BUF","GB","NBC"],["401873123","2026-12-15T01:15:00Z",14,"PIT","JAX","ESPN"],["401873124","2026-12-18T01:15:00Z",15,"SF","LAC","Prime Video"],["401873125","2026-12-19T22:00:00Z",15,"SEA","PHI","FOX"],["401873126","2026-12-20T01:20:00Z",15,"CHI","BUF","CBS"],["401873127","2026-12-20T18:00:00Z",15,"ATL","WSH","FOX"],["401873128","2026-12-20T18:00:00Z",15,"BAL","PIT","CBS"],["401873129","2026-12-20T18:00:00Z",15,"CIN","CAR","FOX"],["401873130","2026-12-20T18:00:00Z",15,"CLE","NYG","CBS"],["401873131","2026-12-20T18:00:00Z",15,"IND","TEN","CBS"],["401873132","2026-12-20T18:00:00Z",15,"JAX","HOU","CBS"],["401873133","2026-12-20T18:00:00Z",15,"MIA","GB","FOX"],["401873134","2026-12-20T18:00:00Z",15,"NO","TB","FOX"],["401873135","2026-12-20T21:05:00Z",15,"NYJ","ARI","FOX"],["401873136","2026-12-20T21:25:00Z",15,"DAL","LAR","CBS"],["401873137","2026-12-20T21:25:00Z",15,"DEN","LV","CBS"],["401873138","2026-12-21T01:20:00Z",15,"DET","MIN","NBC"],["401873139","2026-12-22T01:15:00Z",15,"NE","KC","ESPN/ABC"],["401873140","2026-12-25T01:15:00Z",16,"HOU","PHI","Prime Video"],["401873141","2026-12-25T18:00:00Z",16,"GB","CHI","Netflix"],["401873142","2026-12-25T21:30:00Z",16,"BUF","DEN","Netflix"],["401873143","2026-12-26T01:15:00Z",16,"LAR","SEA","FOX"],["401873144","",16,"CAR","PIT",""],["401873145","",16,"CIN","IND",""],["401873146","",16,"TB","ATL",""],["401873147","",16,"WSH","MIN",""],["401873148","2026-12-27T18:00:00Z",16,"ARI","NO","FOX"],["401873149","2026-12-27T18:00:00Z",16,"CLE","BAL","CBS"],["401873150","2026-12-27T18:00:00Z",16,"LAC","MIA","FOX"],["401873151","2026-12-27T18:00:00Z",16,"NE","NYJ","CBS"],["401873152","2026-12-27T21:05:00Z",16,"TEN","LV","FOX"],["401873153","2026-12-27T21:25:00Z",16,"SF","KC","CBS"],["401873154","2026-12-28T01:20:00Z",16,"JAX","DAL","NBC"],["401873155","2026-12-29T01:15:00Z",16,"NYG","DET","ESPN"],["401873156","2027-01-01T01:15:00Z",17,"BAL","CIN","Prime Video"],["401873157","",17,"DEN","NE",""],["401873158","",17,"KC","LAC",""],["401873159","",17,"LAR","TB",""],["401873160","",17,"WSH","JAX",""],["401873161","2027-01-03T18:00:00Z",17,"BUF","MIA","CBS"],["401873162","2027-01-03T18:00:00Z",17,"IND","CLE","FOX"],["401873163","2027-01-03T18:00:00Z",17,"MIN","NYJ","CBS"],["401873164","2027-01-03T18:00:00Z",17,"NO","ATL","FOX"],["401873165","2027-01-03T18:00:00Z",17,"NYG","DAL","FOX"],["401873166","2027-01-03T18:00:00Z",17,"PIT","TEN","CBS"],["401873167","2027-01-03T18:00:00Z",17,"SEA","CAR","FOX"],["401873168","2027-01-03T21:05:00Z",17,"LV","ARI","CBS"],["401873169","2027-01-03T21:25:00Z",17,"DET","CHI","FOX"],["401873170","2027-01-04T01:20:00Z",17,"PHI","SF","NBC"],["401873171","2027-01-05T01:15:00Z",17,"HOU","GB","ESPN"],["401873172","",18,"ATL","CAR",""],["401873173","",18,"CHI","MIN",""],["401873174","",18,"CLE","CIN",""],["401873175","",18,"DAL","WSH",""],["401873176","",18,"DET","GB",""],["401873177","",18,"JAX","IND",""],["401873178","",18,"LV","KC",""],["401873179","",18,"LAC","DEN",""],["401873180","",18,"MIA","NE",""],["401873181","",18,"NYJ","BUF",""],["401873182","",18,"PHI","NYG",""],["401873183","",18,"PIT","BAL",""],["401873184","",18,"SF","ARI",""],["401873185","",18,"SEA","LAR",""],["401873186","",18,"TB","NO",""],["401873187","",18,"TEN","HOU",""]];
+    const FALLBACK_TEAM_NAMES={
+      ARI:"Arizona Cardinals",ATL:"Atlanta Falcons",BAL:"Baltimore Ravens",BUF:"Buffalo Bills",
+      CAR:"Carolina Panthers",CHI:"Chicago Bears",CIN:"Cincinnati Bengals",CLE:"Cleveland Browns",
+      DAL:"Dallas Cowboys",DEN:"Denver Broncos",DET:"Detroit Lions",GB:"Green Bay Packers",
+      HOU:"Houston Texans",IND:"Indianapolis Colts",JAX:"Jacksonville Jaguars",KC:"Kansas City Chiefs",
+      LV:"Las Vegas Raiders",LAC:"Los Angeles Chargers",LAR:"Los Angeles Rams",MIA:"Miami Dolphins",
+      MIN:"Minnesota Vikings",NE:"New England Patriots",NO:"New Orleans Saints",NYG:"New York Giants",
+      NYJ:"New York Jets",PHI:"Philadelphia Eagles",PIT:"Pittsburgh Steelers",SF:"San Francisco 49ers",
+      SEA:"Seattle Seahawks",TB:"Tampa Bay Buccaneers",TEN:"Tennessee Titans",WSH:"Washington Commanders"
+    };
+    const FALLBACK_WEEK_DATES={
+      16:"2026-12-27T17:00:00Z",
+      17:"2027-01-03T18:00:00Z",
+      18:"2027-01-10T18:00:00Z"
+    };
+
+    function fallbackLogo(abbr){
+      return `https://a.espncdn.com/i/teamlogos/nfl/500/scoreboard/${String(abbr).toLowerCase()}.png`;
+    }
+
+    function buildEmbeddedScheduleFallback(){
+      return EMBEDDED_2026_SCHEDULE.map(([id,kickoff,week,awayAbbr,homeAbbr,network])=>{
+        const kickoffTbd=!kickoff;
+        const dateTime=kickoff||FALLBACK_WEEK_DATES[week];
+        const broadcast=network||"TBD";
+        return {
+          id,dateTime,
+          homeTeam:FALLBACK_TEAM_NAMES[homeAbbr]||homeAbbr,
+          awayTeam:FALLBACK_TEAM_NAMES[awayAbbr]||awayAbbr,
+          homeAbbr,awayAbbr,
+          homeLogo:fallbackLogo(homeAbbr),
+          awayLogo:fallbackLogo(awayAbbr),
+          homeScore:"",awayScore:"",homeRecord:"",awayRecord:"",
+          network:broadcast,
+          broadcasts:network?[{name:network,shortName:network,market:"National",type:"TV"}]:[],
+          sourceLinks:[],
+          status:"scheduled",statusDetail:kickoffTbd?"DATE / TIME TBD":"",
+          period:"",clock:"",possessionAbbr:"",
+          homeTimeouts:null,awayTimeouts:null,venue:"",
+          seasonYear:2026,seasonType:2,weekNumber:week,
+          fallbackSchedule:true,kickoffTbd
+        };
+      }).sort((a,b)=>new Date(a.dateTime)-new Date(b.dateTime));
+    }
+
     function mergeDynamicGameState(base,update){
       // Schedule identity/broadcast metadata remains from the long-lived season
       // cache. Only volatile scoreboard state is refreshed.
+      const resolvedKickoff=!!base.kickoffTbd && !!update.dateTime && !/\b(?:TBD|TBA)\b/i.test(String(update.statusDetail||""));
       return {
         ...base,
+        dateTime:resolvedKickoff?update.dateTime:base.dateTime,
+        kickoffTbd:resolvedKickoff?false:!!base.kickoffTbd,
         homeScore:update.homeScore,
         awayScore:update.awayScore,
         status:update.status,
@@ -2560,7 +2613,9 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
     function isScheduledGame(game){ return cleanStatus(game.status) === "scheduled"; }
     function groupByDay(games){
       return games.reduce((acc, game) => {
-        const key = new Date(game.dateTime).toLocaleDateString([], { weekday:"long", month:"short", day:"numeric" });
+        const key = game.kickoffTbd
+          ? "DATE / TIME TBD"
+          : new Date(game.dateTime).toLocaleDateString([], { weekday:"long", month:"short", day:"numeric" });
         acc[key] ||= [];
         acc[key].push(game);
         return acc;
@@ -2621,7 +2676,7 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
           <div class="game-top">
 
             <div class="time">
-              ${formatKickoff(game.dateTime)}
+              ${formatKickoff(game)}
             </div>
 
             <div class="game-clock-top" data-game-field="clock">
@@ -3233,6 +3288,9 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
     }
 
     function getProviderKeysForGame(game){
+      // Do not manufacture a watch destination for late-season games whose
+      // kickoff time and distribution have not been assigned yet.
+      if(game?.kickoffTbd && (!game.network || game.network==="TBD"))return [];
       const {networkClass,providers}=baseProvidersForNetwork(game);
       let keys=[...providers];
 
@@ -3626,7 +3684,10 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
 
     function updateWeekRange(games){ renderWeekNavigator(); }
 
-    function formatKickoff(iso){ return new Date(iso).toLocaleString([], { weekday:"short", hour:"numeric", minute:"2-digit" }); }
+    function formatKickoff(game){
+      if(game?.kickoffTbd)return "DATE / TIME TBD";
+      return new Date(game?.dateTime||game).toLocaleString([], { weekday:"short", hour:"numeric", minute:"2-digit" });
+    }
     function cleanStatus(status){
       const s = String(status || "").toLowerCase();
       if(!s) return "scheduled";
@@ -3823,7 +3884,16 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
 
       // First-ever launch has no usable cache, so one network load is necessary.
       // Subsequent launches use the fast path above.
-      await refreshFullSeasonSchedule();
+      const refreshed=await refreshFullSeasonSchedule();
+      if(!refreshed){
+        // Keep the fallback in memory only. A bundled snapshot must never
+        // overwrite a fresher device cache or masquerade as network-fetched data.
+        allGames=buildEmbeddedScheduleFallback();
+        ensureSeasonalStreamingRights();
+        renderWeekNavigator();
+        renderSchedule();
+        showToast("Using the built-in 2026 schedule");
+      }
       scheduleScoreRefresh();
       ensureSeasonalStreamingRights();
     }
