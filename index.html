@@ -3616,11 +3616,21 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       scheduleWeeks=[...groups].sort((a,b)=>{const A=a[0].split(":").map(Number),B=b[0].split(":").map(Number);return A[0]*100+A[1]-B[0]*100-B[1]}).map(([key,games])=>{const [type,week]=key.split(":").map(Number),ds=games.map(g=>new Date(g.dateTime));return{key,type,week,hasGames:!!games.length,min:ds.length?new Date(Math.min(...ds)):null,max:ds.length?new Date(Math.max(...ds)):null}});
       if(!selectedScheduleWeek||!scheduleWeeks.some(w=>w.key===selectedScheduleWeek))selectedScheduleWeek=(findCurrentScheduleWeek()||scheduleWeeks[0])?.key;
     }
-    function findCurrentScheduleWeek(){
-      const now=Date.now(),pop=scheduleWeeks.filter(w=>w.hasGames);
-      return pop.find(w=>allGames.filter(g=>scheduleWeekKey(g)===w.key).some(g=>Math.abs(new Date(g.dateTime)-now)<4*86400000))
-        ||pop.find(w=>allGames.filter(g=>scheduleWeekKey(g)===w.key).some(g=>new Date(g.dateTime)>now))
-        ||pop[pop.length-1];
+    function findCurrentScheduleWeek(now=Date.now()){
+      const populated=scheduleWeeks.filter(w=>w.hasGames);
+      if(!populated.length)return null;
+
+      // A week remains current through the expected end of its last game. After
+      // that window, advance to the next populated week—even before its first
+      // kickoff. This avoids Thursday launches incorrectly reopening the prior
+      // week because its Monday-night game happened less than four days ago.
+      const GAME_COMPLETION_WINDOW_MS=6*60*60*1000;
+      return populated.find(w=>{
+        const lastKickoff=allGames
+          .filter(g=>scheduleWeekKey(g)===w.key)
+          .reduce((latest,g)=>Math.max(latest,new Date(g.dateTime).getTime()||0),0);
+        return lastKickoff+GAME_COMPLETION_WINDOW_MS>now;
+      })||populated[populated.length-1];
     }
     function postseasonInfo(w){if(w.type!==3)return null;return({1:{label:"WILD CARD",tag:"PLAYOFFS",cls:"postseason"},2:{label:"DIV RD",tag:"PLAYOFFS",cls:"postseason"},3:{label:"CONF CHAMP",tag:"FINAL FOUR",cls:"championship"},4:{label:"PRO BOWL",tag:"ALL-STAR",cls:"postseason"},5:{label:"SUPER BOWL",tag:"CHAMPIONSHIP",cls:"superbowl"}})[w.week]||null}
     function weekLabel(w){const p=postseasonInfo(w);return p?p.label:w.type===1?`PRE ${w.week}`:`WEEK ${w.week}`}
@@ -3838,6 +3848,15 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
 
     let lastForegroundRefreshAt=0;
 
+    function restoreCurrentWeekSelection(){
+      if(!allGames.length)return;
+      buildScheduleWeeks();
+      const current=findCurrentScheduleWeek();
+      if(current && selectedScheduleWeek!==current.key){
+        selectScheduleWeek(current.key);
+      }
+    }
+
     function refreshInBackground({fullSeason=false}={}){
       // Let the cached UI paint before any network work begins.
       setTimeout(()=>{
@@ -3850,6 +3869,10 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
     }
 
     function handleNativeResume(){
+      // Week browsing is deliberately session-only. Returning to the app always
+      // restores the actual current week instead of preserving an older manual
+      // selection from the suspended web view.
+      restoreCurrentWeekSelection();
       const now=Date.now();
       if(now-lastForegroundRefreshAt<RESUME_REFRESH_COOLDOWN_MS){
         scheduleScoreRefresh();
@@ -3912,6 +3935,9 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
     initSettingsControls();
 
     window.addEventListener("gridironGuideNativeResume",handleNativeResume);
+    document.addEventListener("visibilitychange",()=>{
+      if(document.visibilityState==="visible")handleNativeResume();
+    });
 
     const refreshBtnEl=document.querySelector("#refreshBtn");
     const MANUAL_REFRESH_COOLDOWN_MS=2000;
