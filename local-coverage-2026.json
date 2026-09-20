@@ -1,7 +1,2329 @@
 {
-  "version": 1,
+  "schemaVersion": 1,
   "season": 2026,
-  "updatedAt": "2026-08-29T22:15:00Z",
-  "source": "Weekly CBS/FOX coverage assignments; publish only confirmed market assignments.",
-  "weeks": {}
+  "updatedAt": "2026-09-19T19:27:48Z",
+  "source": "506 Sports Week 2 coverage maps",
+  "sourceUrls": {
+    "CBS": "https://506sports.com/2026/02-CBS-V2.png",
+    "FOX:EARLY": "https://506sports.com/2026/02-FOX-E-V2.png",
+    "FOX:LATE": "https://506sports.com/2026/02-FOX-L-V2.png"
+  },
+  "weeks": {
+    "2": {
+      "startDate": "2026-09-17",
+      "endDate": "2026-09-21",
+      "markets": {
+        "New York": {
+          "CBS:LATE": {
+            "game": "JAX@DEN"
+          },
+          "FOX:EARLY": {
+            "game": "GB@NYJ"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Los Angeles": {
+          "CBS:LATE": {
+            "game": "LV@LAC"
+          },
+          "FOX:EARLY": {
+            "game": "MIN@CHI"
+          },
+          "FOX:LATE": {
+            "game": "MIA@SF"
+          }
+        },
+        "Chicago": {
+          "CBS:LATE": {
+            "game": "JAX@DEN"
+          },
+          "FOX:EARLY": {
+            "game": "MIN@CHI"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Philadelphia": {
+          "CBS:LATE": {
+            "game": "JAX@DEN"
+          },
+          "FOX:EARLY": {
+            "game": "PHI@TEN"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Dallas-Fort Worth": {
+          "CBS:EARLY": {
+            "game": "CIN@HOU"
+          },
+          "FOX:EARLY": {
+            "game": "PHI@TEN"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "San Francisco": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "MIN@CHI"
+          },
+          "FOX:LATE": {
+            "game": "MIA@SF"
+          }
+        },
+        "Washington": {
+          "CBS:EARLY": {
+            "game": "NO@BAL"
+          },
+          "FOX:EARLY": {
+            "game": "PHI@TEN"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Houston": {
+          "CBS:EARLY": {
+            "game": "CIN@HOU"
+          },
+          "FOX:EARLY": {
+            "game": "PHI@TEN"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Boston": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "GB@NYJ"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Atlanta": {
+          "CBS:LATE": {
+            "game": "JAX@DEN"
+          },
+          "FOX:EARLY": {
+            "game": "CAR@ATL"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Tampa-St. Petersburg": {
+          "CBS:EARLY": {
+            "game": "CLE@TB"
+          },
+          "FOX:EARLY": {
+            "game": "MIN@CHI"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Phoenix": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "MIN@CHI"
+          },
+          "FOX:LATE": {
+            "game": "SEA@ARI"
+          }
+        },
+        "Detroit": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "MIN@CHI"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Seattle-Tacoma": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "MIN@CHI"
+          },
+          "FOX:LATE": {
+            "game": "SEA@ARI"
+          }
+        },
+        "Minneapolis-St. Paul": {
+          "CBS:LATE": {
+            "game": "JAX@DEN"
+          },
+          "FOX:EARLY": {
+            "game": "MIN@CHI"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Miami": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "GB@NYJ"
+          },
+          "FOX:LATE": {
+            "game": "MIA@SF"
+          }
+        },
+        "Denver": {
+          "CBS:LATE": {
+            "game": "JAX@DEN"
+          },
+          "FOX:EARLY": {
+            "game": "MIN@CHI"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Orlando-Daytona Bch-Melbrn": {
+          "CBS:LATE": {
+            "game": "JAX@DEN"
+          },
+          "FOX:EARLY": {
+            "game": "MIN@CHI"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Cleveland": {
+          "CBS:EARLY": {
+            "game": "CLE@TB"
+          },
+          "FOX:EARLY": {
+            "game": "MIN@CHI"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Sacramnto-Stkton-Modesto": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "MIN@CHI"
+          },
+          "FOX:LATE": {
+            "game": "MIA@SF"
+          }
+        },
+        "St. Louis": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "MIN@CHI"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Charlotte": {
+          "CBS:LATE": {
+            "game": "JAX@DEN"
+          },
+          "FOX:EARLY": {
+            "game": "CAR@ATL"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Pittsburgh": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "PHI@TEN"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Raleigh-Durham (Fayetvlle)": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "CAR@ATL"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Portland, OR": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "MIN@CHI"
+          },
+          "FOX:LATE": {
+            "game": "SEA@ARI"
+          }
+        },
+        "Baltimore": {
+          "CBS:EARLY": {
+            "game": "NO@BAL"
+          },
+          "FOX:EARLY": {
+            "game": "PHI@TEN"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Indianapolis": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "MIN@CHI"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "San Diego": {
+          "CBS:LATE": {
+            "game": "LV@LAC"
+          },
+          "FOX:EARLY": {
+            "game": "MIN@CHI"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Nashville": {
+          "CBS:LATE": {
+            "game": "JAX@DEN"
+          },
+          "FOX:EARLY": {
+            "game": "PHI@TEN"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Hartford & New Haven": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "GB@NYJ"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "San Antonio": {
+          "CBS:EARLY": {
+            "game": "CIN@HOU"
+          },
+          "FOX:EARLY": {
+            "game": "PHI@TEN"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Columbus, OH": {
+          "CBS:EARLY": {
+            "game": "CLE@TB"
+          },
+          "FOX:EARLY": {
+            "game": "MIN@CHI"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Kansas City": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "MIN@CHI"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Salt Lake City": {
+          "CBS:LATE": {
+            "game": "JAX@DEN"
+          },
+          "FOX:EARLY": {
+            "game": "GB@NYJ"
+          },
+          "FOX:LATE": {
+            "game": "MIA@SF"
+          }
+        },
+        "Milwaukee": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "GB@NYJ"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Cincinnati": {
+          "CBS:EARLY": {
+            "game": "CIN@HOU"
+          },
+          "FOX:EARLY": {
+            "game": "MIN@CHI"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Greenvll-Spart-Ashevll-And": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "CAR@ATL"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "West Palm Beach-Ft. Pierce": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "GB@NYJ"
+          },
+          "FOX:LATE": {
+            "game": "MIA@SF"
+          }
+        },
+        "Austin": {
+          "CBS:EARLY": {
+            "game": "CIN@HOU"
+          },
+          "FOX:EARLY": {
+            "game": "PHI@TEN"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Las Vegas": {
+          "CBS:LATE": {
+            "game": "LV@LAC"
+          },
+          "FOX:EARLY": {
+            "game": "MIN@CHI"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Oklahoma City": {
+          "CBS:EARLY": {
+            "game": "CLE@TB"
+          },
+          "FOX:EARLY": {
+            "game": "MIN@CHI"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Norfolk-Portsmth-Newpt Nws": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "PHI@TEN"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Harrisburg-Lncstr-Leb-York": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "PHI@TEN"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Grand Rapids-Kalmzoo-B.Crk": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "MIN@CHI"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Birmingham (Ann and Tusc)": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "PHI@TEN"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Greensboro-H.Point-W.Salem": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "CAR@ATL"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Jacksonville": {
+          "CBS:LATE": {
+            "game": "JAX@DEN"
+          },
+          "FOX:EARLY": {
+            "game": "CAR@ATL"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Albuquerque-Santa Fe": {
+          "CBS:LATE": {
+            "game": "JAX@DEN"
+          },
+          "FOX:EARLY": {
+            "game": "MIN@CHI"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Louisville": {
+          "CBS:EARLY": {
+            "game": "NO@BAL"
+          },
+          "FOX:EARLY": {
+            "game": "MIN@CHI"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "New Orleans": {
+          "CBS:EARLY": {
+            "game": "NO@BAL"
+          },
+          "FOX:EARLY": {
+            "game": "CAR@ATL"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Memphis": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "PHI@TEN"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Providence-New Bedford": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "GB@NYJ"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Buffalo": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "GB@NYJ"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Fresno-Visalia": {
+          "CBS:LATE": {
+            "game": "LV@LAC"
+          },
+          "FOX:EARLY": {
+            "game": "MIN@CHI"
+          },
+          "FOX:LATE": {
+            "game": "MIA@SF"
+          }
+        },
+        "Richmond-Petersburg": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "PHI@TEN"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Wilkes Barre-Scranton-Hztn": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "PHI@TEN"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Little Rock-Pine Bluff": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "PHI@TEN"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Tulsa": {
+          "CBS:EARLY": {
+            "game": "CLE@TB"
+          },
+          "FOX:EARLY": {
+            "game": "MIN@CHI"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Albany-Schenectady-Troy": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "GB@NYJ"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Mobile-Pensacola (Ft Walt)": {
+          "CBS:EARLY": {
+            "game": "NO@BAL"
+          },
+          "FOX:EARLY": {
+            "game": "PHI@TEN"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Ft. Myers-Naples": {
+          "CBS:EARLY": {
+            "game": "CLE@TB"
+          },
+          "FOX:EARLY": {
+            "game": "GB@NYJ"
+          },
+          "FOX:LATE": {
+            "game": "MIA@SF"
+          }
+        },
+        "Knoxville": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "PHI@TEN"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Lexington": {
+          "CBS:EARLY": {
+            "game": "CIN@HOU"
+          },
+          "FOX:EARLY": {
+            "game": "MIN@CHI"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Dayton": {
+          "CBS:EARLY": {
+            "game": "CIN@HOU"
+          },
+          "FOX:EARLY": {
+            "game": "MIN@CHI"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Honolulu": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "MIN@CHI"
+          },
+          "FOX:LATE": {
+            "game": "SEA@ARI"
+          }
+        },
+        "Wichita-Hutchinson Plus": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "MIN@CHI"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Roanoke-Lynchburg": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "PHI@TEN"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Green Bay": {
+          "CBS:LATE": {
+            "game": "JAX@DEN"
+          },
+          "FOX:EARLY": {
+            "game": "GB@NYJ"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Des Moines-Ames": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "MIN@CHI"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Charleston-Huntington": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "CAR@ATL"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Tucson (Sierra Vista)": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "MIN@CHI"
+          },
+          "FOX:LATE": {
+            "game": "SEA@ARI"
+          }
+        },
+        "Flint-Saginaw-Bay City": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "MIN@CHI"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Spokane": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "MIN@CHI"
+          },
+          "FOX:LATE": {
+            "game": "SEA@ARI"
+          }
+        },
+        "Omaha": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "MIN@CHI"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Springfield, MO": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "MIN@CHI"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Rochester, NY": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "GB@NYJ"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Columbia, SC": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "CAR@ATL"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Toledo": {
+          "CBS:EARLY": {
+            "game": "CLE@TB"
+          },
+          "FOX:EARLY": {
+            "game": "MIN@CHI"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Huntsville-Decatur (Flor)": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "PHI@TEN"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Madison": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "GB@NYJ"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Portland-Auburn": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "GB@NYJ"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Shreveport": {
+          "CBS:EARLY": {
+            "game": "NO@BAL"
+          },
+          "FOX:EARLY": {
+            "game": "PHI@TEN"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Paducah-Cape Girard-Harsbg": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "MIN@CHI"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Harlingen-Wslco-Brnsvl-McA": {
+          "CBS:EARLY": {
+            "game": "CIN@HOU"
+          },
+          "FOX:EARLY": {
+            "game": "PHI@TEN"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Syracuse": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "GB@NYJ"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Champaign&Sprngfld-Decatur": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "MIN@CHI"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Waco-Temple-Bryan": {
+          "CBS:EARLY": {
+            "game": "CIN@HOU"
+          },
+          "FOX:EARLY": {
+            "game": "PHI@TEN"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Colorado Springs-Pueblo": {
+          "CBS:LATE": {
+            "game": "JAX@DEN"
+          },
+          "FOX:EARLY": {
+            "game": "MIN@CHI"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Chattanooga": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "CAR@ATL"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Cedar Rapids-Wtrlo-IWC&Dub": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "MIN@CHI"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Savannah": {
+          "CBS:LATE": {
+            "game": "JAX@DEN"
+          },
+          "FOX:EARLY": {
+            "game": "CAR@ATL"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "El Paso (Las Cruces)": {
+          "CBS:EARLY": {
+            "game": "CIN@HOU"
+          },
+          "FOX:EARLY": {
+            "game": "PHI@TEN"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Baton Rouge": {
+          "CBS:EARLY": {
+            "game": "NO@BAL"
+          },
+          "FOX:EARLY": {
+            "game": "CAR@ATL"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Charleston, SC": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "CAR@ATL"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Jackson, MS": {
+          "CBS:EARLY": {
+            "game": "NO@BAL"
+          },
+          "FOX:EARLY": {
+            "game": "CAR@ATL"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "South Bend-Elkhart": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "MIN@CHI"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Burlington-Plattsburgh": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "GB@NYJ"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Tri-Cities, TN-VA": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "PHI@TEN"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Ft. Smith-Fay-Sprngdl-Rgrs": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "MIN@CHI"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Greenville-N.Bern-Washngtn": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "CAR@ATL"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Davenport-R.Island-Moline": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "MIN@CHI"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Myrtle Beach-Florence": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "CAR@ATL"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Evansville": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "MIN@CHI"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Johnstown-Altoona-St Colge": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "PHI@TEN"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Lincoln & Hastings-Krny": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "MIN@CHI"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Boise": {
+          "CBS:LATE": {
+            "game": "JAX@DEN"
+          },
+          "FOX:EARLY": {
+            "game": "MIN@CHI"
+          },
+          "FOX:LATE": {
+            "game": "SEA@ARI"
+          }
+        },
+        "Tallahassee-Thomasville": {
+          "CBS:LATE": {
+            "game": "JAX@DEN"
+          },
+          "FOX:EARLY": {
+            "game": "CAR@ATL"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Tyler-Longview(Lfkn&Ncgd)": {
+          "CBS:EARLY": {
+            "game": "CIN@HOU"
+          },
+          "FOX:EARLY": {
+            "game": "PHI@TEN"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Sioux Falls(Mitchell)": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "MIN@CHI"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Ft. Wayne": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "MIN@CHI"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Augusta-Aiken": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "CAR@ATL"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Reno": {
+          "CBS:LATE": {
+            "game": "LV@LAC"
+          },
+          "FOX:EARLY": {
+            "game": "MIN@CHI"
+          },
+          "FOX:LATE": {
+            "game": "MIA@SF"
+          }
+        },
+        "Lansing": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "MIN@CHI"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Springfield-Holyoke": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "GB@NYJ"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Youngstown": {
+          "CBS:EARLY": {
+            "game": "CLE@TB"
+          },
+          "FOX:EARLY": {
+            "game": "MIN@CHI"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Fargo-Valley City": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "MIN@CHI"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Eugene": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "MIN@CHI"
+          },
+          "FOX:LATE": {
+            "game": "SEA@ARI"
+          }
+        },
+        "Peoria-Bloomington": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "MIN@CHI"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Traverse City-Cadillac": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "MIN@CHI"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Lafayette, LA": {
+          "CBS:EARLY": {
+            "game": "NO@BAL"
+          },
+          "FOX:EARLY": {
+            "game": "PHI@TEN"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Macon": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "MIN@CHI"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Yakima-Pasco-Rchlnd-Knnwck": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "MIN@CHI"
+          },
+          "FOX:LATE": {
+            "game": "SEA@ARI"
+          }
+        },
+        "Montgomery-Selma": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "PHI@TEN"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "SantaBarbra-SanMar-SanLuOb": {
+          "CBS:LATE": {
+            "game": "LV@LAC"
+          },
+          "FOX:EARLY": {
+            "game": "MIN@CHI"
+          },
+          "FOX:LATE": {
+            "game": "MIA@SF"
+          }
+        },
+        "Monterey-Salinas": {
+          "CBS:LATE": {
+            "game": "LV@LAC"
+          },
+          "FOX:EARLY": {
+            "game": "MIN@CHI"
+          },
+          "FOX:LATE": {
+            "game": "MIA@SF"
+          }
+        },
+        "Bakersfield": {
+          "CBS:LATE": {
+            "game": "LV@LAC"
+          },
+          "FOX:EARLY": {
+            "game": "GB@NYJ"
+          },
+          "FOX:LATE": {
+            "game": "MIA@SF"
+          }
+        },
+        "Columbus, GA (Opelika, AL)": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "CAR@ATL"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Corpus Christi": {
+          "CBS:EARLY": {
+            "game": "CIN@HOU"
+          },
+          "FOX:EARLY": {
+            "game": "PHI@TEN"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "La Crosse-Eau Claire": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "GB@NYJ"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Wilmington": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "CAR@ATL"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Amarillo": {
+          "CBS:EARLY": {
+            "game": "CIN@HOU"
+          },
+          "FOX:EARLY": {
+            "game": "PHI@TEN"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Chico-Redding": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "MIN@CHI"
+          },
+          "FOX:LATE": {
+            "game": "MIA@SF"
+          }
+        },
+        "Columbus-Tupelo-W Pnt-Hstn": {
+          "CBS:EARLY": {
+            "game": "NO@BAL"
+          },
+          "FOX:EARLY": {
+            "game": "PHI@TEN"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Wausau-Rhinelander": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "GB@NYJ"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Topeka": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "MIN@CHI"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Columbia-Jefferson City": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "MIN@CHI"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Monroe-El Dorado": {
+          "CBS:EARLY": {
+            "game": "NO@BAL"
+          },
+          "FOX:EARLY": {
+            "game": "PHI@TEN"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Rockford": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "MIN@CHI"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Medford-Klamath Falls": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "MIN@CHI"
+          },
+          "FOX:LATE": {
+            "game": "MIA@SF"
+          }
+        },
+        "Minot-Bsmrck-Dcknsn(Wlstn)": {
+          "CBS:LATE": {
+            "game": "JAX@DEN"
+          },
+          "FOX:EARLY": {
+            "game": "MIN@CHI"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Beaumont-Port Arthur": {
+          "CBS:EARLY": {
+            "game": "CIN@HOU"
+          },
+          "FOX:EARLY": {
+            "game": "PHI@TEN"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Duluth-Superior": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "MIN@CHI"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Odessa-Midland": {
+          "CBS:EARLY": {
+            "game": "CIN@HOU"
+          },
+          "FOX:EARLY": {
+            "game": "PHI@TEN"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Salisbury": {
+          "CBS:EARLY": {
+            "game": "NO@BAL"
+          },
+          "FOX:EARLY": {
+            "game": "PHI@TEN"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Lubbock": {
+          "CBS:EARLY": {
+            "game": "CIN@HOU"
+          },
+          "FOX:EARLY": {
+            "game": "PHI@TEN"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Palm Springs": {
+          "CBS:LATE": {
+            "game": "LV@LAC"
+          },
+          "FOX:EARLY": {
+            "game": "MIN@CHI"
+          },
+          "FOX:LATE": {
+            "game": "MIA@SF"
+          }
+        },
+        "Anchorage": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "GB@NYJ"
+          },
+          "FOX:LATE": {
+            "game": "SEA@ARI"
+          }
+        },
+        "Wichita Falls & Lawton": {
+          "CBS:EARLY": {
+            "game": "CIN@HOU"
+          },
+          "FOX:EARLY": {
+            "game": "PHI@TEN"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Sioux City": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "MIN@CHI"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Erie": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "PHI@TEN"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Joplin-Pittsburg": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "MIN@CHI"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Albany, GA": {
+          "CBS:LATE": {
+            "game": "JAX@DEN"
+          },
+          "FOX:EARLY": {
+            "game": "CAR@ATL"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Rochestr-Mason City-Austin": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "MIN@CHI"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Panama City": {
+          "CBS:LATE": {
+            "game": "JAX@DEN"
+          },
+          "FOX:EARLY": {
+            "game": "PHI@TEN"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Terre Haute": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "MIN@CHI"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Bangor": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "GB@NYJ"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Biloxi-Gulfport": {
+          "CBS:EARLY": {
+            "game": "NO@BAL"
+          },
+          "FOX:EARLY": {
+            "game": "PHI@TEN"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Wheeling-Steubenville": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "MIN@CHI"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Bluefield-Beckley-Oak Hill": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "PHI@TEN"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Binghamton": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "PHI@TEN"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Gainesville": {
+          "CBS:LATE": {
+            "game": "JAX@DEN"
+          },
+          "FOX:EARLY": {
+            "game": "MIN@CHI"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Sherman-Ada": {
+          "CBS:EARLY": {
+            "game": "CIN@HOU"
+          },
+          "FOX:EARLY": {
+            "game": "PHI@TEN"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Idaho Fals-Pocatllo(Jcksn)": {
+          "CBS:LATE": {
+            "game": "JAX@DEN"
+          },
+          "FOX:EARLY": {
+            "game": "MIN@CHI"
+          },
+          "FOX:LATE": {
+            "game": "SEA@ARI"
+          }
+        },
+        "Missoula": {
+          "CBS:LATE": {
+            "game": "JAX@DEN"
+          },
+          "FOX:EARLY": {
+            "game": "MIN@CHI"
+          },
+          "FOX:LATE": {
+            "game": "SEA@ARI"
+          }
+        },
+        "Abilene-Sweetwater": {
+          "CBS:EARLY": {
+            "game": "CIN@HOU"
+          },
+          "FOX:EARLY": {
+            "game": "PHI@TEN"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Billings": {
+          "CBS:LATE": {
+            "game": "JAX@DEN"
+          },
+          "FOX:EARLY": {
+            "game": "MIN@CHI"
+          },
+          "FOX:LATE": {
+            "game": "SEA@ARI"
+          }
+        },
+        "Yuma-El Centro": {
+          "CBS:LATE": {
+            "game": "LV@LAC"
+          },
+          "FOX:EARLY": {
+            "game": "MIN@CHI"
+          },
+          "FOX:LATE": {
+            "game": "SEA@ARI"
+          }
+        },
+        "Hattiesburg-Laurel": {
+          "CBS:EARLY": {
+            "game": "NO@BAL"
+          },
+          "FOX:EARLY": {
+            "game": "PHI@TEN"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Clarksburg-Weston": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "PHI@TEN"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Quincy-Hannibal-Keokuk": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "MIN@CHI"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Utica": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "GB@NYJ"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Rapid City": {
+          "CBS:LATE": {
+            "game": "JAX@DEN"
+          },
+          "FOX:EARLY": {
+            "game": "MIN@CHI"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Dothan": {
+          "CBS:LATE": {
+            "game": "JAX@DEN"
+          },
+          "FOX:EARLY": {
+            "game": "CAR@ATL"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Lake Charles": {
+          "CBS:EARLY": {
+            "game": "NO@BAL"
+          },
+          "FOX:EARLY": {
+            "game": "PHI@TEN"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Elmira (Corning)": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "PHI@TEN"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Jackson, TN": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "PHI@TEN"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Harrisonburg": {
+          "CBS:EARLY": {
+            "game": "NO@BAL"
+          },
+          "FOX:EARLY": {
+            "game": "PHI@TEN"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Watertown": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "GB@NYJ"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Alexandria, LA": {
+          "CBS:EARLY": {
+            "game": "NO@BAL"
+          },
+          "FOX:EARLY": {
+            "game": "PHI@TEN"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Marquette": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "GB@NYJ"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Bowling Green": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "PHI@TEN"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Jonesboro": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "PHI@TEN"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Charlottesville": {
+          "CBS:EARLY": {
+            "game": "NO@BAL"
+          },
+          "FOX:EARLY": {
+            "game": "PHI@TEN"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Laredo": {
+          "CBS:EARLY": {
+            "game": "CIN@HOU"
+          },
+          "FOX:EARLY": {
+            "game": "PHI@TEN"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Butte-Bozeman": {
+          "CBS:LATE": {
+            "game": "JAX@DEN"
+          },
+          "FOX:EARLY": {
+            "game": "MIN@CHI"
+          },
+          "FOX:LATE": {
+            "game": "SEA@ARI"
+          }
+        },
+        "Grand Junction-Montrose": {
+          "CBS:LATE": {
+            "game": "JAX@DEN"
+          },
+          "FOX:EARLY": {
+            "game": "MIN@CHI"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Lafayette, IN": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "MIN@CHI"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Bend, OR": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "MIN@CHI"
+          },
+          "FOX:LATE": {
+            "game": "SEA@ARI"
+          }
+        },
+        "Lima": {
+          "CBS:EARLY": {
+            "game": "CLE@TB"
+          },
+          "FOX:EARLY": {
+            "game": "MIN@CHI"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Meridian": {
+          "CBS:LATE": {
+            "game": "JAX@DEN"
+          },
+          "FOX:EARLY": {
+            "game": "MIN@CHI"
+          },
+          "FOX:LATE": {
+            "game": "SEA@ARI"
+          }
+        },
+        "Twin Falls": {
+          "CBS:LATE": {
+            "game": "JAX@DEN"
+          },
+          "FOX:EARLY": {
+            "game": "MIN@CHI"
+          },
+          "FOX:LATE": {
+            "game": "SEA@ARI"
+          }
+        },
+        "Great Falls": {
+          "CBS:LATE": {
+            "game": "JAX@DEN"
+          },
+          "FOX:EARLY": {
+            "game": "MIN@CHI"
+          },
+          "FOX:LATE": {
+            "game": "SEA@ARI"
+          }
+        },
+        "Greenwood-Greenville": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "MIN@CHI"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Parkersburg": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "MIN@CHI"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Eureka": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "MIN@CHI"
+          },
+          "FOX:LATE": {
+            "game": "MIA@SF"
+          }
+        },
+        "San Angelo": {
+          "CBS:EARLY": {
+            "game": "CIN@HOU"
+          },
+          "FOX:EARLY": {
+            "game": "PHI@TEN"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Casper-Riverton": {
+          "CBS:LATE": {
+            "game": "JAX@DEN"
+          },
+          "FOX:EARLY": {
+            "game": "MIN@CHI"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Cheyenne-Scottsbluff": {
+          "CBS:LATE": {
+            "game": "JAX@DEN"
+          },
+          "FOX:EARLY": {
+            "game": "MIN@CHI"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Mankato": {
+          "CBS:LATE": {
+            "game": "JAX@DEN"
+          },
+          "FOX:EARLY": {
+            "game": "MIN@CHI"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Ottumwa-Kirksville": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "MIN@CHI"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "St. Joseph": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "MIN@CHI"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Fairbanks": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "GB@NYJ"
+          },
+          "FOX:LATE": {
+            "game": "SEA@ARI"
+          }
+        },
+        "Victoria": {
+          "CBS:EARLY": {
+            "game": "CIN@HOU"
+          },
+          "FOX:EARLY": {
+            "game": "PHI@TEN"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Zanesville": {
+          "CBS:EARLY": {
+            "game": "CLE@TB"
+          },
+          "FOX:EARLY": {
+            "game": "MIN@CHI"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Helena": {
+          "CBS:LATE": {
+            "game": "JAX@DEN"
+          },
+          "FOX:EARLY": {
+            "game": "MIN@CHI"
+          },
+          "FOX:LATE": {
+            "game": "SEA@ARI"
+          }
+        },
+        "Presque Isle": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "GB@NYJ"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Juneau": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "GB@NYJ"
+          },
+          "FOX:LATE": {
+            "game": "SEA@ARI"
+          }
+        },
+        "Alpena": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "MIN@CHI"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "North Platte": {
+          "CBS:EARLY": {
+            "game": "PIT@NE"
+          },
+          "FOX:EARLY": {
+            "game": "MIN@CHI"
+          },
+          "FOX:LATE": {
+            "game": "WSH@DAL"
+          }
+        },
+        "Glendive": {
+          "CBS:LATE": {
+            "game": "JAX@DEN"
+          },
+          "FOX:EARLY": {
+            "game": "MIN@CHI"
+          },
+          "FOX:LATE": {
+            "game": "SEA@ARI"
+          }
+        }
+      }
+    }
+  }
 }
