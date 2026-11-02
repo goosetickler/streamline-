@@ -210,6 +210,17 @@
     .location-field{width:100%;padding:0 10px}
     .location-button{padding:0 12px;cursor:pointer}
     .location-field:disabled,.location-button:disabled{opacity:.45;cursor:not-allowed}
+
+    .results-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:12px 0 15px}
+    .results-heading h2{margin:0;font-size:1.05rem}
+    .results-view-switch{display:flex;gap:4px;padding:3px;border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.04)}
+    .results-view-switch button{border:0;border-radius:999px;background:transparent;color:var(--muted);padding:8px 12px;font:inherit;font-size:.75rem;font-weight:900;cursor:pointer}
+    .results-view-switch button.active{background:linear-gradient(135deg,var(--green),var(--accent));color:#07111d}
+    .weekly-heading{display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .weekly-heading h3{margin:0;font-size:1.05rem}
+    .weekly-scoring-pill{border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.07);color:var(--text);padding:8px 12px;font:inherit;font-size:.72rem;font-weight:900;cursor:pointer;white-space:nowrap}
+    .weekly-stats-pending{color:var(--muted)}
+    @media(max-width:450px){.results-heading h2{font-size:.95rem}.results-view-switch button{padding:7px 9px;font-size:.68rem}}
     .results-subnav{display:flex;gap:8px;margin:12px 0 15px}
     .results-subnav button,.weekly-position button{border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.06);color:var(--muted);padding:9px 14px;font-weight:900;cursor:pointer}
     .results-subnav button.active,.weekly-position button.active{background:linear-gradient(135deg,var(--green),var(--accent));color:#07111d;border-color:transparent}
@@ -1282,10 +1293,16 @@
     const FANTASY_CACHE_PREFIX = "gridironGuide.realFantasy.v2.";
     const LIVE_FANTASY_CACHE_TTL_MS = 90*1000;
     const fantasyLeaderRequests = new Map();
-    const WEEKLY_FANTASY_CACHE_PREFIX="gridironGuide.weeklyFantasyAll.v1.";
+    const WEEKLY_FANTASY_CACHE_PREFIX="gridironGuide.weeklyFantasyAll.v2.";
     const weeklyFantasyRequests=new Map();
     let resultsSubview=localStorage.getItem("gridironGuide.resultsSubview.v1")==="fantasy"?"fantasy":"games";
     let weeklyFantasyPosition="ALL";
+    const WEEKLY_SCORING_MODES=[{key:"ppr",label:"Full PPR",bonus:1},{key:"half",label:"Half PPR",bonus:0.5},{key:"standard",label:"Standard",bonus:0}];
+    let weeklyScoringMode=localStorage.getItem("gridironGuide.weeklyScoring.v1")||"ppr";
+    if(!WEEKLY_SCORING_MODES.some(mode=>mode.key===weeklyScoringMode))weeklyScoringMode="ppr";
+    let weeklyFantasyPlayers=[];
+    let weeklyFantasyLoaded=0;
+    let weeklyFantasyExpected=0;
     let weeklyFantasyRenderToken=0;
     const DEFAULT_ENABLED_PROVIDERS = ["youtubetv","hulu","paramount","directv","peacock","netflix","fox","espn","prime","nflplus"];
 
@@ -2849,9 +2866,9 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       syncFollowedGamesWithNative();
       syncWidgetDataWithNative();
       if(sortMode==="final"){
-        const subnav=`<div class="results-subnav" aria-label="Results views"><button type="button" data-results-view="games" class="${resultsSubview==="games"?"active":""}">Games</button><button type="button" data-results-view="fantasy" class="${resultsSubview==="fantasy"?"active":""}">Fantasy Top 10</button></div>`;
+        const subnav=`<div class="results-heading"><h2>Results</h2><div class="results-view-switch" aria-label="Results views"><button type="button" data-results-view="games" class="${resultsSubview==="games"?"active":""}">Games</button><button type="button" data-results-view="fantasy" class="${resultsSubview==="fantasy"?"active":""}">🏆 Top 10</button></div></div>`;
         if(resultsSubview==="fantasy"){
-          scheduleEl.innerHTML=subnav+`<section class="weekly-leaders" id="weeklyFantasy"><h2>Weekly Fantasy Top 10</h2><div class="weekly-position" aria-label="Fantasy position filters">${["ALL","QB","RB","WR","TE"].map(pos=>`<button type="button" data-weekly-position="${pos}" class="${weeklyFantasyPosition===pos?"active":""}">${pos==="ALL"?"Overall":pos}</button>`).join("")}</div><div id="weeklyFantasyContent" aria-live="polite">Loading weekly player stats…</div></section>`;
+          scheduleEl.innerHTML=subnav+`<section class="weekly-leaders" id="weeklyFantasy"><div class="weekly-heading"><h3>Fantasy Leaders</h3><button type="button" class="weekly-scoring-pill" data-cycle-scoring="true" aria-label="Change fantasy scoring format">${WEEKLY_SCORING_MODES.find(m=>m.key===weeklyScoringMode).label} ↻</button></div><div class="weekly-position" aria-label="Fantasy position filters">${["ALL","QB","RB","WR","TE"].map(pos=>`<button type="button" data-weekly-position="${pos}" class="${weeklyFantasyPosition===pos?"active":""}">${pos==="ALL"?"Overall":pos}</button>`).join("")}</div><div id="weeklyFantasyContent" aria-live="polite">Loading weekly player stats…</div></section>`;
           loadWeeklyFantasy();
           return;
         }
@@ -3324,31 +3341,42 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       weeklyFantasyRequests.set(key,request);
       return request;
     }
-    function renderWeeklyFantasyPlayers(players,completed,total){
+    function weeklyFantasyScore(player){
+      const scoring=WEEKLY_SCORING_MODES.find(m=>m.key===weeklyScoringMode)||WEEKLY_SCORING_MODES[0];
+      return Number(player.points||0)-Number(player.receptions||0)*(1-scoring.bonus);
+    }
+    function renderWeeklyFantasyPlayers(){
       const el=document.querySelector("#weeklyFantasyContent");
       if(!el||sortMode!=="final"||resultsSubview!=="fantasy")return;
-      const filtered=players.filter(p=>weeklyFantasyPosition==="ALL"||p.position===weeklyFantasyPosition).sort((a,b)=>b.points-a.points).slice(0,10);
-      const progress=`<div class="weekly-progress">${completed} of ${total} game box scores loaded${completed<total?" · Rankings may be incomplete":""} · Full PPR</div>`;
-      el.innerHTML=progress+(filtered.length?filtered.map((p,i)=>`<div class="weekly-player"><span class="weekly-rank">${i+1}</span><div class="weekly-player-info"><div class="weekly-player-name">${escapeHtml(p.name)}</div><div class="weekly-player-detail">${escapeHtml(p.teamAbbr)} · ${escapeHtml(p.position)}${p.line?` · ${escapeHtml(p.line)}`:""}</div></div><div class="weekly-player-points">${Number(p.points).toFixed(1)} PTS</div></div>`).join(""):`<p class="weekly-progress">No ${weeklyFantasyPosition==="ALL"?"player":"position"} stats available for this week yet.</p>`);
+      const weekGames=allGames.filter(game=>!selectedScheduleWeek||scheduleWeekKey(game)===selectedScheduleWeek);
+      const finished=weekGames.filter(isFinalGame).length;
+      const remaining=weekGames.length-finished;
+      const progress=weekGames.length?(remaining?`${finished} completed · ${remaining} remaining`:`${finished} games completed · Final results`):"No games scheduled";
+      const pending=weeklyFantasyLoaded<weeklyFantasyExpected;
+      const notice=pending?`<span class="weekly-stats-pending"> · Updating player stats…</span>`:"";
+      const filtered=weeklyFantasyPlayers.filter(p=>weeklyFantasyPosition==="ALL"||p.position===weeklyFantasyPosition).sort((a,b)=>weeklyFantasyScore(b)-weeklyFantasyScore(a)).slice(0,10);
+      el.innerHTML=`<div class="weekly-progress">${progress}${notice}</div>`+(filtered.length?filtered.map((p,i)=>`<div class="weekly-player"><span class="weekly-rank">${i+1}</span><div class="weekly-player-info"><div class="weekly-player-name">${escapeHtml(p.name)}</div><div class="weekly-player-detail">${escapeHtml(p.teamAbbr)} · ${escapeHtml(p.position)}${p.line?` · ${escapeHtml(p.line)}`:""}</div></div><div class="weekly-player-points">${weeklyFantasyScore(p).toFixed(1)} PTS</div></div>`).join(""):`<p class="weekly-progress">${pending?"Loading player performances…":`No ${weeklyFantasyPosition==="ALL"?"player":"position"} stats available for this week yet.`}</p>`);
     }
     async function loadWeeklyFantasy(){
       const token=++weeklyFantasyRenderToken;
       const games=weeklyFantasyGames();
-      const all=[];let completed=0;
-      renderWeeklyFantasyPlayers([],0,games.length);
+      weeklyFantasyPlayers=[];weeklyFantasyLoaded=0;weeklyFantasyExpected=games.length;
+      renderWeeklyFantasyPlayers();
       await Promise.allSettled(games.map(async game=>{
         const players=await getAllFantasyPlayers(game);
         if(token!==weeklyFantasyRenderToken)return;
-        if(players.length)completed++;
-        for(const p of players)all.push({...p,gameId:game.id});
-        renderWeeklyFantasyPlayers(all,completed,games.length);
+        if(players.length)weeklyFantasyLoaded++;
+        for(const p of players)weeklyFantasyPlayers.push({...p,gameId:game.id});
+        renderWeeklyFantasyPlayers();
       }));
     }
     scheduleEl.addEventListener("click",event=>{
       const view=event.target.closest("[data-results-view]");
       if(view){resultsSubview=view.dataset.resultsView;localStorage.setItem("gridironGuide.resultsSubview.v1",resultsSubview);renderSchedule();return;}
       const pos=event.target.closest("[data-weekly-position]");
-      if(pos){weeklyFantasyPosition=pos.dataset.weeklyPosition;renderSchedule();}
+      if(pos){weeklyFantasyPosition=pos.dataset.weeklyPosition;document.querySelectorAll("[data-weekly-position]").forEach(btn=>btn.classList.toggle("active",btn.dataset.weeklyPosition===weeklyFantasyPosition));renderWeeklyFantasyPlayers();return;}
+      const score=event.target.closest("[data-cycle-scoring]");
+      if(score){const i=WEEKLY_SCORING_MODES.findIndex(m=>m.key===weeklyScoringMode);weeklyScoringMode=WEEKLY_SCORING_MODES[(i+1)%WEEKLY_SCORING_MODES.length].key;localStorage.setItem("gridironGuide.weeklyScoring.v1",weeklyScoringMode);score.textContent=WEEKLY_SCORING_MODES.find(m=>m.key===weeklyScoringMode).label+" ↻";renderWeeklyFantasyPlayers();}
     });
 
     function renderFantasyBlock(game){
@@ -3452,7 +3480,7 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
             const stats = row?.stats || [];
             const rawPosition = athlete.position?.abbreviation || athlete.position?.name || athlete.position || "";
             const inferredPosition = inferFantasyPosition(groupName, rawPosition);
-            const entry = playersById.get(id) || { id, name, teamAbbr, position:inferredPosition, points:0, line:[] };
+            const entry = playersById.get(id) || { id, name, teamAbbr, position:inferredPosition, points:0, receptions:0, line:[] };
             if(inferredPosition && !entry.position) entry.position = inferredPosition;
             if(teamAbbr && !entry.teamAbbr) entry.teamAbbr = teamAbbr;
             if(groupName.includes("passing")){
@@ -3476,6 +3504,7 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
               const recYds = statValue(labels, stats, "yds");
               const recTd = statValue(labels, stats, "td");
               entry.points += rec + recYds / 10 + recTd * 6;
+              entry.receptions += rec;
               if(rec) entry.line.push(`${rec} rec`);
               if(recYds) entry.line.push(`${Math.round(recYds)} rec yds`);
               if(recTd) entry.line.push(`${recTd} rec TD`);
