@@ -201,6 +201,10 @@
     .settings-switch-track:after{content:"";position:absolute;width:20px;height:20px;left:2px;top:2px;border-radius:50%;background:#fff;transition:.18s ease;box-shadow:0 2px 8px rgba(0,0,0,.3)}
     .settings-switch input:checked + .settings-switch-track{background:linear-gradient(135deg,var(--green),var(--accent));border-color:transparent}
     .settings-switch input:checked + .settings-switch-track:after{transform:translateX(20px);background:#07111d}
+    .widget-help-card{display:flex;align-items:center;justify-content:space-between;gap:12px;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.055);padding:10px 12px}
+    .widget-help-button{border:1px solid rgba(83,183,255,.35);border-radius:11px;background:rgba(83,183,255,.12);color:#bfe5ff;min-height:38px;padding:0 12px;font:inherit;font-size:.7rem;font-weight:950;white-space:nowrap;cursor:pointer}
+    .game-card.widget-opened{animation:widgetOpenedPulse 1.2s ease-out}
+    @keyframes widgetOpenedPulse{0%{box-shadow:0 0 0 0 rgba(106,255,183,.65)}45%{box-shadow:0 0 0 5px rgba(106,255,183,.28),0 0 26px rgba(83,183,255,.18)}100%{box-shadow:0 0 0 0 rgba(106,255,183,0)}}
     .location-controls{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px}
     .location-field,.location-button{height:42px;border:1px solid var(--line);border-radius:12px;background:#111827;color:var(--text);font:inherit;font-size:.72rem;font-weight:850}
     .location-field{width:100%;padding:0 10px}
@@ -320,6 +324,12 @@
     .badge.live{background:var(--red);border-color:transparent;color:white;animation:pulse 1.15s ease-in-out infinite}
     .badge.final{background:rgba(106,255,183,.16);border-color:rgba(106,255,183,.3);color:#b8ffdc}
     .badge.scheduled{background:rgba(255,255,255,.07);color:var(--muted)}
+    button.badge{appearance:none;-webkit-appearance:none;font-family:inherit;margin:0}
+    .follow-badge{display:inline-flex;align-items:center;gap:4px;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;transition:transform .08s ease,background-color .16s ease,border-color .16s ease,color .16s ease}
+    .follow-badge:active{transform:scale(.95)}
+    .follow-badge:focus-visible{outline:3px solid rgba(83,183,255,.45);outline-offset:2px}
+    .follow-badge svg{width:11px;height:11px;display:block;flex:0 0 auto}
+    .follow-badge.following{background:rgba(106,255,183,.16);border-color:rgba(106,255,183,.34);color:#b8ffdc}
     @keyframes pulse{50%{box-shadow:0 0 0 7px rgba(255,54,95,.13)}}
 
     .teams-row{
@@ -1173,7 +1183,18 @@
         </div>
       </div>
       <div class="settings-section">
-        <h3 class="settings-section-title">Location & DIRECTV</h3><div class="location-controls"><input id="directvZip" class="location-field" maxlength="5" inputmode="numeric" placeholder="ZIP Code"><button id="directvZipSave" class="location-button">Save ZIP</button></div><div class="location-controls" style="margin-top:8px"><div id="directvMarketStatus" class="location-field" style="display:flex;align-items:center;cursor:default">Market: not detected</div><button id="directvLocate" class="location-button" type="button">Use location</button></div><div class="dtv-package-setting"><div><div class="settings-toggle-label">NFL Network on DIRECTV</div><div class="settings-toggle-detail">Enable if your DIRECTV plan includes NFL Network.</div></div><label class="settings-switch"><input id="directvNflPackage" type="checkbox"><span class="settings-switch-track"></span></label></div><p id="directvZipHint" class="settings-hint">Your ZIP or location identifies local CBS/FOX availability. Results are cached on this device.</p></div><div class="settings-version-wrap">
+        <h3 class="settings-section-title">Location & DIRECTV</h3><div class="location-controls"><input id="directvZip" class="location-field" maxlength="5" inputmode="numeric" placeholder="ZIP Code"><button id="directvZipSave" class="location-button">Save ZIP</button></div><div class="location-controls" style="margin-top:8px"><div id="directvMarketStatus" class="location-field" style="display:flex;align-items:center;cursor:default">Market: not detected</div><button id="directvLocate" class="location-button" type="button">Use location</button></div><div class="dtv-package-setting"><div><div class="settings-toggle-label">NFL Network on DIRECTV</div><div class="settings-toggle-detail">Enable if your DIRECTV plan includes NFL Network.</div></div><label class="settings-switch"><input id="directvNflPackage" type="checkbox"><span class="settings-switch-track"></span></label></div><p id="directvZipHint" class="settings-hint">Your ZIP or location identifies local CBS/FOX availability. Results are cached on this device.</p></div>
+      <div id="nativeWidgetSettings" class="settings-section" hidden>
+        <h3 class="settings-section-title">Lock Screen</h3>
+        <div class="widget-help-card">
+          <div class="settings-toggle-copy">
+            <div class="settings-toggle-label">Next Game Widget</div>
+            <div class="settings-toggle-detail">See your next followed or favorite-team game without opening Gridiron Guide.</div>
+          </div>
+          <button id="widgetHelpButton" class="widget-help-button" type="button">How to Add</button>
+        </div>
+      </div>
+      <div class="settings-version-wrap">
         <div id="appVersionLabel" class="settings-version" aria-label="Gridiron Guide version 1.0">Gridiron Guide · Version 1.0</div>
       </div>
       </div></section>
@@ -1222,6 +1243,7 @@
     const SUNDAY_TICKET_KEY="gridironGuide.sundayTicket.v1";
     const LOCAL_FIRST_KEY="gridironGuide.localFirst.v1";
     const FAVORITE_TEAMS_KEY="gridironGuide.favoriteTeams.v1";
+    const FOLLOWED_GAMES_KEY="gridironGuide.followedGames.v1";
     const NFL_TEAMS = Object.freeze([
       ["ARI","Arizona Cardinals"],["ATL","Atlanta Falcons"],["BAL","Baltimore Ravens"],["BUF","Buffalo Bills"],
       ["CAR","Carolina Panthers"],["CHI","Chicago Bears"],["CIN","Cincinnati Bengals"],["CLE","Cleveland Browns"],
@@ -1237,6 +1259,7 @@
     const WEEKLY_COVERAGE_FEED_URL="https://goosetickler.github.io/streamline-/local-coverage-2026.json";
     const FANTASY_CACHE_PREFIX = "gridironGuide.realFantasy.v2.";
     const LIVE_FANTASY_CACHE_TTL_MS = 90*1000;
+    const FINAL_FANTASY_CACHE_TTL_MS = 15*60*1000;
     const fantasyLeaderRequests = new Map();
     const DEFAULT_ENABLED_PROVIDERS = ["youtubetv","hulu","paramount","directv","peacock","netflix","fox","espn","prime","nflplus"];
 
@@ -2126,6 +2149,10 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
     let sundayTicketEnabled=localStorage.getItem(SUNDAY_TICKET_KEY)==="true";
     let localFirstEnabled=localStorage.getItem(LOCAL_FIRST_KEY)==="true";
     let favoriteTeams=readFavoriteTeams();
+    let followedGameIds=readFollowedGameIds();
+    let lastNativeFollowSyncFingerprint="";
+    let lastNativeWidgetSyncFingerprint="";
+    let pendingNativeWidgetGameId="";
     let weeklyCoverageData=readWeeklyCoverageCache();
     const scheduleEl = document.querySelector("#schedule");
     const weekTimelineEl = document.querySelector("#weekTimeline");
@@ -2547,6 +2574,88 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
     function saveFavoriteTeams(){
       localStorage.setItem(FAVORITE_TEAMS_KEY,JSON.stringify(favoriteTeams));
     }
+    function readFollowedGameIds(){
+      try{
+        const value=JSON.parse(localStorage.getItem(FOLLOWED_GAMES_KEY)||"[]");
+        return new Set(Array.isArray(value)?value.map(String):[]);
+      }catch(_){ return new Set(); }
+    }
+    function saveFollowedGameIds(){
+      try{localStorage.setItem(FOLLOWED_GAMES_KEY,JSON.stringify([...followedGameIds]));}catch(_){}
+    }
+    function isGameFollowed(gameId){return followedGameIds.has(String(gameId));}
+    function nativeFollowHandler(){return window.webkit?.messageHandlers?.followGame||null;}
+    function followGamePayload(game,action){
+      const kickoffEpochMs=new Date(game.dateTime||"").getTime();
+      return {
+        action,
+        gameId:String(game.id),
+        awayTeam:String(game.awayTeam||game.awayAbbr||"Away Team"),
+        homeTeam:String(game.homeTeam||game.homeAbbr||"Home Team"),
+        kickoff:String(game.dateTime||""),
+        kickoffEpochMs:Number.isFinite(kickoffEpochMs)?kickoffEpochMs:null,
+        network:String(game.network||"")
+      };
+    }
+    function sendFollowGameToNative(game,action){
+      const handler=nativeFollowHandler();
+      if(!handler||!game)return false;
+      handler.postMessage(followGamePayload(game,action));
+      return true;
+    }
+    function updateFollowBadge(gameId){
+      const id=String(gameId), followed=isGameFollowed(id);
+      document.querySelectorAll("[data-follow-game-id]").forEach(button=>{
+        if(button.dataset.followGameId!==id)return;
+        button.classList.toggle("following",followed);
+        button.setAttribute("aria-pressed",String(followed));
+        button.setAttribute("aria-label",`${followed?"Following":"Follow"} ${button.dataset.matchup||"game"}`);
+        button.innerHTML=`${bellIcon(followed)}${followed?"FOLLOWING":"FOLLOW"}`;
+      });
+    }
+    function toggleFollowGame(event,gameId){
+      event?.preventDefault?.();
+      event?.stopPropagation?.();
+      const id=String(gameId), game=allGames.find(item=>String(item.id)===id);
+      if(!game)return;
+      if(isGameFollowed(id)){
+        followedGameIds.delete(id);
+        saveFollowedGameIds();
+        updateFollowBadge(id);
+        sendFollowGameToNative(game,"unfollow");
+        showToast("Game unfollowed");
+      }else{
+        followedGameIds.add(id);
+        saveFollowedGameIds();
+        updateFollowBadge(id);
+        const nativeSent=sendFollowGameToNative(game,"follow");
+        showToast(nativeSent?"Following game…":"Game followed");
+      }
+      lastNativeFollowSyncFingerprint="";
+      lastNativeWidgetSyncFingerprint="";
+      syncWidgetDataWithNative();
+    }
+    function syncFollowedGamesWithNative(){
+      if(!nativeFollowHandler())return;
+      const followedGames=allGames.filter(game=>isGameFollowed(game.id));
+      const fingerprint=followedGames
+        .map(game=>`${game.id}|${game.dateTime}|${cleanStatus(game.status)}`)
+        .sort()
+        .join(";");
+      if(fingerprint===lastNativeFollowSyncFingerprint)return;
+      lastNativeFollowSyncFingerprint=fingerprint;
+      followedGames.forEach(game=>sendFollowGameToNative(game,"sync"));
+    }
+    window.gridironGuideNativeFollowResult=function(result){
+      if(!result||result.action!=="follow")return;
+      if(result.scheduled){
+        showToast("Following · kickoff alert set");
+      }else if(result.reason==="permissionDenied"){
+        showToast("Following · notifications disabled in Settings");
+      }else if(result.reason==="invalidKickoff"){
+        showToast("Game followed · kickoff time unavailable");
+      }
+    };
     function isFavoriteTeam(league,id){
       const l=String(league||"").toUpperCase(), team=String(id||"").toUpperCase();
       return favoriteTeams.some(item=>item.league===l&&item.id===team);
@@ -2554,6 +2663,69 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
     function isFavoriteGame(game){
       return isFavoriteTeam("NFL",game?.awayAbbr)||isFavoriteTeam("NFL",game?.homeAbbr);
     }
+    function nativeWidgetHandler(){return window.webkit?.messageHandlers?.syncWidgetData||null;}
+    function isNationalWidgetGame(game){
+      return ["NETFLIX","PRIME","PEACOCK_EXCLUSIVE","NFL_NETWORK","ESPN","NBC","ABC","FOX_NATIONAL"]
+        .includes(classifyBroadcastNetwork(game));
+    }
+    function syncWidgetDataWithNative(){
+      const handler=nativeWidgetHandler();
+      if(!handler||!allGames.length)return false;
+      const now=Date.now();
+      const games=allGames
+        .filter(game=>{
+          const kickoffEpochMs=new Date(game.dateTime||"").getTime();
+          return Number.isFinite(kickoffEpochMs)&&!isFinalGame(game)&&kickoffEpochMs+4*60*60*1000>now;
+        })
+        .map(game=>{
+          const kickoffEpochMs=new Date(game.dateTime).getTime();
+          const localStatus=getLocalAvailabilityStatus(game);
+          return {
+            id:String(game.id),
+            kickoffEpochMs,
+            awayAbbr:String(game.awayAbbr||"AWAY").toUpperCase(),
+            homeAbbr:String(game.homeAbbr||"HOME").toUpperCase(),
+            network:String(game.network||""),
+            status:cleanStatus(game.status),
+            isFollowed:isGameFollowed(game.id),
+            isFavorite:isFavoriteGame(game),
+            isNational:isNationalWidgetGame(game),
+            isLocal:localFirstEnabled&&Number(localStatus?.score||0)>=3
+          };
+        })
+        .sort((a,b)=>a.kickoffEpochMs-b.kickoffEpochMs);
+      const fingerprint=JSON.stringify(games);
+      if(fingerprint===lastNativeWidgetSyncFingerprint)return true;
+      lastNativeWidgetSyncFingerprint=fingerprint;
+      handler.postMessage({savedAtEpochMs:Date.now(),games});
+      return true;
+    }
+    window.gridironGuideOpenGame=function(gameId){
+      const id=String(gameId||"");
+      if(!id)return true;
+      const game=allGames.find(item=>String(item.id)===id);
+      if(!game){
+        pendingNativeWidgetGameId=id;
+        return true;
+      }
+      pendingNativeWidgetGameId="";
+      selectedScheduleWeek=scheduleWeekKey(game)||selectedScheduleWeek;
+      sortMode=isFinalGame(game)?"final":(isLiveGame(game)?"live":"kickoff");
+      localStorage.setItem("gridironGuide.sortMode",sortMode);
+      document.querySelectorAll(".sort-tab").forEach(tab=>tab.classList.toggle("active",tab.dataset.sort===sortMode));
+      renderWeekNavigator();
+      renderSchedule();
+      requestAnimationFrame(()=>{
+        const card=findVisibleGameCard(id);
+        if(!card)return;
+        card.scrollIntoView({behavior:"smooth",block:"center"});
+        card.classList.remove("widget-opened");
+        void card.offsetWidth;
+        card.classList.add("widget-opened");
+        window.setTimeout(()=>card.classList.remove("widget-opened"),1250);
+      });
+      return true;
+    };
     function renderFavoriteTeamSettings(){
       const select=document.querySelector("#favoriteTeamSelect");
       const list=document.querySelector("#favoriteTeamList");
@@ -2626,6 +2798,8 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       const games = getDisplayGames();
       updateWeekRange(games);
       updateFilterCounts();
+      syncFollowedGamesWithNative();
+      syncWidgetDataWithNative();
       if(!games.length){
         const scoped = selectedScheduleWeek ? allGames.filter(g=>scheduleWeekKey(g)===selectedScheduleWeek) : allGames;
         const allFinal = scoped.length > 0 && scoped.every(isFinalGame);
@@ -2643,6 +2817,11 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       `).join("");
       hydrateFantasyBlocks(games);
       scheduleLiveRefresh();
+      if(pendingNativeWidgetGameId){
+        const gameId=pendingNativeWidgetGameId;
+        pendingNativeWidgetGameId="";
+        setTimeout(()=>window.gridironGuideOpenGame(gameId),0);
+      }
     }
 
     function getPreferredProviderForGame(providerKeys){
@@ -2666,6 +2845,11 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       const favoriteClass = isFavoriteGame(game) ? " favorite-game" : "";
       const winnerSideClass = isFinal && result.away === "winner" ? " away-winner" : (isFinal && result.home === "winner" ? " home-winner" : "");
       const statusClass = isLive ? "live" : (isFinal ? "final" : "scheduled");
+      const followed=isGameFollowed(game.id);
+      const matchup=`${game.awayTeam} at ${game.homeTeam}`;
+      const statusBadge=(!isLive&&!isFinal&&nativeFollowHandler())
+        ? `<button type="button" class="badge scheduled follow-badge${followed?" following":""}" data-game-field="status" data-follow-game-id="${escapeHtml(String(game.id))}" data-matchup="${escapeHtml(matchup)}" aria-label="${followed?"Following":"Follow"} ${escapeHtml(matchup)}" aria-pressed="${followed}" onclick='toggleFollowGame(event, ${JSON.stringify(String(game.id)).replace(/'/g,"&#39;")})'>${bellIcon(followed)}${followed?"FOLLOWING":"FOLLOW"}</button>`
+        : `<span class="badge ${statusClass}" data-game-field="status">${displayStatus(game.status)}</span>`;
       const actionRow = isFinal ? "" : `
           <div class="lower-row">
             ${providerIcons || `<div class="no-provider">No streams available</div>`}
@@ -2684,7 +2868,7 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
             </div>
 
             <div class="badges">
-              <span class="badge ${statusClass}" data-game-field="status">${displayStatus(game.status)}</span>
+              ${statusBadge}
             </div>
           </div>
           <div class="teams-row">
@@ -2819,6 +3003,8 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       });
 
       updateFilterCounts();
+      lastNativeWidgetSyncFingerprint="";
+      syncWidgetDataWithNative();
       if(fantasyRefresh.size)hydrateFantasyBlocks([...fantasyRefresh.values()]);
       if(forcedFantasyRefresh.size)hydrateFantasyBlocks([...forcedFantasyRefresh.values()],{force:true});
     }
@@ -2848,6 +3034,12 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
 
     function initSettingsControls(){
       renderFavoriteTeamSettings();
+      const widgetHelpHandler=window.webkit?.messageHandlers?.widgetHelp;
+      const nativeWidgetSettings=document.querySelector("#nativeWidgetSettings");
+      if(widgetHelpHandler&&nativeWidgetSettings){
+        nativeWidgetSettings.hidden=false;
+        document.querySelector("#widgetHelpButton")?.addEventListener("click",()=>widgetHelpHandler.postMessage({}));
+      }
       document.querySelector("#favoriteTeamAdd")?.addEventListener("click",()=>{
         const select=document.querySelector("#favoriteTeamSelect");
         const id=String(select?.value||"");
@@ -3094,7 +3286,9 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
     async function getFantasyLeaders(game,{force=false}={}){
       const cacheKey = FANTASY_CACHE_PREFIX + game.id;
       const cached = readFantasyCacheRecord(cacheKey);
-      const cacheIsFresh = cached.leaders.length && (isFinalGame(game) || Date.now()-cached.savedAt<LIVE_FANTASY_CACHE_TTL_MS);
+      const cacheIsFresh = cached.leaders.length && (isFinalGame(game)
+        ? cached.finalVerified && Date.now()-cached.savedAt<FINAL_FANTASY_CACHE_TTL_MS
+        : Date.now()-cached.savedAt<LIVE_FANTASY_CACHE_TTL_MS);
       if(!force && cacheIsFresh) return cached.leaders;
       if(fantasyLeaderRequests.has(cacheKey)) return fantasyLeaderRequests.get(cacheKey);
 
@@ -3102,7 +3296,7 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
         try{
           const summary = await fetchJson(`${ESPN_SUMMARY_BASE}?event=${encodeURIComponent(game.id)}`);
           const leaders = extractFantasyLeadersFromEspnSummary(summary).slice(0,3);
-          if(leaders.length) cacheFantasy(cacheKey, leaders);
+          if(leaders.length) cacheFantasy(cacheKey, leaders, {finalVerified:isFinalGame(game)});
           return leaders;
         }catch(err){
           if(cached.leaders.length) return cached.leaders;
@@ -3119,9 +3313,10 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
         const cached = JSON.parse(localStorage.getItem(key) || "null");
         return {
           savedAt:Number(cached?.savedAt)||0,
+          finalVerified:cached?.finalVerified===true,
           leaders:Array.isArray(cached?.leaders)?cached.leaders:[]
         };
-      }catch(err){ return {savedAt:0,leaders:[]}; }
+      }catch(err){ return {savedAt:0,finalVerified:false,leaders:[]}; }
     }
 
     function readCachedFantasy(key){
@@ -3130,11 +3325,13 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
 
     function isFantasyCacheFresh(game){
       const cached=readFantasyCacheRecord(FANTASY_CACHE_PREFIX+game.id);
-      return Boolean(cached.leaders.length && (isFinalGame(game) || Date.now()-cached.savedAt<LIVE_FANTASY_CACHE_TTL_MS));
+      return Boolean(cached.leaders.length && (isFinalGame(game)
+        ? cached.finalVerified && Date.now()-cached.savedAt<FINAL_FANTASY_CACHE_TTL_MS
+        : Date.now()-cached.savedAt<LIVE_FANTASY_CACHE_TTL_MS));
     }
 
-    function cacheFantasy(key, leaders){
-      try{ localStorage.setItem(key, JSON.stringify({ savedAt: Date.now(), leaders })); }catch(err){}
+    function cacheFantasy(key, leaders, {finalVerified=false}={}){
+      try{ localStorage.setItem(key, JSON.stringify({ savedAt: Date.now(), finalVerified, leaders })); }catch(err){}
     }
 
     function extractFantasyLeadersFromEspnSummary(summary){
@@ -3711,6 +3908,7 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
     }
     function hasScore(game){ return game.awayScore !== undefined && game.homeScore !== undefined && game.awayScore !== "" && game.homeScore !== ""; }
     function playIcon(){ return `<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="rgba(7,17,29,.18)"/><path d="M10 8.5v7l6-3.5-6-3.5Z" fill="currentColor"/></svg>`; }
+    function bellIcon(filled=false){return `<svg viewBox="0 0 24 24" aria-hidden="true" fill="${filled?"currentColor":"none"}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/></svg>`;}
     function slug(value){ return String(value).toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,""); }
     function escapeHtml(value){ return String(value ?? "").replace(/[&<>'"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"}[c])); }
     function initSortControls(){
