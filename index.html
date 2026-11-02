@@ -323,6 +323,8 @@
     .badge.network{background:var(--gold);border-color:transparent;color:#111827}
     .badge.live{background:var(--red);border-color:transparent;color:white;animation:pulse 1.15s ease-in-out infinite}
     .badge.final{background:rgba(106,255,183,.16);border-color:rgba(106,255,183,.3);color:#b8ffdc}
+    .badge.national-confirmed{background:rgba(105,165,255,.13);border-color:rgba(105,165,255,.42);color:#b9d5ff;white-space:nowrap}
+    .badge.local-confirmed{background:rgba(106,255,183,.13);border-color:rgba(106,255,183,.42);color:#b8ffdc;white-space:nowrap}
     .badge.scheduled{background:rgba(255,255,255,.07);color:var(--muted)}
     button.badge{appearance:none;-webkit-appearance:none;font-family:inherit;margin:0}
     .follow-badge{display:inline-flex;align-items:center;gap:4px;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;transition:transform .08s ease,background-color .16s ease,border-color .16s ease,color .16s ease}
@@ -1259,7 +1261,6 @@
     const WEEKLY_COVERAGE_FEED_URL="https://goosetickler.github.io/streamline-/local-coverage-2026.json";
     const FANTASY_CACHE_PREFIX = "gridironGuide.realFantasy.v2.";
     const LIVE_FANTASY_CACHE_TTL_MS = 90*1000;
-    const FINAL_FANTASY_CACHE_TTL_MS = 15*60*1000;
     const fantasyLeaderRequests = new Map();
     const DEFAULT_ENABLED_PROVIDERS = ["youtubetv","hulu","paramount","directv","peacock","netflix","fox","espn","prime","nflplus"];
 
@@ -2543,6 +2544,32 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       const assignedGame=String(a.game||a.matchup||"").toUpperCase().replace(/\s+/g,""),current=gameCoverageKey(game);
       return {source:String(a.source||data.source||"weekly coverage feed"),station:String(a.station||""),slot,assignedGame,match:assignedGame===current,conflict:!!assignedGame&&assignedGame!==current,updatedAt:String(data.updatedAt||"")};
     }
+    // Display-only: never infer a LOCAL badge from national rights, team markets,
+    // or ESPN affiliates. A positive assignment in the weekly JSON is required.
+    // Only confirmed national distribution or an explicit market-level JSON match
+    // earns a broadcast badge. Unknown coverage remains unlabelled.
+    function isConfirmedNationalBroadcast(game){
+      const network=classifyBroadcastNetwork(game);
+      if(["NBC","ESPN","PRIME","NETFLIX","PEACOCK_EXCLUSIVE","NFL_NETWORK","FOX_NATIONAL"].includes(network))return true;
+      // ABC games may be regional simulcasts; only label ABC when paired with ESPN
+      // or when the schedule explicitly marks it as a national broadcast.
+      if(network==="ABC"){
+        const names=getBroadcastNames(game).join(" | ");
+        return /\bespn\b/i.test(names) || game.nationalBroadcast===true || game.isNational===true;
+      }
+      return game.nationalBroadcast===true || game.isNational===true;
+    }
+    function renderBroadcastBadge(game){
+      if(isConfirmedNationalBroadcast(game))return `<span class="badge national-confirmed" title="National broadcast" aria-label="National broadcast">NATIONAL</span>`;
+      return renderConfirmedLocalBadge(game);
+    }
+    function renderConfirmedLocalBadge(game){
+      const assignment=getWeeklyCoverageAssignment(game);
+      if(!assignment?.match)return "";
+      const station=assignment.station?` · ${assignment.station}`:"";
+      const tooltip=escapeHtml(`Confirmed local broadcast${station}`);
+      return `<span class="badge local-confirmed" title="${tooltip}" aria-label="${tooltip}">⌂ LOCAL</span>`;
+    }
     function getLocalAvailabilityStatus(game){
       const n=classifyBroadcastNetwork(game),weekly=getWeeklyCoverageAssignment(game);
       if(weekly?.match)return {score:5,state:"CONFIRMED LOCAL",source:weekly.source,station:weekly.station,weekly};
@@ -2868,6 +2895,7 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
             </div>
 
             <div class="badges">
+              ${renderBroadcastBadge(game)}
               ${statusBadge}
             </div>
           </div>
@@ -3286,9 +3314,7 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
     async function getFantasyLeaders(game,{force=false}={}){
       const cacheKey = FANTASY_CACHE_PREFIX + game.id;
       const cached = readFantasyCacheRecord(cacheKey);
-      const cacheIsFresh = cached.leaders.length && (isFinalGame(game)
-        ? cached.finalVerified && Date.now()-cached.savedAt<FINAL_FANTASY_CACHE_TTL_MS
-        : Date.now()-cached.savedAt<LIVE_FANTASY_CACHE_TTL_MS);
+      const cacheIsFresh = cached.leaders.length && (isFinalGame(game) || Date.now()-cached.savedAt<LIVE_FANTASY_CACHE_TTL_MS);
       if(!force && cacheIsFresh) return cached.leaders;
       if(fantasyLeaderRequests.has(cacheKey)) return fantasyLeaderRequests.get(cacheKey);
 
@@ -3296,7 +3322,7 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
         try{
           const summary = await fetchJson(`${ESPN_SUMMARY_BASE}?event=${encodeURIComponent(game.id)}`);
           const leaders = extractFantasyLeadersFromEspnSummary(summary).slice(0,3);
-          if(leaders.length) cacheFantasy(cacheKey, leaders, {finalVerified:isFinalGame(game)});
+          if(leaders.length) cacheFantasy(cacheKey, leaders);
           return leaders;
         }catch(err){
           if(cached.leaders.length) return cached.leaders;
@@ -3313,10 +3339,9 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
         const cached = JSON.parse(localStorage.getItem(key) || "null");
         return {
           savedAt:Number(cached?.savedAt)||0,
-          finalVerified:cached?.finalVerified===true,
           leaders:Array.isArray(cached?.leaders)?cached.leaders:[]
         };
-      }catch(err){ return {savedAt:0,finalVerified:false,leaders:[]}; }
+      }catch(err){ return {savedAt:0,leaders:[]}; }
     }
 
     function readCachedFantasy(key){
@@ -3325,13 +3350,11 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
 
     function isFantasyCacheFresh(game){
       const cached=readFantasyCacheRecord(FANTASY_CACHE_PREFIX+game.id);
-      return Boolean(cached.leaders.length && (isFinalGame(game)
-        ? cached.finalVerified && Date.now()-cached.savedAt<FINAL_FANTASY_CACHE_TTL_MS
-        : Date.now()-cached.savedAt<LIVE_FANTASY_CACHE_TTL_MS));
+      return Boolean(cached.leaders.length && (isFinalGame(game) || Date.now()-cached.savedAt<LIVE_FANTASY_CACHE_TTL_MS));
     }
 
-    function cacheFantasy(key, leaders, {finalVerified=false}={}){
-      try{ localStorage.setItem(key, JSON.stringify({ savedAt: Date.now(), finalVerified, leaders })); }catch(err){}
+    function cacheFantasy(key, leaders){
+      try{ localStorage.setItem(key, JSON.stringify({ savedAt: Date.now(), leaders })); }catch(err){}
     }
 
     function extractFantasyLeadersFromEspnSummary(summary){
@@ -4178,7 +4201,7 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
     setTimeout(()=>{
       const beforeCoverage=weeklyCoverageFingerprint(weeklyCoverageData);
       refreshWeeklyCoverageData(false).then(payload=>{
-        if(localFirstEnabled && weeklyCoverageFingerprint(payload)!==beforeCoverage){
+        if(weeklyCoverageFingerprint(payload)!==beforeCoverage){
           renderSchedule();
         }
       }).catch(()=>{});
