@@ -332,6 +332,27 @@
     .fantasy-team{display:inline-flex;align-items:center;height:16px;border-radius:999px;padding:0 5px;background:rgba(106,255,183,.13);color:#b8ffdc;font-size:.58rem;font-weight:1000;line-height:1}
     .fantasy-line{min-width:0;overflow:hidden;text-overflow:ellipsis}
     .fantasy-points{color:var(--green);font-size:.80rem;font-weight:1000}
+    /* Consistent player identity across final game cards and weekly Top 10. */
+    .fantasy-player-name,.weekly-player-name{
+      font-size:.98rem;font-weight:900;line-height:1.15;letter-spacing:-.015em;
+      overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+    }
+    .fantasy-player-meta{
+      display:flex;align-items:center;gap:5px;min-width:0;max-width:100%;
+      margin-top:3px;color:var(--muted);font-size:.74rem;font-weight:750;
+      line-height:1.25;text-transform:uppercase;white-space:nowrap;overflow:hidden;
+      text-overflow:ellipsis;opacity:.9;
+    }
+    .fantasy-team,.fantasy-tag{
+      display:inline-flex;flex:0 0 auto;align-items:center;justify-content:center;
+      height:17px;padding:0 6px;border-radius:999px;font-size:.60rem;
+      font-weight:1000;line-height:1;letter-spacing:.01em;
+    }
+    .fantasy-line{display:block;flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .weekly-player-info .fantasy-player-meta{margin-top:4px}
+    .weekly-player-points{font-size:.98rem;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+    .weekly-rank{flex:0 0 22px;font-variant-numeric:tabular-nums}
+
     .no-provider{color:var(--muted);font-size:.68rem;font-weight:900;text-transform:uppercase;letter-spacing:.03em}
     @media (min-width:700px){.settings-provider-grid{grid-template-columns:repeat(4,minmax(0,1fr))}.settings-overlay{align-items:center}.settings-sheet{border-radius:26px}}
 
@@ -1195,21 +1216,22 @@
     .follow-icon-button.following{color:#b8ffdc;border-color:rgba(106,255,183,.48);background:rgba(106,255,183,.12)}
     .follow-icon-button:focus-visible{outline:3px solid rgba(83,183,255,.55);outline-offset:2px}
 
-    /* Completed Results cards: keep FINAL in its own header row.
-       The empty kickoff label must not collapse that row and overlap the score. */
-    .results-final-card .game-top{
-      min-height:28px;
-      grid-template-columns:minmax(0,1fr) auto;
-    }
+    /* Results cards are already final: let the scores carry the outcome.
+       No empty status header and no boxed-in winner highlight. */
+    .results-final-card{padding:10px 12px 12px}
+    .results-final-card .teams-row{margin:2px 0 7px}
+    .results-final-card .team-row.winner{background:transparent;box-shadow:none}
+    .results-final-card .team-row.winner .team-name{color:var(--green)}
+    .results-final-card .team-row.loser{opacity:.72}
+    .results-final-card.away-winner .teams-row::before,
+    .results-final-card.home-winner .teams-row::before{content:none}
+    /* Rare OT or confirmed local badge: only then keep a small header. */
+    .results-final-card .game-top{min-height:22px;grid-template-columns:1fr auto}
     .results-final-card .game-top .badges{
-      position:static;
-      transform:none;
-      grid-column:2;
-      justify-self:end;
-      align-self:center;
+      position:static;transform:none;grid-column:2;
+      justify-self:end;align-self:center;
     }
-    .results-final-card .game-top .time{grid-column:1;}
-    .results-final-card .teams-row{margin-top:8px;}
+    .results-final-card .game-top + .teams-row{margin-top:4px}
   </style>
 </head>
 <body class="provider-chip-refresh">
@@ -3044,34 +3066,31 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       const favoriteClass = isFavoriteGame(game) ? " favorite-game" : "";
       const winnerSideClass = isFinal && result.away === "winner" ? " away-winner" : (isFinal && result.home === "winner" ? " home-winner" : "");
       const statusClass = isLive ? "live" : (isFinal ? "final" : "scheduled");
+      const isResultsFinal = isFinal && sortMode === "final";
+      const isOvertimeFinal = isResultsFinal && (Number(game.period) > 4 || /\b(?:OT|overtime)\b/i.test(String(game.statusDetail || "")));
+      const localBadge = renderConfirmedLocalBadge(game);
       const followed=isGameFollowed(game.id);
       const matchup=`${game.awayTeam} at ${game.homeTeam}`;
       const followButton=(!isLive&&!isFinal&&nativeFollowHandler())
         ? `<button type="button" class="follow-icon-button${followed?" following":""}" data-follow-game-id="${escapeHtml(String(game.id))}" data-matchup="${escapeHtml(matchup)}" aria-label="${followed?"Following":"Follow"} ${escapeHtml(matchup)}" aria-pressed="${followed}" title="${followed?"Unfollow game":"Follow game"}" onclick='toggleFollowGame(event, ${JSON.stringify(String(game.id)).replace(/'/g,"&#39;")})'>${bellIcon(followed)}</button>`
         : "";
-      const statusBadge=(isLive||isFinal)
-        ? `<span class="badge ${statusClass}" data-game-field="status">${displayStatus(game.status)}</span>`
-        : "";
+      const statusBadge=isResultsFinal
+        ? (isOvertimeFinal ? `<span class="badge final" aria-label="Final after overtime">OT</span>` : "")
+        : ((isLive||isFinal) ? `<span class="badge ${statusClass}" data-game-field="status">${displayStatus(game.status)}</span>` : "");
+      // A completed Results card does not need a blank header above the score.
+      const showCardHeader=!isResultsFinal || Boolean(localBadge || statusBadge);
       const actionRow = isFinal ? "" : `
           <div class="lower-row">
             ${providerIcons || `<div class="no-provider">No streams available</div>`}
             ${providerKeys.length ? `<button class="watch" aria-label="Open ${escapeHtml(provider.label)} for ${escapeHtml(game.awayAbbr)} at ${escapeHtml(game.homeAbbr)}" onclick='openProvider("${providerKey}", ${JSON.stringify(game).replace(/'/g,"&#39;")})'>${playIcon()} WATCH</button>` : ""}
           </div>`;
       return `
-        <article class="game-card${isFinal && sortMode==="final" ? " results-final-card" : ""}${liveClass}${favoriteClass}${winnerSideClass}" data-game-id="${escapeHtml(String(game.id))}" aria-label="${escapeHtml(game.awayTeam)} at ${escapeHtml(game.homeTeam)}">
-          <div class="game-top">
-
-            <div class="time">${isFinal && sortMode==="final" ? "" : `${followButton}<span>${formatKickoff(game)}</span>`}</div>
-
-            <div class="game-clock-top" data-game-field="clock">
-              ${isLive ? getClockLine(game) : ""}
-            </div>
-
-            <div class="badges">
-              ${renderConfirmedLocalBadge(game)}
-              ${statusBadge}
-            </div>
-          </div>
+        <article class="game-card${isResultsFinal ? " results-final-card" : ""}${liveClass}${favoriteClass}${winnerSideClass}" data-game-id="${escapeHtml(String(game.id))}" aria-label="${escapeHtml(isResultsFinal ? `Final: ${game.awayTeam} ${game.awayScore ?? ""}, ${game.homeTeam} ${game.homeScore ?? ""}${isOvertimeFinal ? ", overtime" : ""}` : matchup)}">
+          ${showCardHeader ? `<div class="game-top">
+            <div class="time">${isResultsFinal ? "" : `${followButton}<span>${formatKickoff(game)}</span>`}</div>
+            <div class="game-clock-top" data-game-field="clock">${isLive ? getClockLine(game) : ""}</div>
+            <div class="badges">${localBadge}${statusBadge}</div>
+          </div>` : ""}
           <div class="teams-row">
 
             ${renderTeam(
@@ -3516,7 +3535,7 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       const pending=weeklyFantasyLoaded<weeklyFantasyExpected;
       const notice=pending?`<span class="weekly-stats-pending"> · Updating player stats…</span>`:"";
       const filtered=weeklyFantasyPlayers.filter(p=>weeklyFantasyPosition==="ALL"||p.position===weeklyFantasyPosition).sort((a,b)=>weeklyFantasyScore(b)-weeklyFantasyScore(a)).slice(0,10);
-      el.innerHTML=`<div class="weekly-progress">${progress}${notice}</div>`+(filtered.length?filtered.map((p,i)=>`<div class="weekly-player"><span class="weekly-rank">${i+1}</span><div class="weekly-player-info"><div class="weekly-player-name">${escapeHtml(p.name)}</div><div class="weekly-player-detail">${escapeHtml(p.teamAbbr)} · ${escapeHtml(p.position)}${p.line?` · ${escapeHtml(p.line)}`:""}</div></div><div class="weekly-player-points">${weeklyFantasyScore(p).toFixed(1)} PTS</div></div>`).join(""):`<p class="weekly-progress">${pending?"Loading player performances…":`No ${weeklyFantasyPosition==="ALL"?"player":"position"} stats available for this week yet.`}</p>`);
+      el.innerHTML=`<div class="weekly-progress">${progress}${notice}</div>`+(filtered.length?filtered.map((p,i)=>`<div class="weekly-player"><span class="weekly-rank">${i+1}</span><div class="weekly-player-info"><div class="weekly-player-name">${escapeHtml(p.name)}</div>${renderFantasyPlayerMeta(p)}</div><div class="weekly-player-points">${weeklyFantasyScore(p).toFixed(1)} PTS</div></div>`).join(""):`<p class="weekly-progress">${pending?"Loading player performances…":`No ${weeklyFantasyPosition==="ALL"?"player":"position"} stats available for this week yet.`}</p>`);
     }
     async function loadWeeklyFantasy(){
       const token=++weeklyFantasyRenderToken;
@@ -3743,12 +3762,18 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       return `<div class="fantasy-title">⭐ ${title}</div><div class="fantasy-list"><div class="fantasy-player"><span>—</span><span class="fantasy-player-name">${escapeHtml(message)}<span class="fantasy-player-meta"><span class="fantasy-line">Waiting for box score data</span></span></span><span class="fantasy-points"></span></div></div>`;
     }
 
+    // One shared player identity + stat presentation for final game cards and Top 10.
+    // The same badges and stat text are deliberately used in both views.
+    function renderFantasyPlayerMeta(player){
+      const team = player.teamAbbr ? `<span class="fantasy-team">${escapeHtml(player.teamAbbr)}</span>` : "";
+      const position = player.position ? `<span class="fantasy-tag">${escapeHtml(player.position)}</span>` : "";
+      const line = player.line ? `<span class="fantasy-line">${escapeHtml(player.line)}</span>` : "";
+      return `<div class="fantasy-player-meta">${team}${position}${line}</div>`;
+    }
+
     function renderFantasyPlayer(player, index){
       const mvpClass = index === 0 ? " mvp" : "";
-      const position = player.position ? `<span class="fantasy-tag">${escapeHtml(player.position)}</span>` : "";
-      const team = player.teamAbbr ? `<span class="fantasy-team">${escapeHtml(player.teamAbbr)}</span>` : "";
-      const line = player.line ? `<span class="fantasy-line">${escapeHtml(player.line)}</span>` : "";
-      return `<div class="fantasy-player${mvpClass}"><span class="fantasy-player-name">${escapeHtml(player.name)}<span class="fantasy-player-meta">${team}${position}${line}</span></span></div>`;
+      return `<div class="fantasy-player${mvpClass}"><div class="fantasy-player-name">${escapeHtml(player.name)}</div>${renderFantasyPlayerMeta(player)}</div>`;
     }
 
     // Turns an ESPN broadcast string like "CBS" or "FOX" into one or more
