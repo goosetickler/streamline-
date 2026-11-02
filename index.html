@@ -239,11 +239,14 @@
     .weekly-position::-webkit-scrollbar{display:none}
     .weekly-position button{border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.06);color:var(--muted);padding:7px 11px;font-size:.75rem;font-weight:900;cursor:pointer;flex-shrink:0}
     .weekly-position button.active{background:linear-gradient(135deg,var(--green),var(--accent));color:#07111d;border-color:transparent}
-    .results-games-header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:12px 0 6px}
-    .results-games-header .day-heading{flex:1;min-width:0;margin:0}
-    .results-games-header + .day-group{margin-top:0}
-    .results-games-header + .day-group > .day-heading{display:none}
-    .results-games-header .results-view-switch{order:2}
+    /* Identical Results section header in both subviews; day headings stay inside Games. */
+    .results-section-header{display:flex;align-items:center;gap:12px;margin:12px 0 12px;min-height:42px}
+    .results-section-title{margin:0;flex-shrink:0;font-size:.82rem;font-weight:1000;letter-spacing:.12em;text-transform:uppercase}
+    .results-section-rule{height:1px;flex:1;min-width:8px;background:linear-gradient(90deg,var(--line),transparent)}
+    .results-section-header .results-view-switch{margin-left:auto}
+    .results-section-header + .day-group{margin-top:0}
+    .results-section-header + .weekly-leaders{margin-top:0}
+    @media(max-width:450px){.results-section-header{gap:8px}.results-section-title{font-size:.76rem}.results-section-header .results-view-switch{flex-shrink:0}}
     @media(max-width:450px){.results-view-switch button{padding:7px 9px;font-size:.68rem}.weekly-heading h3{font-size:.96rem}.weekly-scoring-pill{padding:7px 9px;font-size:.68rem}.weekly-position{gap:4px}.weekly-position button{padding:7px 9px}}
     .weekly-player{display:flex;gap:10px;align-items:center;padding:11px 2px;border-top:1px solid var(--line)}
     .weekly-rank{width:22px;color:var(--muted);font-weight:900}
@@ -1125,6 +1128,21 @@
     .follow-icon-button.following{color:#b8ffdc;border-color:rgba(106,255,183,.48);background:rgba(106,255,183,.12)}
     .follow-icon-button:focus-visible{outline:3px solid rgba(83,183,255,.55);outline-offset:2px}
 
+    /* Completed Results cards: keep FINAL in its own header row.
+       The empty kickoff label must not collapse that row and overlap the score. */
+    .results-final-card .game-top{
+      min-height:28px;
+      grid-template-columns:minmax(0,1fr) auto;
+    }
+    .results-final-card .game-top .badges{
+      position:static;
+      transform:none;
+      grid-column:2;
+      justify-self:end;
+      align-self:center;
+    }
+    .results-final-card .game-top .time{grid-column:1;}
+    .results-final-card .teams-row{margin-top:8px;}
   </style>
 </head>
 <body class="provider-chip-refresh">
@@ -2883,15 +2901,17 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       updateFilterCounts();
       syncFollowedGamesWithNative();
       syncWidgetDataWithNative();
+      let resultsHeader="";
       if(sortMode==="final"){
+        const selectedWeek=scheduleWeeks.find(w=>w.key===selectedScheduleWeek);
+        const weekTitle=selectedWeek?weekLabel(selectedWeek):"Results";
         const subnav=`<div class="results-view-switch" aria-label="Results views"><button type="button" data-results-view="games" class="${resultsSubview==="games"?"active":""}">Games</button><button type="button" data-results-view="fantasy" class="${resultsSubview==="fantasy"?"active":""}">🏆 Top 10</button></div>`;
+        resultsHeader=`<div class="results-section-header"><h2 class="results-section-title">${escapeHtml(weekTitle)}</h2><span class="results-section-rule" aria-hidden="true"></span>${subnav}</div>`;
         if(resultsSubview==="fantasy"){
-          scheduleEl.innerHTML=`<section class="weekly-leaders" id="weeklyFantasy"><div class="weekly-heading"><h3>Fantasy Leaders</h3>${subnav}</div><div class="weekly-controls"><div class="weekly-position" aria-label="Fantasy position filters">${["ALL","QB","RB","WR","TE","K"].map(pos=>`<button type="button" data-weekly-position="${pos}" class="${weeklyFantasyPosition===pos?"active":""}">${pos==="ALL"?"Overall":pos}</button>`).join("")}</div><button type="button" class="weekly-scoring-pill" data-cycle-scoring="true" aria-label="Change fantasy scoring format">${WEEKLY_SCORING_MODES.find(m=>m.key===weeklyScoringMode).label} ↻</button></div><div id="weeklyFantasyContent" aria-live="polite">Loading weekly player stats…</div></section>`;
+          scheduleEl.innerHTML=`${resultsHeader}<section class="weekly-leaders" id="weeklyFantasy"><div class="weekly-heading"><h3>Fantasy Leaders</h3></div><div class="weekly-controls"><div class="weekly-position" aria-label="Fantasy position filters">${["ALL","QB","RB","WR","TE","K"].map(pos=>`<button type="button" data-weekly-position="${pos}" class="${weeklyFantasyPosition===pos?"active":""}>${pos==="ALL"?"Overall":pos}</button>`).join("")}</div><button type="button" class="weekly-scoring-pill" data-cycle-scoring="true" aria-label="Change fantasy scoring format">${WEEKLY_SCORING_MODES.find(m=>m.key===weeklyScoringMode).label} ↻</button></div><div id="weeklyFantasyContent" aria-live="polite">Loading weekly player stats…</div></section>`;
           loadWeeklyFantasy();
           return;
         }
-        // Results Games keeps the existing game cards.
-        scheduleEl.dataset.resultsSubnav=subnav;
       }
       if(!games.length){
         const scoped = selectedScheduleWeek ? allGames.filter(g=>scheduleWeekKey(g)===selectedScheduleWeek) : allGames;
@@ -2902,19 +2922,12 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
         return;
       }
       const groups = groupByDay(games);
-      scheduleEl.innerHTML = Object.entries(groups).map(([day, dayGames]) => `
+      scheduleEl.innerHTML = resultsHeader + Object.entries(groups).map(([day, dayGames]) => `
         <section class="day-group" aria-labelledby="${slug(day)}">
           <h2 class="day-heading" id="${slug(day)}">${day}</h2>
           <div class="games">${dayGames.map(renderGameCard).join("")}</div>
         </section>
       `).join("");
-      if(sortMode==="final"){
-        const firstGroup=scheduleEl.querySelector(".day-group");
-        if(firstGroup){
-          const dayLabel=firstGroup.querySelector(".day-heading")?.textContent||"Results";
-          firstGroup.insertAdjacentHTML("beforebegin",`<div class="results-games-header"><h2 class="day-heading">${escapeHtml(dayLabel)}</h2>${scheduleEl.dataset.resultsSubnav||""}</div>`);
-        }
-      }
       hydrateFantasyBlocks(games);
       scheduleLiveRefresh();
       if(pendingNativeWidgetGameId){
@@ -3462,9 +3475,7 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
 
     function renderFantasyLeadersContent(title,leaders){
       const top=leaders.filter(p=>p.position!=="K").slice(0,3);
-      const kickers=leaders.filter(p=>p.position==="K");
-      const kickerLine=kickers.length?`<div class="fantasy-kicker-summary" style="border-top:1px solid var(--border);margin-top:7px;padding-top:7px;font-size:.78rem;color:var(--muted)"><span style="font-weight:800;color:var(--text)">KICKERS</span> · ${kickers.map(p=>`${escapeHtml(p.name)} (${escapeHtml(p.teamAbbr)}) ${escapeHtml(p.line)}`).join(" · ")}</div>`:"";
-      return `<div class="fantasy-title">🏆 ${title}</div><div class="fantasy-list">${top.map(renderFantasyPlayer).join("")}${kickerLine}</div>`;
+      return `<div class="fantasy-title">🏆 ${title}</div><div class="fantasy-list">${top.map(renderFantasyPlayer).join("")}</div>`;
     }
 
     async function hydrateFantasyBlocks(games,{force=false}={}){
