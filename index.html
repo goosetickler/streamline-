@@ -210,6 +210,18 @@
     .location-field{width:100%;padding:0 10px}
     .location-button{padding:0 12px;cursor:pointer}
     .location-field:disabled,.location-button:disabled{opacity:.45;cursor:not-allowed}
+    .results-subnav{display:flex;gap:8px;margin:12px 0 15px}
+    .results-subnav button,.weekly-position button{border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.06);color:var(--muted);padding:9px 14px;font-weight:900;cursor:pointer}
+    .results-subnav button.active,.weekly-position button.active{background:linear-gradient(135deg,var(--green),var(--accent));color:#07111d;border-color:transparent}
+    .weekly-leaders{border:1px solid var(--line);border-radius:16px;padding:15px;background:rgba(255,255,255,.04)}
+    .weekly-position{display:flex;gap:6px;flex-wrap:wrap;margin:12px 0}
+    .weekly-position button{padding:7px 11px;font-size:.75rem}
+    .weekly-player{display:flex;gap:10px;align-items:center;padding:11px 2px;border-top:1px solid var(--line)}
+    .weekly-rank{width:22px;color:var(--muted);font-weight:900}
+    .weekly-player-info{flex:1;min-width:0}
+    .weekly-player-name{font-weight:900;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .weekly-player-detail,.weekly-progress{color:var(--muted);font-size:.76rem;margin-top:4px}
+    .weekly-player-points{font-weight:1000;color:var(--green);white-space:nowrap}
     .fantasy-block{position:relative;z-index:1;margin:9px 0 10px;padding:9px 10px;border:1px solid rgba(255,255,255,.10);border-radius:14px;background:rgba(255,255,255,.045)}
     .fantasy-title{display:flex;align-items:center;gap:6px;margin-bottom:7px;color:#ffd166;font-size:.67rem;font-weight:1000;letter-spacing:.08em;text-transform:uppercase}
     .fantasy-list{display:grid;gap:6px}
@@ -1270,6 +1282,11 @@
     const FANTASY_CACHE_PREFIX = "gridironGuide.realFantasy.v2.";
     const LIVE_FANTASY_CACHE_TTL_MS = 90*1000;
     const fantasyLeaderRequests = new Map();
+    const WEEKLY_FANTASY_CACHE_PREFIX="gridironGuide.weeklyFantasyAll.v1.";
+    const weeklyFantasyRequests=new Map();
+    let resultsSubview=localStorage.getItem("gridironGuide.resultsSubview.v1")==="fantasy"?"fantasy":"games";
+    let weeklyFantasyPosition="ALL";
+    let weeklyFantasyRenderToken=0;
     const DEFAULT_ENABLED_PROVIDERS = ["youtubetv","hulu","paramount","directv","peacock","netflix","fox","espn","prime","nflplus"];
 
     // Deep link notes:
@@ -2831,6 +2848,16 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       updateFilterCounts();
       syncFollowedGamesWithNative();
       syncWidgetDataWithNative();
+      if(sortMode==="final"){
+        const subnav=`<div class="results-subnav" aria-label="Results views"><button type="button" data-results-view="games" class="${resultsSubview==="games"?"active":""}">Games</button><button type="button" data-results-view="fantasy" class="${resultsSubview==="fantasy"?"active":""}">Fantasy Top 10</button></div>`;
+        if(resultsSubview==="fantasy"){
+          scheduleEl.innerHTML=subnav+`<section class="weekly-leaders" id="weeklyFantasy"><h2>Weekly Fantasy Top 10</h2><div class="weekly-position" aria-label="Fantasy position filters">${["ALL","QB","RB","WR","TE"].map(pos=>`<button type="button" data-weekly-position="${pos}" class="${weeklyFantasyPosition===pos?"active":""}">${pos==="ALL"?"Overall":pos}</button>`).join("")}</div><div id="weeklyFantasyContent" aria-live="polite">Loading weekly player stats…</div></section>`;
+          loadWeeklyFantasy();
+          return;
+        }
+        // Results Games keeps the existing game cards.
+        scheduleEl.dataset.resultsSubnav=subnav;
+      }
       if(!games.length){
         const scoped = selectedScheduleWeek ? allGames.filter(g=>scheduleWeekKey(g)===selectedScheduleWeek) : allGames;
         const allFinal = scoped.length > 0 && scoped.every(isFinalGame);
@@ -2846,6 +2873,7 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
           <div class="games">${dayGames.map(renderGameCard).join("")}</div>
         </section>
       `).join("");
+      if(sortMode==="final")scheduleEl.insertAdjacentHTML("afterbegin",scheduleEl.dataset.resultsSubnav||"");
       hydrateFantasyBlocks(games);
       scheduleLiveRefresh();
       if(pendingNativeWidgetGameId){
@@ -3276,6 +3304,52 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       const detected=getProviderKeysForGame(game);
       return detected.filter(key=>key==="sundayticket"?sundayTicketEnabled:enabledProviders.includes(key));
     }
+
+    function weeklyFantasyGames(){
+      return allGames.filter(game=>(!selectedScheduleWeek||scheduleWeekKey(game)===selectedScheduleWeek)&&(isFinalGame(game)||isLiveGame(game)));
+    }
+    async function getAllFantasyPlayers(game){
+      const key=WEEKLY_FANTASY_CACHE_PREFIX+game.id;
+      const cached=readFantasyCacheRecord(key);
+      if(cached.leaders.length&&(isFinalGame(game)||Date.now()-cached.savedAt<LIVE_FANTASY_CACHE_TTL_MS))return cached.leaders;
+      if(weeklyFantasyRequests.has(key))return weeklyFantasyRequests.get(key);
+      const request=(async()=>{
+        try{
+          const summary=await fetchJson(`${ESPN_SUMMARY_BASE}?event=${encodeURIComponent(game.id)}`);
+          const players=extractFantasyLeadersFromEspnSummary(summary);
+          if(players.length)cacheFantasy(key,players);
+          return players;
+        }catch(err){return cached.leaders;}
+      })().finally(()=>weeklyFantasyRequests.delete(key));
+      weeklyFantasyRequests.set(key,request);
+      return request;
+    }
+    function renderWeeklyFantasyPlayers(players,completed,total){
+      const el=document.querySelector("#weeklyFantasyContent");
+      if(!el||sortMode!=="final"||resultsSubview!=="fantasy")return;
+      const filtered=players.filter(p=>weeklyFantasyPosition==="ALL"||p.position===weeklyFantasyPosition).sort((a,b)=>b.points-a.points).slice(0,10);
+      const progress=`<div class="weekly-progress">${completed} of ${total} game box scores loaded${completed<total?" · Rankings may be incomplete":""} · Full PPR</div>`;
+      el.innerHTML=progress+(filtered.length?filtered.map((p,i)=>`<div class="weekly-player"><span class="weekly-rank">${i+1}</span><div class="weekly-player-info"><div class="weekly-player-name">${escapeHtml(p.name)}</div><div class="weekly-player-detail">${escapeHtml(p.teamAbbr)} · ${escapeHtml(p.position)}${p.line?` · ${escapeHtml(p.line)}`:""}</div></div><div class="weekly-player-points">${Number(p.points).toFixed(1)} PTS</div></div>`).join(""):`<p class="weekly-progress">No ${weeklyFantasyPosition==="ALL"?"player":"position"} stats available for this week yet.</p>`);
+    }
+    async function loadWeeklyFantasy(){
+      const token=++weeklyFantasyRenderToken;
+      const games=weeklyFantasyGames();
+      const all=[];let completed=0;
+      renderWeeklyFantasyPlayers([],0,games.length);
+      await Promise.allSettled(games.map(async game=>{
+        const players=await getAllFantasyPlayers(game);
+        if(token!==weeklyFantasyRenderToken)return;
+        if(players.length)completed++;
+        for(const p of players)all.push({...p,gameId:game.id});
+        renderWeeklyFantasyPlayers(all,completed,games.length);
+      }));
+    }
+    scheduleEl.addEventListener("click",event=>{
+      const view=event.target.closest("[data-results-view]");
+      if(view){resultsSubview=view.dataset.resultsView;localStorage.setItem("gridironGuide.resultsSubview.v1",resultsSubview);renderSchedule();return;}
+      const pos=event.target.closest("[data-weekly-position]");
+      if(pos){weeklyFantasyPosition=pos.dataset.weeklyPosition;renderSchedule();}
+    });
 
     function renderFantasyBlock(game){
       if(!isLiveGame(game) && !isFinalGame(game)) return "";
