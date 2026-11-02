@@ -27,7 +27,7 @@
     /* Keep the viewport and centered content at exactly the same width when
        Results switches between long game cards and a shorter Top 10 list.
        Without a reserved scrollbar lane, the page recenters by several pixels. */
-    html{overflow-y:scroll;scrollbar-gutter:stable}
+    html{overflow-y:scroll;scrollbar-gutter:stable; -webkit-text-size-adjust:100%; text-size-adjust:100%}
     @supports (scrollbar-gutter:stable){
       html{overflow-y:auto;scrollbar-gutter:stable}
     }
@@ -40,7 +40,9 @@
          same viewport-anchored gradient instead of stretching it with body height. */
       background:#070a12;
       isolation:isolate;
-      padding:max(18px,env(safe-area-inset-top)) 12px max(28px,env(safe-area-inset-bottom));
+      /* The fixed header already owns the top safe area; body padding here
+         double-counts it in WKWebView and pushes Results down on iPhones. */
+      padding:0 12px max(28px,env(safe-area-inset-bottom));
     }
 
     body::after{
@@ -351,6 +353,30 @@
     .fantasy-line{display:block;flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
     .weekly-player-info .fantasy-player-meta{margin-top:4px}
     .weekly-player-points{font-size:.98rem;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+
+    /* Compact mobile Top 10: retain two-line player identity, ten independent
+       rankings, and legible scores without inflating each row in WKWebView. */
+    @media (max-width:520px){
+      /* Same shared Results header in both subviews; no toggle jump. */
+      .results-section-header{min-height:38px;margin:6px 0 7px}
+      #weeklyFantasy{padding:10px 11px 11px}
+      #weeklyFantasy .weekly-heading h3{font-size:.94rem;line-height:1.12}
+      #weeklyFantasy .weekly-controls{margin:7px 0 4px;gap:6px}
+      #weeklyFantasy .weekly-position button{padding:6px 9px;font-size:.69rem}
+      #weeklyFantasy .weekly-scoring-pill{padding:6px 9px;font-size:.68rem}
+      #weeklyFantasy .weekly-progress{margin:2px 0 3px;font-size:.69rem;line-height:1.15}
+      #weeklyFantasy .weekly-player{padding:4px 2px;gap:7px;min-height:42px}
+      #weeklyFantasy .weekly-rank{flex-basis:17px;width:17px;font-size:.79rem}
+      #weeklyFantasy .weekly-player-name{font-size:.89rem;line-height:1.1}
+      #weeklyFantasy .weekly-player-info .fantasy-player-meta{
+        font-size:.66rem;line-height:1.12;margin-top:2px;gap:4px;
+      }
+      #weeklyFantasy .fantasy-team,#weeklyFantasy .fantasy-tag{
+        height:15px;padding:0 5px;font-size:.55rem;
+      }
+      #weeklyFantasy .weekly-player-points{font-size:.89rem}
+    }
+
     .weekly-rank{flex:0 0 22px;font-variant-numeric:tabular-nums}
 
     .no-provider{color:var(--muted);font-size:.68rem;font-weight:900;text-transform:uppercase;letter-spacing:.03em}
@@ -4475,6 +4501,13 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       "resize",
       updateHeaderOffset
     );
+    // Week chips and safe-area layout can change the fixed header after first
+    // paint. Track its actual height instead of relying on a stale fallback.
+    if(typeof ResizeObserver!=="undefined"){
+      const headerNode=document.querySelector(".app-header");
+      if(headerNode)new ResizeObserver(updateHeaderOffset).observe(headerNode);
+    }
+
 
     weekPrevBtnEl?.addEventListener("click",()=>scrollWeekTimeline(-1));
     weekNextBtnEl?.addEventListener("click",()=>scrollWeekTimeline(1));
