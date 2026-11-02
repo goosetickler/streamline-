@@ -3578,7 +3578,7 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
     }
     scheduleEl.addEventListener("click",event=>{
       const view=event.target.closest("[data-results-view]");
-      if(view){resultsSubview=view.dataset.resultsView;localStorage.setItem("gridironGuide.resultsSubview.v1",resultsSubview);renderSchedule();return;}
+      if(view){resultsSubview=view.dataset.resultsView;localStorage.setItem("gridironGuide.resultsSubview.v1",resultsSubview);renderSchedule();resetPageScrollForNavigation();return;}
       const pos=event.target.closest("[data-weekly-position]");
       if(pos){weeklyFantasyPosition=pos.dataset.weeklyPosition;document.querySelectorAll("[data-weekly-position]").forEach(btn=>btn.classList.toggle("active",btn.dataset.weeklyPosition===weeklyFantasyPosition));renderWeeklyFantasyPlayers();return;}
       const score=event.target.closest("[data-cycle-scoring]");
@@ -4130,17 +4130,20 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
     }
 
     function updateHeaderOffset(){
+      const header=document.querySelector(".app-header");
+      if(!header)return;
+      // Use the fixed header's actual viewport bottom (including iOS safe area)
+      // instead of a pre-navigation height estimate.
+      const bottom=Math.ceil(header.getBoundingClientRect().bottom);
+      document.documentElement.style.setProperty("--header-height",`${Math.max(0,bottom)+12}px`);
+    }
 
-    const header =
-      document.querySelector(".app-header");
-
-    if(!header) return;
-
-    document.documentElement.style.setProperty(
-      "--header-height",
-      `${header.offsetHeight + 8}px`
-    );
-}
+    function resetPageScrollForNavigation(){
+      // Fixed header buttons must reveal the beginning of their new view,
+      // even when the previous view was scrolled deep into a long list.
+      window.scrollTo(0,0);
+      requestAnimationFrame(()=>window.scrollTo(0,0));
+    }
 
     function buildAndroidAppIntent(provider, webUrl, game){
       if(!provider.androidPackage) return provider.androidWeb || webUrl;
@@ -4239,7 +4242,19 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
         return `<button class="week-chip ${weekClass(w)}${special?` special-week ${special.key}`:""}${isKickoffWeek(w)?" kickoff":""}${w.hasGames?"":" future-empty"}${w.key===selectedScheduleWeek?" active":""}" data-week="${w.key}">${meta?`<span class="week-chip-meta">${meta}</span>`:""}<span class="week-chip-title">${label}</span>${range?`<span class="week-chip-range">${range}</span>`:""}</button>`;
       }).join("");
       weekTimelineEl.querySelectorAll(".week-chip").forEach(b=>b.addEventListener("click",()=>selectScheduleWeek(b.dataset.week)));
-      requestAnimationFrame(()=>weekTimelineEl.querySelector(".week-chip.active")?.scrollIntoView({behavior:"smooth",inline:"center",block:"nearest"}));
+      // Keep navigation strictly horizontal. scrollIntoView() can also scroll
+      // the entire WKWebView vertically when this navigator is inside a fixed
+      // header, hiding the Results switch and sliding game cards under the tabs.
+      requestAnimationFrame(()=>{
+        const active=weekTimelineEl.querySelector(".week-chip.active");
+        if(!active)return;
+        const view=weekTimelineEl.getBoundingClientRect();
+        const chip=active.getBoundingClientRect();
+        const left=weekTimelineEl.scrollLeft + chip.left - view.left - (view.width-chip.width)/2;
+        weekTimelineEl.scrollTo({left:Math.max(0,left),behavior:"smooth"});
+      });
+      // Navigation chips can change header height after the initial paint.
+      updateHeaderOffset();
 
     }
     function selectScheduleWeek(k){
@@ -4251,6 +4266,7 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       document.querySelectorAll(".sort-tab").forEach(tab=>tab.classList.toggle("active",tab.dataset.sort===sortMode));
       renderWeekNavigator();
       renderSchedule();
+      resetPageScrollForNavigation();
     }
     function scrollWeekTimeline(dir){
       if(!weekTimelineEl)return;
@@ -4295,6 +4311,7 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
           document.querySelectorAll(".sort-tab").forEach(tab => tab.classList.remove("active"));
           btn.classList.add("active");
           renderSchedule();
+          resetPageScrollForNavigation();
         });
       });
     }
@@ -4306,7 +4323,7 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       document.querySelectorAll(".sort-tab").forEach(tab=>tab.classList.remove("active"));
       resultsTab.classList.add("active");
       renderSchedule();
-      window.scrollTo({top:0,behavior:"smooth"});
+      resetPageScrollForNavigation();
     }
 
     document.addEventListener("click",event=>{
