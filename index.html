@@ -36,11 +36,23 @@
       min-height:100svh;
       color:var(--text);
       font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+      /* The page length changes substantially between Results views. Keep the
+         same viewport-anchored gradient instead of stretching it with body height. */
+      background:#070a12;
+      isolation:isolate;
+      padding:max(18px,env(safe-area-inset-top)) 12px max(28px,env(safe-area-inset-bottom));
+    }
+
+    body::after{
+      content:"";
+      position:fixed;
+      inset:0;
+      z-index:-1;
+      pointer-events:none;
       background:
         radial-gradient(circle at 18% -8%,rgba(83,183,255,.20),transparent 34%),
         radial-gradient(circle at 90% 4%,rgba(106,255,183,.10),transparent 30%),
         linear-gradient(180deg,#070a12 0%,#0b101c 46%,#05070d 100%);
-      padding:max(18px,env(safe-area-inset-top)) 12px max(28px,env(safe-area-inset-bottom));
     }
 
     body:before{
@@ -221,14 +233,60 @@
     /* Results controls share the content header instead of occupying a floating row. */
     .results-heading{display:flex;align-items:center;justify-content:flex-end;gap:12px;margin:0}
     .results-heading h2{margin:0;font-size:1.05rem}
-    .results-view-switch{display:inline-flex;flex-shrink:0;gap:4px;padding:3px;border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.04)}
-    .results-view-switch button{border:0;border-radius:999px;background:transparent;color:var(--muted);padding:8px 12px;font:inherit;font-size:.75rem;font-weight:900;cursor:pointer;white-space:nowrap}
-    .results-view-switch button.active{background:linear-gradient(135deg,var(--green),var(--accent));color:#07111d}
-    .results-view-switch button,.weekly-position button,.weekly-scoring-pill{transform:translateZ(0) scale(1);transform-origin:center;transition:transform 210ms cubic-bezier(.2,1.65,.35,1),background 170ms ease,box-shadow 170ms ease;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
-    .results-view-switch button:active,.weekly-position button:active,.weekly-scoring-pill:active{transform:scale(.91);transition-duration:85ms}
-    .results-view-switch button.active,.weekly-position button.active{box-shadow:inset 0 1px 0 rgba(255,255,255,.2)}
+    /* One persistent segmented control; its highlight slides rather than
+       blinking as Results swaps its content. */
+    .results-view-switch{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      flex-shrink:0;
+      position:relative;
+      isolation:isolate;
+      gap:4px;
+      padding:3px;
+      border:1px solid var(--line);
+      border-radius:999px;
+      background:rgba(255,255,255,.04);
+    }
+    .results-view-switch::before{
+      content:"";
+      position:absolute;
+      z-index:0;
+      top:4px;
+      bottom:4px;
+      left:4px;
+      width:calc((100% - 12px)/2);
+      border-radius:999px;
+      background:linear-gradient(135deg,var(--green),var(--accent));
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.20);
+      transform:translateX(0);
+      transition:transform 340ms cubic-bezier(.22,1,.36,1);
+      pointer-events:none;
+    }
+    .results-view-switch[data-selected="fantasy"]::before{transform:translateX(calc(100% + 4px))}
+    .results-view-switch button{
+      position:relative;
+      z-index:1;
+      min-width:81px;
+      border:0;
+      border-radius:999px;
+      background:transparent;
+      color:var(--muted);
+      padding:8px 12px;
+      font:inherit;
+      font-size:.75rem;
+      font-weight:900;
+      cursor:pointer;
+      white-space:nowrap;
+      transition:color 200ms ease,transform 210ms cubic-bezier(.2,1.65,.35,1);
+      touch-action:manipulation;
+      -webkit-tap-highlight-color:transparent;
+    }
+    .results-view-switch button.active{color:#07111d}
+    .weekly-position button,.weekly-scoring-pill{transform:translateZ(0) scale(1);transform-origin:center;transition:transform 210ms cubic-bezier(.2,1.65,.35,1),background 170ms ease,box-shadow 170ms ease;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+    .results-view-switch button:active,.weekly-position button:active,.weekly-scoring-pill:active{transform:scale(.94);transition-duration:85ms}
+    .weekly-position button.active{box-shadow:inset 0 1px 0 rgba(255,255,255,.2)}
     .results-view-switch button:focus-visible,.weekly-position button:focus-visible,.weekly-scoring-pill:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
-    @media(prefers-reduced-motion:reduce){.results-view-switch button,.weekly-position button,.weekly-scoring-pill{transition:none!important;transform:none!important}}
+    @media(prefers-reduced-motion:reduce){.results-view-switch::before,.results-view-switch button,.weekly-position button,.weekly-scoring-pill{transition:none!important;transform:none!important}.results-view-switch[data-selected="fantasy"]::before{transform:translateX(calc(100% + 4px))!important}}
     .weekly-heading{display:flex;align-items:center;justify-content:space-between;gap:10px}
     .weekly-heading h3{margin:0;font-size:1.05rem}
     .weekly-controls{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:12px 0 8px;min-width:0}
@@ -253,6 +311,8 @@
     .results-section-header .results-view-switch{margin-left:auto}
     .results-section-header + .day-group{margin-top:0}
     .results-section-header + .weekly-leaders{margin-top:0}
+    .results-content > .day-group:first-child{margin-top:0}
+    .results-content > .weekly-leaders:first-child{margin-top:0}
     @media(max-width:450px){.results-section-header{gap:8px}.results-section-title{font-size:.76rem}.results-section-header .results-view-switch{flex-shrink:0}}
     @media(max-width:450px){.results-view-switch button{padding:7px 9px;font-size:.68rem}.weekly-heading h3{font-size:.96rem}.weekly-scoring-pill{padding:7px 9px;font-size:.68rem}.weekly-position{gap:4px}.weekly-position button{padding:7px 9px}}
     .weekly-player{display:flex;gap:10px;align-items:center;padding:11px 2px;border-top:1px solid var(--line)}
@@ -2908,14 +2968,29 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       updateFilterCounts();
       syncFollowedGamesWithNative();
       syncWidgetDataWithNative();
-      let resultsHeader="";
+      let resultsContentEl=null;
       if(sortMode==="final"){
         const selectedWeek=scheduleWeeks.find(w=>w.key===selectedScheduleWeek);
         const weekTitle=selectedWeek?weekLabel(selectedWeek):"Results";
-        const subnav=`<div class="results-view-switch" aria-label="Results views"><button type="button" data-results-view="games" class="${resultsSubview==="games"?"active":""}">Games</button><button type="button" data-results-view="fantasy" class="${resultsSubview==="fantasy"?"active":""}">🏆 Top 10</button></div>`;
-        resultsHeader=`<div class="results-section-header"><h2 class="results-section-title">${escapeHtml(weekTitle)}</h2><span class="results-section-rule" aria-hidden="true"></span>${subnav}</div>`;
+        const weekKey=String(selectedScheduleWeek||"");
+        const existingHeader=scheduleEl.querySelector(":scope > .results-section-header");
+        const existingContent=scheduleEl.querySelector(":scope > .results-content");
+        // Keep the actual toggle DOM mounted while switching between Games and
+        // Top 10. Rebuilding the control on every click prevented CSS motion.
+        if(!existingHeader||!existingContent||existingHeader.dataset.weekKey!==weekKey){
+          const subnav=`<div class="results-view-switch" role="group" aria-label="Results views" data-selected="${resultsSubview}"><button type="button" data-results-view="games" class="${resultsSubview==="games"?"active":""}" aria-pressed="${resultsSubview==="games"}">Games</button><button type="button" data-results-view="fantasy" class="${resultsSubview==="fantasy"?"active":""}" aria-pressed="${resultsSubview==="fantasy"}">🏆 Top 10</button></div>`;
+          scheduleEl.innerHTML=`<div class="results-section-header" data-week-key="${escapeHtml(weekKey)}"><h2 class="results-section-title">${escapeHtml(weekTitle)}</h2><span class="results-section-rule" aria-hidden="true"></span>${subnav}</div><div class="results-content"></div>`;
+        }
+        const viewSwitch=scheduleEl.querySelector(".results-view-switch");
+        viewSwitch.dataset.selected=resultsSubview;
+        viewSwitch.querySelectorAll("[data-results-view]").forEach(button=>{
+          const active=button.dataset.resultsView===resultsSubview;
+          button.classList.toggle("active",active);
+          button.setAttribute("aria-pressed",String(active));
+        });
+        resultsContentEl=scheduleEl.querySelector(":scope > .results-content");
         if(resultsSubview==="fantasy"){
-          scheduleEl.innerHTML=`${resultsHeader}<section class="weekly-leaders" id="weeklyFantasy"><div class="weekly-heading"><h3>Fantasy Leaders</h3></div><div class="weekly-controls"><div class="weekly-position" aria-label="Fantasy position filters">${["ALL","QB","RB","WR","TE","K"].map(pos=>`<button type="button" data-weekly-position="${pos}" class="${weeklyFantasyPosition===pos?"active":""}">${pos==="ALL"?"Overall":pos}</button>`).join("")}</div><button type="button" class="weekly-scoring-pill" data-cycle-scoring="true" aria-label="Change fantasy scoring format">${WEEKLY_SCORING_MODES.find(m=>m.key===weeklyScoringMode).label} ↻</button></div><div id="weeklyFantasyContent" aria-live="polite">Loading weekly player stats…</div></section>`;
+          resultsContentEl.innerHTML=`<section class="weekly-leaders" id="weeklyFantasy"><div class="weekly-heading"><h3>Fantasy Leaders</h3></div><div class="weekly-controls"><div class="weekly-position" aria-label="Fantasy position filters">${["ALL","QB","RB","WR","TE","K"].map(pos=>`<button type="button" data-weekly-position="${pos}" class="${weeklyFantasyPosition===pos?"active":""}">${pos==="ALL"?"Overall":pos}</button>`).join("")}</div><button type="button" class="weekly-scoring-pill" data-cycle-scoring="true" aria-label="Change fantasy scoring format">${WEEKLY_SCORING_MODES.find(m=>m.key===weeklyScoringMode).label} ↻</button></div><div id="weeklyFantasyContent" aria-live="polite">Loading weekly player stats…</div></section>`;
           loadWeeklyFantasy();
           return;
         }
@@ -2923,18 +2998,22 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       if(!games.length){
         const scoped = selectedScheduleWeek ? allGames.filter(g=>scheduleWeekKey(g)===selectedScheduleWeek) : allGames;
         const allFinal = scoped.length > 0 && scoped.every(isFinalGame);
-        scheduleEl.innerHTML = allFinal && sortMode === "kickoff"
+        const emptyContent=allFinal && sortMode === "kickoff"
           ? `<section class="empty week-complete-cta" role="button" tabindex="0" data-open-results="true" aria-label="Week complete. Open Results to view scores."><h2>Week Complete</h2><p>All games are final. Tap to open RESULTS and view scores.</p></section>`
           : `<section class="empty"><h2>No games found</h2><p>Try another filter or refresh the schedule.</p></section>`;
+        if(resultsContentEl)resultsContentEl.innerHTML=emptyContent;
+        else scheduleEl.innerHTML=emptyContent;
         return;
       }
       const groups = groupByDay(games);
-      scheduleEl.innerHTML = resultsHeader + Object.entries(groups).map(([day, dayGames]) => `
+      const gamesContent=Object.entries(groups).map(([day, dayGames]) => `
         <section class="day-group" aria-labelledby="${slug(day)}">
           <h2 class="day-heading" id="${slug(day)}">${day}</h2>
           <div class="games">${dayGames.map(renderGameCard).join("")}</div>
         </section>
       `).join("");
+      if(resultsContentEl)resultsContentEl.innerHTML=gamesContent;
+      else scheduleEl.innerHTML=gamesContent;
       hydrateFantasyBlocks(games);
       scheduleLiveRefresh();
       if(pendingNativeWidgetGameId){
