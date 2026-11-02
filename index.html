@@ -218,28 +218,33 @@
     .location-button{padding:0 12px;cursor:pointer}
     .location-field:disabled,.location-button:disabled{opacity:.45;cursor:not-allowed}
 
-    .results-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:12px 0 15px}
+    /* Results controls share the content header instead of occupying a floating row. */
+    .results-heading{display:flex;align-items:center;justify-content:flex-end;gap:12px;margin:0}
     .results-heading h2{margin:0;font-size:1.05rem}
-    .results-view-switch{display:flex;gap:4px;padding:3px;border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.04)}
-    .results-view-switch button{border:0;border-radius:999px;background:transparent;color:var(--muted);padding:8px 12px;font:inherit;font-size:.75rem;font-weight:900;cursor:pointer}
+    .results-view-switch{display:inline-flex;flex-shrink:0;gap:4px;padding:3px;border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.04)}
+    .results-view-switch button{border:0;border-radius:999px;background:transparent;color:var(--muted);padding:8px 12px;font:inherit;font-size:.75rem;font-weight:900;cursor:pointer;white-space:nowrap}
     .results-view-switch button.active{background:linear-gradient(135deg,var(--green),var(--accent));color:#07111d}
-    /* Compact tactile feedback for Results controls; avoid layout shifts. */
     .results-view-switch button,.weekly-position button,.weekly-scoring-pill{transform:translateZ(0) scale(1);transform-origin:center;transition:transform 210ms cubic-bezier(.2,1.65,.35,1),background 170ms ease,box-shadow 170ms ease;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
     .results-view-switch button:active,.weekly-position button:active,.weekly-scoring-pill:active{transform:scale(.91);transition-duration:85ms}
     .results-view-switch button.active,.weekly-position button.active{box-shadow:inset 0 1px 0 rgba(255,255,255,.2)}
     .results-view-switch button:focus-visible,.weekly-position button:focus-visible,.weekly-scoring-pill:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
     @media(prefers-reduced-motion:reduce){.results-view-switch button,.weekly-position button,.weekly-scoring-pill{transition:none!important;transform:none!important}}
-    .weekly-heading{display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .weekly-heading{display:flex;align-items:center;justify-content:space-between;gap:10px}
     .weekly-heading h3{margin:0;font-size:1.05rem}
-    .weekly-scoring-pill{border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.07);color:var(--text);padding:8px 12px;font:inherit;font-size:.72rem;font-weight:900;cursor:pointer;white-space:nowrap}
+    .weekly-controls{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:12px 0 8px;min-width:0}
+    .weekly-scoring-pill{border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.07);color:var(--text);padding:8px 12px;font:inherit;font-size:.72rem;font-weight:900;cursor:pointer;white-space:nowrap;flex-shrink:0}
     .weekly-stats-pending{color:var(--muted)}
-    @media(max-width:450px){.results-heading h2{font-size:.95rem}.results-view-switch button{padding:7px 9px;font-size:.68rem}}
-    .results-subnav{display:flex;gap:8px;margin:12px 0 15px}
-    .results-subnav button,.weekly-position button{border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.06);color:var(--muted);padding:9px 14px;font-weight:900;cursor:pointer}
-    .results-subnav button.active,.weekly-position button.active{background:linear-gradient(135deg,var(--green),var(--accent));color:#07111d;border-color:transparent}
     .weekly-leaders{border:1px solid var(--line);border-radius:16px;padding:15px;background:rgba(255,255,255,.04)}
-    .weekly-position{display:flex;gap:6px;flex-wrap:wrap;margin:12px 0}
-    .weekly-position button{padding:7px 11px;font-size:.75rem}
+    .weekly-position{display:flex;gap:6px;flex:1;min-width:0;overflow-x:auto;flex-wrap:nowrap;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+    .weekly-position::-webkit-scrollbar{display:none}
+    .weekly-position button{border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.06);color:var(--muted);padding:7px 11px;font-size:.75rem;font-weight:900;cursor:pointer;flex-shrink:0}
+    .weekly-position button.active{background:linear-gradient(135deg,var(--green),var(--accent));color:#07111d;border-color:transparent}
+    .results-games-header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:12px 0 6px}
+    .results-games-header .day-heading{flex:1;min-width:0;margin:0}
+    .results-games-header + .day-group{margin-top:0}
+    .results-games-header + .day-group > .day-heading{display:none}
+    .results-games-header .results-view-switch{order:2}
+    @media(max-width:450px){.results-view-switch button{padding:7px 9px;font-size:.68rem}.weekly-heading h3{font-size:.96rem}.weekly-scoring-pill{padding:7px 9px;font-size:.68rem}.weekly-position{gap:4px}.weekly-position button{padding:7px 9px}}
     .weekly-player{display:flex;gap:10px;align-items:center;padding:11px 2px;border-top:1px solid var(--line)}
     .weekly-rank{width:22px;color:var(--muted);font-weight:900}
     .weekly-player-info{flex:1;min-width:0}
@@ -2879,9 +2884,9 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       syncFollowedGamesWithNative();
       syncWidgetDataWithNative();
       if(sortMode==="final"){
-        const subnav=`<div class="results-heading"><div class="results-view-switch" aria-label="Results views"><button type="button" data-results-view="games" class="${resultsSubview==="games"?"active":""}">Games</button><button type="button" data-results-view="fantasy" class="${resultsSubview==="fantasy"?"active":""}">🏆 Top 10</button></div></div>`;
+        const subnav=`<div class="results-view-switch" aria-label="Results views"><button type="button" data-results-view="games" class="${resultsSubview==="games"?"active":""}">Games</button><button type="button" data-results-view="fantasy" class="${resultsSubview==="fantasy"?"active":""}">🏆 Top 10</button></div>`;
         if(resultsSubview==="fantasy"){
-          scheduleEl.innerHTML=subnav+`<section class="weekly-leaders" id="weeklyFantasy"><div class="weekly-heading"><h3>Fantasy Leaders</h3><button type="button" class="weekly-scoring-pill" data-cycle-scoring="true" aria-label="Change fantasy scoring format">${WEEKLY_SCORING_MODES.find(m=>m.key===weeklyScoringMode).label} ↻</button></div><div class="weekly-position" aria-label="Fantasy position filters">${["ALL","QB","RB","WR","TE","K"].map(pos=>`<button type="button" data-weekly-position="${pos}" class="${weeklyFantasyPosition===pos?"active":""}">${pos==="ALL"?"Overall":pos}</button>`).join("")}</div><div id="weeklyFantasyContent" aria-live="polite">Loading weekly player stats…</div></section>`;
+          scheduleEl.innerHTML=`<section class="weekly-leaders" id="weeklyFantasy"><div class="weekly-heading"><h3>Fantasy Leaders</h3>${subnav}</div><div class="weekly-controls"><div class="weekly-position" aria-label="Fantasy position filters">${["ALL","QB","RB","WR","TE","K"].map(pos=>`<button type="button" data-weekly-position="${pos}" class="${weeklyFantasyPosition===pos?"active":""}">${pos==="ALL"?"Overall":pos}</button>`).join("")}</div><button type="button" class="weekly-scoring-pill" data-cycle-scoring="true" aria-label="Change fantasy scoring format">${WEEKLY_SCORING_MODES.find(m=>m.key===weeklyScoringMode).label} ↻</button></div><div id="weeklyFantasyContent" aria-live="polite">Loading weekly player stats…</div></section>`;
           loadWeeklyFantasy();
           return;
         }
@@ -2903,7 +2908,13 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
           <div class="games">${dayGames.map(renderGameCard).join("")}</div>
         </section>
       `).join("");
-      if(sortMode==="final")scheduleEl.insertAdjacentHTML("afterbegin",scheduleEl.dataset.resultsSubnav||"");
+      if(sortMode==="final"){
+        const firstGroup=scheduleEl.querySelector(".day-group");
+        if(firstGroup){
+          const dayLabel=firstGroup.querySelector(".day-heading")?.textContent||"Results";
+          firstGroup.insertAdjacentHTML("beforebegin",`<div class="results-games-header"><h2 class="day-heading">${escapeHtml(dayLabel)}</h2>${scheduleEl.dataset.resultsSubnav||""}</div>`);
+        }
+      }
       hydrateFantasyBlocks(games);
       scheduleLiveRefresh();
       if(pendingNativeWidgetGameId){
@@ -2948,10 +2959,10 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
             ${providerKeys.length ? `<button class="watch" aria-label="Open ${escapeHtml(provider.label)} for ${escapeHtml(game.awayAbbr)} at ${escapeHtml(game.homeAbbr)}" onclick='openProvider("${providerKey}", ${JSON.stringify(game).replace(/'/g,"&#39;")})'>${playIcon()} WATCH</button>` : ""}
           </div>`;
       return `
-        <article class="game-card${liveClass}${favoriteClass}${winnerSideClass}" data-game-id="${escapeHtml(String(game.id))}" aria-label="${escapeHtml(game.awayTeam)} at ${escapeHtml(game.homeTeam)}">
+        <article class="game-card${isFinal && sortMode==="final" ? " results-final-card" : ""}${liveClass}${favoriteClass}${winnerSideClass}" data-game-id="${escapeHtml(String(game.id))}" aria-label="${escapeHtml(game.awayTeam)} at ${escapeHtml(game.homeTeam)}">
           <div class="game-top">
 
-            <div class="time">${followButton}<span>${formatKickoff(game)}</span></div>
+            <div class="time">${isFinal && sortMode==="final" ? "" : `${followButton}<span>${formatKickoff(game)}</span>`}</div>
 
             <div class="game-clock-top" data-game-field="clock">
               ${isLive ? getClockLine(game) : ""}
