@@ -365,7 +365,11 @@
       #weeklyFantasy .weekly-position button{padding:6px 9px;font-size:.69rem}
       #weeklyFantasy .weekly-scoring-pill{padding:6px 9px;font-size:.68rem}
       #weeklyFantasy .weekly-progress{margin:2px 0 3px;font-size:.69rem;line-height:1.15}
-      #weeklyFantasy .weekly-player{padding:4px 2px;gap:7px;min-height:42px}
+      /* Measured against 942 x 2048 iOS screenshot: ~120 screen pixels
+         between the Top 10 panel and bottom bar. With ~2.4 image pixels
+         per CSS px, adding 3px to each of 10 rows consumes ~72 pixels
+         and preserves ~48px (~20 CSS px) of breathing room. */
+      #weeklyFantasy .weekly-player{padding:6px 2px;gap:7px;min-height:49px}
       #weeklyFantasy .weekly-rank{flex-basis:17px;width:17px;font-size:.79rem}
       #weeklyFantasy .weekly-player-name{font-size:.89rem;line-height:1.1}
       #weeklyFantasy .weekly-player-info .fantasy-player-meta{
@@ -375,6 +379,12 @@
         height:15px;padding:0 5px;font-size:.55rem;
       }
       #weeklyFantasy .weekly-player-points{font-size:.89rem}
+    }
+
+    /* Shorter handsets retain the compact version so the complete Top 10
+       stays as accessible as the available screen height permits. */
+    @media (max-width:520px) and (max-height:740px){
+      #weeklyFantasy .weekly-player{padding:4px 2px;min-height:42px}
     }
 
     .weekly-rank{flex:0 0 22px;font-variant-numeric:tabular-nums}
