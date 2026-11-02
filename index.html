@@ -216,6 +216,12 @@
     .results-view-switch{display:flex;gap:4px;padding:3px;border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.04)}
     .results-view-switch button{border:0;border-radius:999px;background:transparent;color:var(--muted);padding:8px 12px;font:inherit;font-size:.75rem;font-weight:900;cursor:pointer}
     .results-view-switch button.active{background:linear-gradient(135deg,var(--green),var(--accent));color:#07111d}
+    /* Compact tactile feedback for Results controls; avoid layout shifts. */
+    .results-view-switch button,.weekly-position button,.weekly-scoring-pill{transform:translateZ(0) scale(1);transform-origin:center;transition:transform 210ms cubic-bezier(.2,1.65,.35,1),background 170ms ease,box-shadow 170ms ease;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+    .results-view-switch button:active,.weekly-position button:active,.weekly-scoring-pill:active{transform:scale(.91);transition-duration:85ms}
+    .results-view-switch button.active,.weekly-position button.active{box-shadow:inset 0 1px 0 rgba(255,255,255,.2)}
+    .results-view-switch button:focus-visible,.weekly-position button:focus-visible,.weekly-scoring-pill:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+    @media(prefers-reduced-motion:reduce){.results-view-switch button,.weekly-position button,.weekly-scoring-pill{transition:none!important;transform:none!important}}
     .weekly-heading{display:flex;align-items:center;justify-content:space-between;gap:12px}
     .weekly-heading h3{margin:0;font-size:1.05rem}
     .weekly-scoring-pill{border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.07);color:var(--text);padding:8px 12px;font:inherit;font-size:.72rem;font-weight:900;cursor:pointer;white-space:nowrap}
@@ -1293,7 +1299,7 @@
     const FANTASY_CACHE_PREFIX = "gridironGuide.realFantasy.v2.";
     const LIVE_FANTASY_CACHE_TTL_MS = 90*1000;
     const fantasyLeaderRequests = new Map();
-    const WEEKLY_FANTASY_CACHE_PREFIX="gridironGuide.weeklyFantasyAll.v2.";
+    const WEEKLY_FANTASY_CACHE_PREFIX="gridironGuide.weeklyFantasyAll.v3.";
     const weeklyFantasyRequests=new Map();
     let resultsSubview=localStorage.getItem("gridironGuide.resultsSubview.v1")==="fantasy"?"fantasy":"games";
     let weeklyFantasyPosition="ALL";
@@ -2866,7 +2872,7 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       syncFollowedGamesWithNative();
       syncWidgetDataWithNative();
       if(sortMode==="final"){
-        const subnav=`<div class="results-heading"><h2>Results</h2><div class="results-view-switch" aria-label="Results views"><button type="button" data-results-view="games" class="${resultsSubview==="games"?"active":""}">Games</button><button type="button" data-results-view="fantasy" class="${resultsSubview==="fantasy"?"active":""}">🏆 Top 10</button></div></div>`;
+        const subnav=`<div class="results-heading"><div class="results-view-switch" aria-label="Results views"><button type="button" data-results-view="games" class="${resultsSubview==="games"?"active":""}">Games</button><button type="button" data-results-view="fantasy" class="${resultsSubview==="fantasy"?"active":""}">🏆 Top 10</button></div></div>`;
         if(resultsSubview==="fantasy"){
           scheduleEl.innerHTML=subnav+`<section class="weekly-leaders" id="weeklyFantasy"><div class="weekly-heading"><h3>Fantasy Leaders</h3><button type="button" class="weekly-scoring-pill" data-cycle-scoring="true" aria-label="Change fantasy scoring format">${WEEKLY_SCORING_MODES.find(m=>m.key===weeklyScoringMode).label} ↻</button></div><div class="weekly-position" aria-label="Fantasy position filters">${["ALL","QB","RB","WR","TE"].map(pos=>`<button type="button" data-weekly-position="${pos}" class="${weeklyFantasyPosition===pos?"active":""}">${pos==="ALL"?"Overall":pos}</button>`).join("")}</div><div id="weeklyFantasyContent" aria-live="polite">Loading weekly player stats…</div></section>`;
           loadWeeklyFantasy();
@@ -3466,6 +3472,16 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
 
     function extractFantasyLeadersFromEspnSummary(summary){
       const playersById = new Map();
+      // ESPN receiving stat groups include both WRs and TEs. Prefer actual
+      // athlete/roster positions over the stat group when assigning filters.
+      const rosterPositions = new Map();
+      (summary?.rosters || []).forEach(teamRoster => {
+        (teamRoster?.roster || teamRoster?.athletes || []).forEach(item => {
+          const athlete = item?.athlete || item;
+          const position = normalizeFantasyPosition(athlete?.position || item?.position);
+          if(position && athlete?.id) rosterPositions.set(String(athlete.id), position);
+        });
+      });
       const teamGroups = summary?.boxscore?.players || [];
       teamGroups.forEach(teamBlock => {
         const teamAbbr = teamBlock?.team?.abbreviation || "";
@@ -3478,10 +3494,13 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
             const name = athlete.displayName || athlete.shortName || athlete.name;
             if(!id || !name) return;
             const stats = row?.stats || [];
-            const rawPosition = athlete.position?.abbreviation || athlete.position?.name || athlete.position || "";
-            const inferredPosition = inferFantasyPosition(groupName, rawPosition);
+            const rosterPosition = rosterPositions.get(String(athlete.id || id)) || "";
+            const actualPosition = normalizeFantasyPosition(athlete.position || row?.position) || rosterPosition;
+            const inferredPosition = actualPosition || inferFantasyPosition(groupName, "");
             const entry = playersById.get(id) || { id, name, teamAbbr, position:inferredPosition, points:0, receptions:0, line:[] };
-            if(inferredPosition && !entry.position) entry.position = inferredPosition;
+            // A real position must override an earlier group-based inference.
+            if(actualPosition) entry.position = actualPosition;
+            else if(!entry.position && inferredPosition) entry.position = inferredPosition;
             if(teamAbbr && !entry.teamAbbr) entry.teamAbbr = teamAbbr;
             if(groupName.includes("passing")){
               const passYds = statValue(labels, stats, "yds");
@@ -3517,6 +3536,14 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
         .filter(player => player.points > 0)
         .map(player => ({...player, points:Number(player.points.toFixed(1)), line:uniqueList(player.line).slice(0,3).join(" · ")}))
         .sort((a,b) => b.points - a.points);
+    }
+
+    function normalizeFantasyPosition(raw){
+      const value = typeof raw === "object" && raw !== null
+        ? (raw.abbreviation || raw.name || raw.displayName || "") : raw;
+      const position = String(value || "").trim().toUpperCase();
+      const names = {"QUARTERBACK":"QB","RUNNING BACK":"RB","WIDE RECEIVER":"WR","TIGHT END":"TE"};
+      return names[position] || (["QB","RB","WR","TE"].includes(position) ? position : "");
     }
 
     function inferFantasyPosition(groupName, rawPosition){
