@@ -24,6 +24,13 @@
     }
 
     *{box-sizing:border-box}
+    /* Keep the viewport and centered content at exactly the same width when
+       Results switches between long game cards and a shorter Top 10 list.
+       Without a reserved scrollbar lane, the page recenters by several pixels. */
+    html{overflow-y:scroll;scrollbar-gutter:stable}
+    @supports (scrollbar-gutter:stable){
+      html{overflow-y:auto;scrollbar-gutter:stable}
+    }
     body{
       margin:0;
       min-height:100svh;
@@ -1296,10 +1303,10 @@
     const WEEKLY_COVERAGE_CACHE_KEY="gridironGuide.weeklyCoverage.v1";
     const WEEKLY_COVERAGE_CACHE_TTL_MS=12*60*60*1000;
     const WEEKLY_COVERAGE_FEED_URL="https://goosetickler.github.io/streamline-/local-coverage-2026.json";
-    const FANTASY_CACHE_PREFIX = "gridironGuide.realFantasy.v2.";
+    const FANTASY_CACHE_PREFIX = "gridironGuide.realFantasy.v3.";
     const LIVE_FANTASY_CACHE_TTL_MS = 90*1000;
     const fantasyLeaderRequests = new Map();
-    const WEEKLY_FANTASY_CACHE_PREFIX="gridironGuide.weeklyFantasyAll.v3.";
+    const WEEKLY_FANTASY_CACHE_PREFIX="gridironGuide.weeklyFantasyAll.v5.";
     const weeklyFantasyRequests=new Map();
     let resultsSubview=localStorage.getItem("gridironGuide.resultsSubview.v1")==="fantasy"?"fantasy":"games";
     let weeklyFantasyPosition="ALL";
@@ -2874,7 +2881,7 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       if(sortMode==="final"){
         const subnav=`<div class="results-heading"><div class="results-view-switch" aria-label="Results views"><button type="button" data-results-view="games" class="${resultsSubview==="games"?"active":""}">Games</button><button type="button" data-results-view="fantasy" class="${resultsSubview==="fantasy"?"active":""}">🏆 Top 10</button></div></div>`;
         if(resultsSubview==="fantasy"){
-          scheduleEl.innerHTML=subnav+`<section class="weekly-leaders" id="weeklyFantasy"><div class="weekly-heading"><h3>Fantasy Leaders</h3><button type="button" class="weekly-scoring-pill" data-cycle-scoring="true" aria-label="Change fantasy scoring format">${WEEKLY_SCORING_MODES.find(m=>m.key===weeklyScoringMode).label} ↻</button></div><div class="weekly-position" aria-label="Fantasy position filters">${["ALL","QB","RB","WR","TE"].map(pos=>`<button type="button" data-weekly-position="${pos}" class="${weeklyFantasyPosition===pos?"active":""}">${pos==="ALL"?"Overall":pos}</button>`).join("")}</div><div id="weeklyFantasyContent" aria-live="polite">Loading weekly player stats…</div></section>`;
+          scheduleEl.innerHTML=subnav+`<section class="weekly-leaders" id="weeklyFantasy"><div class="weekly-heading"><h3>Fantasy Leaders</h3><button type="button" class="weekly-scoring-pill" data-cycle-scoring="true" aria-label="Change fantasy scoring format">${WEEKLY_SCORING_MODES.find(m=>m.key===weeklyScoringMode).label} ↻</button></div><div class="weekly-position" aria-label="Fantasy position filters">${["ALL","QB","RB","WR","TE","K"].map(pos=>`<button type="button" data-weekly-position="${pos}" class="${weeklyFantasyPosition===pos?"active":""}">${pos==="ALL"?"Overall":pos}</button>`).join("")}</div><div id="weeklyFantasyContent" aria-live="polite">Loading weekly player stats…</div></section>`;
           loadWeeklyFantasy();
           return;
         }
@@ -3331,6 +3338,44 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
     function weeklyFantasyGames(){
       return allGames.filter(game=>(!selectedScheduleWeek||scheduleWeekKey(game)===selectedScheduleWeek)&&(isFinalGame(game)||isLiveGame(game)));
     }
+    // The box score groups receivers by statistic, not by roster position.
+    // Fetch the two team rosters once per session to distinguish TEs from WRs.
+    const fantasyTeamRosterRequests = new Map();
+    function fantasyRosterEntries(payload){
+      const result=[];
+      const visit=(node,depth=0)=>{
+        if(!node||depth>7)return;
+        if(Array.isArray(node)){node.forEach(item=>visit(item,depth+1));return;}
+        if(typeof node!=="object")return;
+        const athlete=node.athlete || (node.id && (node.displayName||node.fullName) ? node : null);
+        if(athlete){
+          const pos=normalizeFantasyPosition(athlete.position || node.position);
+          if(pos)result.push({id:String(athlete.id||""),name:String(athlete.displayName||athlete.fullName||athlete.name||"").trim().toLowerCase(),position:pos});
+        }
+        for(const key of ["athletes","roster","items","groups","entries"]){if(node[key])visit(node[key],depth+1);}
+      };
+      visit(payload);
+      return result;
+    }
+    async function fantasyTeamRoster(teamId){
+      if(!teamId)return [];
+      const key=String(teamId);
+      if(!fantasyTeamRosterRequests.has(key)){
+        const request=fetchJson(`https://site.api.espn.com/apis/site/v2/sports/football/nfl/teams/${encodeURIComponent(key)}/roster`)
+          .then(fantasyRosterEntries).catch(()=>[]);
+        fantasyTeamRosterRequests.set(key,request);
+      }
+      return fantasyTeamRosterRequests.get(key);
+    }
+    async function resolveFantasyRosterPositions(summary,players){
+      const competitors=summary?.header?.competitions?.[0]?.competitors || [];
+      const teamIds=[...new Set(competitors.map(c=>c?.team?.id).filter(Boolean))];
+      if(!teamIds.length)return players;
+      const rosters=(await Promise.all(teamIds.map(fantasyTeamRoster))).flat();
+      const byId=new Map(rosters.filter(r=>r.id).map(r=>[r.id,r.position]));
+      const byName=new Map(rosters.filter(r=>r.name).map(r=>[r.name,r.position]));
+      return players.map(p=>({...p,position:byId.get(String(p.id))||byName.get(String(p.name).trim().toLowerCase())||p.position}));
+    }
     async function getAllFantasyPlayers(game){
       const key=WEEKLY_FANTASY_CACHE_PREFIX+game.id;
       const cached=readFantasyCacheRecord(key);
@@ -3339,7 +3384,7 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       const request=(async()=>{
         try{
           const summary=await fetchJson(`${ESPN_SUMMARY_BASE}?event=${encodeURIComponent(game.id)}`);
-          const players=extractFantasyLeadersFromEspnSummary(summary);
+          const players=await resolveFantasyRosterPositions(summary,extractFantasyLeadersFromEspnSummary(summary));
           if(players.length)cacheFantasy(key,players);
           return players;
         }catch(err){return cached.leaders;}
@@ -3405,7 +3450,10 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
     }
 
     function renderFantasyLeadersContent(title,leaders){
-      return `<div class="fantasy-title">🏆 ${title}</div><div class="fantasy-list">${leaders.slice(0,3).map(renderFantasyPlayer).join("")}</div>`;
+      const top=leaders.filter(p=>p.position!=="K").slice(0,3);
+      const kickers=leaders.filter(p=>p.position==="K");
+      const kickerLine=kickers.length?`<div class="fantasy-kicker-summary" style="border-top:1px solid var(--border);margin-top:7px;padding-top:7px;font-size:.78rem;color:var(--muted)"><span style="font-weight:800;color:var(--text)">KICKERS</span> · ${kickers.map(p=>`${escapeHtml(p.name)} (${escapeHtml(p.teamAbbr)}) ${escapeHtml(p.line)}`).join(" · ")}</div>`:"";
+      return `<div class="fantasy-title">🏆 ${title}</div><div class="fantasy-list">${top.map(renderFantasyPlayer).join("")}${kickerLine}</div>`;
     }
 
     async function hydrateFantasyBlocks(games,{force=false}={}){
@@ -3434,7 +3482,8 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       const request = (async()=>{
         try{
           const summary = await fetchJson(`${ESPN_SUMMARY_BASE}?event=${encodeURIComponent(game.id)}`);
-          const leaders = extractFantasyLeadersFromEspnSummary(summary).slice(0,3);
+          const players = await resolveFantasyRosterPositions(summary,extractFantasyLeadersFromEspnSummary(summary));
+          const leaders = [...players.filter(p=>p.position!=="K").slice(0,3),...players.filter(p=>p.position==="K")];
           if(leaders.length) cacheFantasy(cacheKey, leaders);
           return leaders;
         }catch(err){
@@ -3502,6 +3551,15 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
             if(actualPosition) entry.position = actualPosition;
             else if(!entry.position && inferredPosition) entry.position = inferredPosition;
             if(teamAbbr && !entry.teamAbbr) entry.teamAbbr = teamAbbr;
+            if(groupName.includes("kicking")){
+              // ESPN kicking lines use made/attempted strings (e.g. FG 2/3, XP 3/3).
+              const made=(key)=>{const i=labels.findIndex(l=>l===key||l.startsWith(key+"/"));if(i<0)return 0;return parseStat(String(stats[i]).split("/")[0]);};
+              const fg=made("fg"), xp=made("xp");
+              entry.position="K";
+              entry.points+=fg*3+xp;
+              if(fg)entry.line.push(`${fg} FG`);
+              if(xp)entry.line.push(`${xp} XP`);
+            }
             if(groupName.includes("passing")){
               const passYds = statValue(labels, stats, "yds");
               const passTd = statValue(labels, stats, "td");
@@ -3542,8 +3600,8 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       const value = typeof raw === "object" && raw !== null
         ? (raw.abbreviation || raw.name || raw.displayName || "") : raw;
       const position = String(value || "").trim().toUpperCase();
-      const names = {"QUARTERBACK":"QB","RUNNING BACK":"RB","WIDE RECEIVER":"WR","TIGHT END":"TE"};
-      return names[position] || (["QB","RB","WR","TE"].includes(position) ? position : "");
+      const names = {"QUARTERBACK":"QB","RUNNING BACK":"RB","WIDE RECEIVER":"WR","TIGHT END":"TE","KICKER":"K","PLACE KICKER":"K"};
+      return names[position] || (position==="PK"?"K":["QB","RB","WR","TE","K"].includes(position) ? position : "");
     }
 
     function inferFantasyPosition(groupName, rawPosition){
@@ -3552,6 +3610,7 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       if(groupName.includes("passing")) return "QB";
       if(groupName.includes("rushing")) return value || "RB";
       if(groupName.includes("receiving")) return value || "WR";
+      if(groupName.includes("kicking")) return "K";
       return value || "";
     }
 
