@@ -288,7 +288,7 @@
     .results-view-switch button:active,.weekly-position button:active,.weekly-scoring-pill:active{transform:scale(.94);transition-duration:85ms}
     .weekly-position button.active{box-shadow:inset 0 1px 0 rgba(255,255,255,.2)}
     .results-view-switch button:focus-visible,.weekly-position button:focus-visible,.weekly-scoring-pill:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
-    @media(prefers-reduced-motion:reduce){.results-view-switch::before,.results-view-switch button,.weekly-position button,.weekly-scoring-pill{transition:none!important;transform:none!important}.results-view-switch[data-selected="fantasy"]::before{transform:translateX(calc(100% + 4px))!important}}
+    @media(prefers-reduced-motion:reduce){.results-view-switch::before,.results-view-switch button,.weekly-position button,.weekly-scoring-pill{transition:none!important;transform:none!important}.results-view-switch[data-selected="fantasy"]::before,.games-view-switch[data-selected="live"]::before{transform:translateX(calc(100% + 4px))!important}}
     .weekly-heading{display:flex;align-items:center;justify-content:space-between;gap:10px}
     .weekly-heading h3{margin:0;font-size:1.05rem}
     .weekly-controls{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:12px 0 8px;min-width:0}
@@ -317,6 +317,19 @@
     .results-content > .weekly-leaders:first-child{margin-top:0}
     @media(max-width:450px){.results-section-header{gap:8px}.results-section-title{font-size:.76rem}.results-section-header .results-view-switch{flex-shrink:0}}
     @media(max-width:450px){.results-view-switch button{padding:7px 9px;font-size:.68rem}.weekly-heading h3{font-size:.96rem}.weekly-scoring-pill{padding:7px 9px;font-size:.68rem}.weekly-position{gap:4px}.weekly-position button{padding:7px 9px}}
+
+    /* 1.0.2 Results density pass: one title line, no duplicated fantasy heading. */
+    .results-view-title{letter-spacing:0;text-transform:none;font-weight:850}
+    
+    .results-content .completed-results-group{margin:0 0 10px}
+    .results-content .completed-results-group + .completed-results-group{margin-top:0}
+    @media(max-width:520px){
+      .results-section-header{margin:4px 0 5px;gap:6px}
+      .results-section-title{font-size:.83rem;letter-spacing:.015em;white-space:nowrap}
+      .results-section-header .results-view-switch button{min-width:70px;padding:7px 7px;font-size:.67rem}
+      #weeklyFantasy{padding-top:7px}
+      #weeklyFantasy .weekly-controls{margin:0 0 4px}
+    }
     .weekly-player{display:flex;gap:10px;align-items:center;padding:11px 2px;border-top:1px solid var(--line)}
     .weekly-rank{width:22px;color:var(--muted);font-weight:900}
     .weekly-player-info{flex:1;min-width:0}
@@ -358,7 +371,7 @@
        rankings, and legible scores without inflating each row in WKWebView. */
     @media (max-width:520px){
       /* Same shared Results header in both subviews; no toggle jump. */
-      .results-section-header{min-height:38px;margin:6px 0 7px}
+      .results-section-header{min-height:34px;margin:0 0 3px}
       #weeklyFantasy{padding:10px 11px 11px}
       #weeklyFantasy .weekly-heading h3{font-size:.94rem;line-height:1.12}
       #weeklyFantasy .weekly-controls{margin:7px 0 4px;gap:6px}
@@ -1030,7 +1043,26 @@
     }
 
 
-    .sort-tabs{grid-template-columns:repeat(3,1fr)}
+    .sort-tabs{grid-template-columns:repeat(2,1fr)}
+    .games-view-switch[data-selected="live"]::before{transform:translateX(calc(100% + 4px))}
+    .games-view-switch .live-filter-dot{display:none;margin-right:4px;vertical-align:middle}
+    .games-view-switch.has-live .live-filter-dot{display:inline-block}
+    .games-live-count:not(:empty){display:inline-flex;align-items:center;justify-content:center;min-width:16px;height:16px;padding:0 4px;margin-left:3px;border-radius:20px;background:rgba(255,255,255,.13);font-size:.58rem}
+    .games-view-switch[data-selected="live"] .games-live-count:not(:empty){background:rgba(7,17,29,.17)}
+    /* Live mode retains the original red LIVE visual language. */
+    .games-view-switch.has-live [data-games-view="live"]:not(.active){color:#ff667e}
+    .games-view-switch.has-live .live-filter-dot{display:inline-block}
+    .games-view-switch[data-selected="live"]::before{background:linear-gradient(135deg,#ff365f,#fa2855);box-shadow:inset 0 1px 0 rgba(255,255,255,.20),0 2px 10px rgba(255,54,95,.17)}
+    .games-view-switch[data-selected="live"] [data-games-view="live"].active{color:#fff}
+    .games-view-switch[data-selected="live"] .live-filter-dot{background:#fff;box-shadow:0 0 0 3px rgba(255,255,255,.16)}
+    .games-view-switch[data-selected="live"] .games-live-count:not(:empty){background:rgba(0,0,0,.20);color:#fff}
+    /* Springy/squishy feedback for fantasy position filters, without changing dimensions. */
+    .weekly-position button{will-change:transform;transition:background 170ms ease,box-shadow 170ms ease,color 170ms ease,transform 250ms cubic-bezier(.2,1.7,.3,1)}
+    .weekly-position button:active{transform:scaleX(1.10) scaleY(.86);transition:transform 75ms ease-out}
+    .weekly-position button.squish-pop{animation:weekly-squish-pop 370ms cubic-bezier(.2,1,.35,1) both}
+    @keyframes weekly-squish-pop{0%{transform:scaleX(1.10) scaleY(.86)}38%{transform:scaleX(.94) scaleY(1.09)}68%{transform:scaleX(1.025) scaleY(.98)}100%{transform:scale(1)}}
+    @media(prefers-reduced-motion:reduce){.weekly-position button.squish-pop{animation:none}.weekly-position button:active{transform:none}}
+    .games-section-header + .games-content .day-group:first-child{margin-top:0}
     .sort-tab{display:flex;align-items:center;justify-content:center;gap:5px}
     .filter-count{display:none;min-width:18px;height:18px;padding:0 5px;border-radius:999px;background:rgba(255,255,255,.13);color:inherit;font-size:.58rem;font-weight:1000;line-height:18px;text-align:center}
     .filter-count.has-count{display:inline-block}
@@ -1268,6 +1300,17 @@
       justify-self:end;align-self:center;
     }
     .results-final-card .game-top + .teams-row{margin-top:4px}
+    /* Results Games only: fit two completed matchup cards more comfortably.
+       Keep live/upcoming cards and weekly Top 10 unchanged. */
+    .results-final-card{padding:8px 11px 7px}
+    .results-final-card .teams-row{margin:0 0 3px}
+    .results-final-card .team-row{padding-top:0;padding-bottom:0}
+    .results-final-card .fantasy-block{margin:4px 0 0;padding:7px 9px 6px}
+    .results-final-card .fantasy-title{margin-bottom:4px}
+    .results-final-card .fantasy-list{gap:3px}
+    .results-final-card .fantasy-player{padding:3px 0}
+    .results-final-card .fantasy-player-meta{margin-top:1px}
+    .results-content .games{gap:7px}
   </style>
 </head>
 <body class="provider-chip-refresh">
@@ -1291,7 +1334,6 @@
       </section>
       <nav class="sort-tabs" aria-label="Schedule sort options">
         <button class="sort-tab active" data-sort="kickoff"><span>Games</span><span class="filter-count" data-count="kickoff"></span></button>
-        <button class="sort-tab" data-sort="live"><span class="live-filter-dot"></span><span>Live</span><span class="filter-count" data-count="live"></span></button>
         <button class="sort-tab" data-sort="final"><span>Results</span><span class="filter-count" data-count="final"></span></button>
       </nav>
     </header>
@@ -1389,14 +1431,14 @@
         </div>
       </div>
       <div class="settings-version-wrap">
-        <div id="appVersionLabel" class="settings-version" aria-label="Gridiron Guide version 1.0">Gridiron Guide · Version 1.0</div>
+        <div id="appVersionLabel" class="settings-version" aria-label="Gridiron Guide version 1.0.2">Gridiron Guide · Version 1.0.2</div>
       </div>
       </div></section>
   </div>
 
   <script>
     const DEVICE = detectDevice();
-    const APP_VERSION = "1.0";
+    const APP_VERSION = "1.0.2";
 
     // ------------------------------------------------------------
     // DATA SOURCE OVERVIEW
@@ -1448,8 +1490,8 @@
       ["NYJ","New York Jets"],["PHI","Philadelphia Eagles"],["PIT","Pittsburgh Steelers"],["SEA","Seattle Seahawks"],
       ["SF","San Francisco 49ers"],["TB","Tampa Bay Buccaneers"],["TEN","Tennessee Titans"],["WSH","Washington Commanders"]
     ].map(([id,name])=>Object.freeze({league:"NFL",id,name})));
-    const WEEKLY_COVERAGE_CACHE_KEY="gridironGuide.weeklyCoverage.v1";
-    const WEEKLY_COVERAGE_CACHE_TTL_MS=12*60*60*1000;
+    const WEEKLY_COVERAGE_CACHE_KEY="gridironGuide.weeklyCoverage.v2";
+    const WEEKLY_COVERAGE_CACHE_TTL_MS=5*60*1000;
     const WEEKLY_COVERAGE_FEED_URL="https://goosetickler.github.io/streamline-/local-coverage-2026.json";
     const FANTASY_CACHE_PREFIX = "gridironGuide.realFantasy.v3.";
     const LIVE_FANTASY_CACHE_TTL_MS = 90*1000;
@@ -2341,6 +2383,8 @@
 
     let allGames = [];
     let sortMode = localStorage.getItem("gridironGuide.sortMode") || "kickoff";
+    let gamesSubview=localStorage.getItem("gridironGuide.gamesSubview.v1")==="live"?"live":"all";
+    if(sortMode==="live")sortMode="kickoff";
     let selectedScheduleWeek = null;
     let scheduleWeeks = [];
     migrateAppData();
@@ -2728,7 +2772,7 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       const cached=readWeeklyCoverageCache(),savedAt=Number(cached?.savedAt||0);
       if(!force&&cached&&Date.now()-savedAt<WEEKLY_COVERAGE_CACHE_TTL_MS){weeklyCoverageData=cached;return cached;}
       try{
-        const res=await fetch(WEEKLY_COVERAGE_FEED_URL,{cache:"no-store"}); if(!res.ok)throw new Error(`coverage ${res.status}`);
+        const res=await fetch(`${WEEKLY_COVERAGE_FEED_URL}?refresh=${Date.now()}`,{cache:"no-store"}); if(!res.ok)throw new Error(`coverage ${res.status}`);
         const body=await res.json(); if(!body||typeof body!=="object"||!body.weeks)throw new Error("invalid coverage payload");
         const payload={...body,savedAt:Date.now()}; saveWeeklyCoverageCache(payload); return payload;
       }catch(err){weeklyCoverageData=cached||null;return weeklyCoverageData;}
@@ -2936,7 +2980,8 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       }
       pendingNativeWidgetGameId="";
       selectedScheduleWeek=scheduleWeekKey(game)||selectedScheduleWeek;
-      sortMode=isFinalGame(game)?"final":(isLiveGame(game)?"live":"kickoff");
+      sortMode=isFinalGame(game)?"final":"kickoff";
+      if(isLiveGame(game)){gamesSubview="live";localStorage.setItem("gridironGuide.gamesSubview.v1",gamesSubview);}
       localStorage.setItem("gridironGuide.sortMode",sortMode);
       document.querySelectorAll(".sort-tab").forEach(tab=>tab.classList.toggle("active",tab.dataset.sort===sortMode));
       renderWeekNavigator();
@@ -2988,7 +3033,9 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
         ? baseAll.filter(g => scheduleWeekKey(g) === selectedScheduleWeek)
         : baseAll;
       let selected;
-      if(sortMode === "scheduled"){
+      if(sortMode === "kickoff" && gamesSubview === "live"){
+        selected = base.filter(isLiveGame).sort(localFirstEnabled?localFirstSort:sortByDate);
+      } else if(sortMode === "scheduled"){
         selected = base.filter(g => isScheduledGame(g) && new Date(g.dateTime) >= cutoff).sort(localFirstEnabled?localFirstSort:sortByDate);
       } else if(sortMode === "final"){
         selected = base.filter(isFinalGame).sort((a,b) => new Date(b.dateTime) - new Date(a.dateTime));
@@ -3021,12 +3068,38 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
     }
 
     function renderSchedule(){
+      if(sortMode==="live"){sortMode="kickoff";gamesSubview="live";}
       const games = getDisplayGames();
       updateWeekRange(games);
       updateFilterCounts();
       syncFollowedGamesWithNative();
       syncWidgetDataWithNative();
       let resultsContentEl=null;
+      if(sortMode==="kickoff"){
+        const selectedWeek=scheduleWeeks.find(w=>w.key===selectedScheduleWeek);
+        const weekTitle=selectedWeek?weekLabel(selectedWeek):"Games";
+        const weekKey=String(selectedScheduleWeek||"");
+        const existingHeader=scheduleEl.querySelector(":scope > .games-section-header");
+        const existingContent=scheduleEl.querySelector(":scope > .games-content");
+        if(!existingHeader||!existingContent||existingHeader.dataset.weekKey!==weekKey){
+          const subnav=`<div class="results-view-switch games-view-switch" role="group" aria-label="Games views" data-selected="${gamesSubview}"><button type="button" data-games-view="all">All Games</button><button type="button" data-games-view="live"><span class="live-filter-dot"></span>Live <span class="games-live-count"></span></button></div>`;
+          scheduleEl.innerHTML=`<div class="results-section-header games-section-header" data-week-key="${escapeHtml(weekKey)}"><h2 class="results-section-title">${escapeHtml(weekTitle)}<span class="games-view-title"> · ${gamesSubview==="live"?"Live Games":"Games"}</span></h2><span class="results-section-rule" aria-hidden="true"></span>${subnav}</div><div class="games-content"></div>`;
+        }
+        const viewSwitch=scheduleEl.querySelector(".games-view-switch");
+        viewSwitch.dataset.selected=gamesSubview;
+        const title=scheduleEl.querySelector(".games-view-title");
+        if(title)title.textContent=gamesSubview==="live"?" · Live Games":" · Games";
+        viewSwitch.querySelectorAll("[data-games-view]").forEach(button=>{
+          const active=button.dataset.gamesView===gamesSubview;
+          button.classList.toggle("active",active);
+          button.setAttribute("aria-pressed",String(active));
+        });
+        const liveCount=allGames.filter(g=>scheduleWeekKey(g)===selectedScheduleWeek&&isLiveGame(g)).length;
+        const countEl=viewSwitch.querySelector(".games-live-count");
+        if(countEl)countEl.textContent=liveCount?String(liveCount):"";
+        viewSwitch.classList.toggle("has-live",liveCount>0);
+        resultsContentEl=scheduleEl.querySelector(":scope > .games-content");
+      }
       if(sortMode==="final"){
         const selectedWeek=scheduleWeeks.find(w=>w.key===selectedScheduleWeek);
         const weekTitle=selectedWeek?weekLabel(selectedWeek):"Results";
@@ -3037,10 +3110,12 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
         // Top 10. Rebuilding the control on every click prevented CSS motion.
         if(!existingHeader||!existingContent||existingHeader.dataset.weekKey!==weekKey){
           const subnav=`<div class="results-view-switch" role="group" aria-label="Results views" data-selected="${resultsSubview}"><button type="button" data-results-view="games" class="${resultsSubview==="games"?"active":""}" aria-pressed="${resultsSubview==="games"}">Games</button><button type="button" data-results-view="fantasy" class="${resultsSubview==="fantasy"?"active":""}" aria-pressed="${resultsSubview==="fantasy"}">🏆 Top 10</button></div>`;
-          scheduleEl.innerHTML=`<div class="results-section-header" data-week-key="${escapeHtml(weekKey)}"><h2 class="results-section-title">${escapeHtml(weekTitle)}</h2><span class="results-section-rule" aria-hidden="true"></span>${subnav}</div><div class="results-content"></div>`;
+          scheduleEl.innerHTML=`<div class="results-section-header" data-week-key="${escapeHtml(weekKey)}"><h2 class="results-section-title">${escapeHtml(weekTitle)}<span class="results-view-title"> · ${resultsSubview==="fantasy"?"Fantasy Leaders":"Games"}</span></h2><span class="results-section-rule" aria-hidden="true"></span>${subnav}</div><div class="results-content"></div>`;
         }
         const viewSwitch=scheduleEl.querySelector(".results-view-switch");
         viewSwitch.dataset.selected=resultsSubview;
+        const resultsHeaderTitle=scheduleEl.querySelector(".results-view-title");
+        if(resultsHeaderTitle)resultsHeaderTitle.textContent=resultsSubview==="fantasy"?" · Fantasy Leaders":" · Games";
         viewSwitch.querySelectorAll("[data-results-view]").forEach(button=>{
           const active=button.dataset.resultsView===resultsSubview;
           button.classList.toggle("active",active);
@@ -3048,7 +3123,7 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
         });
         resultsContentEl=scheduleEl.querySelector(":scope > .results-content");
         if(resultsSubview==="fantasy"){
-          resultsContentEl.innerHTML=`<section class="weekly-leaders" id="weeklyFantasy"><div class="weekly-heading"><h3>Fantasy Leaders</h3></div><div class="weekly-controls"><div class="weekly-position" aria-label="Fantasy position filters">${["ALL","QB","RB","WR","TE","K"].map(pos=>`<button type="button" data-weekly-position="${pos}" class="${weeklyFantasyPosition===pos?"active":""}">${pos==="ALL"?"Overall":pos}</button>`).join("")}</div><button type="button" class="weekly-scoring-pill" data-cycle-scoring="true" aria-label="Change fantasy scoring format">${WEEKLY_SCORING_MODES.find(m=>m.key===weeklyScoringMode).label} ↻</button></div><div id="weeklyFantasyContent" aria-live="polite">Loading weekly player stats…</div></section>`;
+          resultsContentEl.innerHTML=`<section class="weekly-leaders" id="weeklyFantasy"><div class="weekly-controls"><div class="weekly-position" aria-label="Fantasy position filters">${["ALL","QB","RB","WR","TE","K"].map(pos=>`<button type="button" data-weekly-position="${pos}" class="${weeklyFantasyPosition===pos?"active":""}">${pos==="ALL"?"Overall":pos}</button>`).join("")}</div><button type="button" class="weekly-scoring-pill" data-cycle-scoring="true" aria-label="Change fantasy scoring format">${WEEKLY_SCORING_MODES.find(m=>m.key===weeklyScoringMode).label} ↻</button></div><div id="weeklyFantasyContent" aria-live="polite">Loading weekly player stats…</div></section>`;
           loadWeeklyFantasy();
           return;
         }
@@ -3056,7 +3131,9 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       if(!games.length){
         const scoped = selectedScheduleWeek ? allGames.filter(g=>scheduleWeekKey(g)===selectedScheduleWeek) : allGames;
         const allFinal = scoped.length > 0 && scoped.every(isFinalGame);
-        const emptyContent=allFinal && sortMode === "kickoff"
+        const emptyContent=sortMode==="kickoff"&&gamesSubview==="live"
+          ? `<section class="empty"><h2>No games live right now</h2><p>Switch to All Games to see upcoming matchups.</p></section>`
+          : allFinal && sortMode === "kickoff"
           ? `<section class="empty week-complete-cta" role="button" tabindex="0" data-open-results="true" aria-label="Week complete. Open Results to view scores."><h2>Week Complete</h2><p>All games are final. Tap to open RESULTS and view scores.</p></section>`
           : `<section class="empty"><h2>No games found</h2><p>Try another filter or refresh the schedule.</p></section>`;
         if(resultsContentEl)resultsContentEl.innerHTML=emptyContent;
@@ -3064,12 +3141,15 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
         return;
       }
       const groups = groupByDay(games);
-      const gamesContent=Object.entries(groups).map(([day, dayGames]) => `
-        <section class="day-group" aria-labelledby="${slug(day)}">
-          <h2 class="day-heading" id="${slug(day)}">${day}</h2>
+      const gamesContent=Object.entries(groups).map(([day, dayGames]) => {
+        // Completed Results cards don't need redundant calendar-day headings.
+        // Keep dates for any scheduled/in-progress games in other views.
+        const hideDayHeading=sortMode==="final" && dayGames.every(isFinalGame);
+        return `<section class="day-group${hideDayHeading?" completed-results-group":""}"${hideDayHeading?"":` aria-labelledby="${slug(day)}"`}>
+          ${hideDayHeading?"":`<h2 class="day-heading" id="${slug(day)}">${day}</h2>`}
           <div class="games">${dayGames.map(renderGameCard).join("")}</div>
-        </section>
-      `).join("");
+        </section>`;
+      }).join("");
       if(resultsContentEl)resultsContentEl.innerHTML=gamesContent;
       else scheduleEl.innerHTML=gamesContent;
       hydrateFantasyBlocks(games);
@@ -3587,10 +3667,12 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       }));
     }
     scheduleEl.addEventListener("click",event=>{
+      const gamesView=event.target.closest("[data-games-view]");
+      if(gamesView){gamesSubview=gamesView.dataset.gamesView;localStorage.setItem("gridironGuide.gamesSubview.v1",gamesSubview);renderSchedule();resetPageScrollForNavigation();return;}
       const view=event.target.closest("[data-results-view]");
       if(view){resultsSubview=view.dataset.resultsView;localStorage.setItem("gridironGuide.resultsSubview.v1",resultsSubview);renderSchedule();resetPageScrollForNavigation();return;}
       const pos=event.target.closest("[data-weekly-position]");
-      if(pos){weeklyFantasyPosition=pos.dataset.weeklyPosition;document.querySelectorAll("[data-weekly-position]").forEach(btn=>btn.classList.toggle("active",btn.dataset.weeklyPosition===weeklyFantasyPosition));renderWeeklyFantasyPlayers();return;}
+      if(pos){pos.classList.remove("squish-pop");void pos.offsetWidth;pos.classList.add("squish-pop");weeklyFantasyPosition=pos.dataset.weeklyPosition;document.querySelectorAll("[data-weekly-position]").forEach(btn=>btn.classList.toggle("active",btn.dataset.weeklyPosition===weeklyFantasyPosition));renderWeeklyFantasyPlayers();return;}
       const score=event.target.closest("[data-cycle-scoring]");
       if(score){const i=WEEKLY_SCORING_MODES.findIndex(m=>m.key===weeklyScoringMode);weeklyScoringMode=WEEKLY_SCORING_MODES[(i+1)%WEEKLY_SCORING_MODES.length].key;localStorage.setItem("gridironGuide.weeklyScoring.v1",weeklyScoringMode);score.textContent=WEEKLY_SCORING_MODES.find(m=>m.key===weeklyScoringMode).label+" ↻";renderWeeklyFantasyPlayers();}
     });
@@ -4270,7 +4352,7 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
     function selectScheduleWeek(k){
       selectedScheduleWeek=k;
       const scoped=allGames.filter(g=>scheduleWeekKey(g)===selectedScheduleWeek);
-      if(sortMode==="live"&&!scoped.some(isLiveGame))sortMode="kickoff";
+      if(sortMode==="live")sortMode="kickoff";
       if(sortMode==="final"&&!scoped.some(isFinalGame))sortMode="kickoff";
       localStorage.setItem("gridironGuide.sortMode",sortMode);
       document.querySelectorAll(".sort-tab").forEach(tab=>tab.classList.toggle("active",tab.dataset.sort===sortMode));
@@ -4361,8 +4443,7 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
         el.textContent=count?String(count):"";
         el.classList.toggle("has-count",count>0);
       });
-      const liveBtn=document.querySelector('.sort-tab[data-sort="live"]');
-      liveBtn?.classList.toggle("has-live",counts.live>0);
+
     }
 
     let scoreRefreshTimer=null;
@@ -4586,7 +4667,7 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
     bootstrapSchedule();
     setTimeout(()=>{
       const beforeCoverage=weeklyCoverageFingerprint(weeklyCoverageData);
-      refreshWeeklyCoverageData(false).then(payload=>{
+      refreshWeeklyCoverageData(true).then(payload=>{
         if(weeklyCoverageFingerprint(payload)!==beforeCoverage){
           renderSchedule();
         }
