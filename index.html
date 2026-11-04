@@ -2795,12 +2795,19 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       return `${parent}:${d.getUTCHours()<19?"EARLY":"LATE"}`;
     }
     function getWeeklyCoverageAssignment(game){
-      const data=weeklyCoverageData;if(!data?.weeks||!directvMarket)return null;
-      const week=data.weeks[scheduleWeekKey(game)]||data.weeks[String(game.weekNumber||"")]||null;if(!week)return null;
-      const marketKey=Object.keys(week.markets||{}).find(k=>marketsEquivalent(k,directvMarket));if(!marketKey)return null;
-      const slot=gameCoverageSlot(game),a=(week.markets[marketKey]||{})[slot]||null;if(!a)return null;
-      const assignedGame=String(a.game||a.matchup||"").toUpperCase().replace(/\s+/g,""),current=gameCoverageKey(game);
-      return {source:String(a.source||data.source||"weekly coverage feed"),station:String(a.station||""),slot,assignedGame,match:assignedGame===current,conflict:!!assignedGame&&assignedGame!==current,updatedAt:String(data.updatedAt||"")};
+      // Optional, display-only enrichment. Broken or incomplete coverage data must
+      // fail OPEN: game cards, providers and the schedule never depend on it.
+      try{
+        const data=weeklyCoverageData;if(!data?.weeks||!directvMarket)return null;
+        const week=data.weeks[scheduleWeekKey(game)]||data.weeks[String(game.weekNumber||"")]||null;if(!week)return null;
+        const marketKey=Object.keys(week.markets||{}).find(k=>marketsEquivalent(k,directvMarket));if(!marketKey)return null;
+        const slot=gameCoverageSlot(game),a=(week.markets[marketKey]||{})[slot]||null;if(!a)return null;
+        const assignedGame=String(a.game||a.matchup||"").toUpperCase().replace(/\s+/g,""),current=gameCoverageKey(game);
+        return {source:String(a.source||data.source||"weekly coverage feed"),station:String(a.station||""),slot,assignedGame,match:assignedGame===current,conflict:!!assignedGame&&assignedGame!==current,updatedAt:String(data.updatedAt||"")};
+      }catch(err){
+        console.warn("Optional LOCAL coverage lookup failed; showing game without badge",err);
+        return null;
+      }
     }
     // Display-only: never infer a LOCAL badge from national rights, team markets,
     // or ESPN affiliates. A positive assignment in the weekly JSON is required.
@@ -2823,6 +2830,36 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       const station=assignment.station?` · ${assignment.station}`:"";
       const tooltip=escapeHtml(`Confirmed local broadcast${station}`);
       return `<span class="badge local-confirmed" title="${tooltip}" aria-label="${tooltip}">⌂ LOCAL</span>`;
+    }
+    function updateLocalBadgesInPlace(){
+      // Coverage updates may ONLY add/remove a badge. Never re-render the
+      // schedule: that would discard cards, live state, scroll position and
+      // other UI whenever the independent JSON feed finishes loading.
+      if(!scheduleEl||!allGames.length)return;
+      const gamesById=new Map(allGames.map(game=>[String(game.id),game]));
+      scheduleEl.querySelectorAll(".game-card[data-game-id]").forEach(card=>{
+        const game=gamesById.get(card.dataset.gameId);
+        if(!game)return;
+        let badge="";
+        try{badge=renderConfirmedLocalBadge(game);}catch(err){console.warn("LOCAL badge skipped",err);}
+        let top=card.querySelector(":scope > .game-top");
+        // Final result cards normally omit their empty top row, so construct a
+        // badge-only row if a confirmed LOCAL assignment arrives later.
+        if(!top&&badge){
+          top=document.createElement("div");
+          top.className="game-top";
+          top.dataset.coverageOnly="true";
+          top.innerHTML='<div class="time"></div><div class="badges"></div>';
+          card.prepend(top);
+        }
+        if(!top)return;
+        let badges=top.querySelector(".badges");
+        if(!badges&&badge){badges=document.createElement("div");badges.className="badges";top.append(badges);}
+        if(!badges)return;
+        badges.querySelectorAll(".local-confirmed").forEach(node=>node.remove());
+        if(badge)badges.insertAdjacentHTML("afterbegin",badge);
+        if(!badge&&top.dataset.coverageOnly==="true")top.remove();
+      });
     }
     function getLocalAvailabilityStatus(game){
       const n=classifyBroadcastNetwork(game),weekly=getWeeklyCoverageAssignment(game);
@@ -3035,6 +3072,8 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       saveFavoriteTeams();renderFavoriteTeamSettings();renderSchedule();
     }
 
+    // Card visibility is determined ONLY by selected week and Games/Live/Results
+    // status filters. LOCAL coverage is strictly presentational, never a filter.
     function getDisplayGames(sourceGames = allGames){
       const now = new Date();
       const cutoff = new Date(now.getTime() - 4 * 60 * 60 * 1000);
@@ -4680,7 +4719,7 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       const beforeCoverage=weeklyCoverageFingerprint(weeklyCoverageData);
       refreshWeeklyCoverageData(true).then(payload=>{
         if(weeklyCoverageFingerprint(payload)!==beforeCoverage){
-          renderSchedule();
+          updateLocalBadgesInPlace();
         }
       }).catch(()=>{});
     },1500);
