@@ -2199,6 +2199,17 @@
       return 2*r*Math.asin(Math.sqrt(q));
     }
     function normalizeMarketName(name){return MARKET_NAME_ALIASES[String(name||"").trim()]||String(name||"").trim();}
+    // Match weekly coverage market labels to ZIP-resolved DMA names.
+    // Example: "San Diego, CA" in JSON versus "San Diego" from ZIP lookup.
+    function marketsEquivalent(a,b){
+      const normalize=value=>normalizeMarketName(String(value||""))
+        .normalize("NFKD").replace(/[\u0300-\u036f]/g,"")
+        .toLowerCase().replace(/\([^)]*\)/g," ")
+        .replace(/\b(?:ca|california|ny|new york|wa|washington|tx|texas)\b(?=\s*$)/g,"")
+        .replace(/[^a-z0-9]+/g," ").trim();
+      const left=normalize(a),right=normalize(b);
+      return !!left&&!!right&&(left===right||left.startsWith(right+" ")||right.startsWith(left+" "));
+    }
     function validMarketCenters(rows){
       return Array.isArray(rows)&&rows.length>=180&&rows.every(r=>r&&typeof r.dma==="string"&&Number.isFinite(Number(r.lat))&&Number.isFinite(Number(r.lon)));
     }

@@ -1,8 +1,8 @@
 {
   "version": 1,
   "season": 2026,
-  "updatedAt": "2026-11-04T16:00:00Z",
-  "source": "Week 9 partial market coverage, including San Diego (Sports Maps updated Nov 2); verify before kickoff",
+  "updatedAt": "2026-11-04T00:00:00Z",
+  "source": "Week 9 market assignments: EntitledSports coverage map updated Nov 3, 2026; unverified markets omitted",
   "weeks": {
     "8": {
       "markets": {
@@ -430,23 +430,6 @@
             "game": "GB@NE",
             "station": "WTTG",
             "source": "https://entitledsports.com/schedule/nfl/coverage-map/"
-          }
-        },
-        "San Diego, CA": {
-          "FOX:EARLY": {
-            "game": "LAR@WSH",
-            "station": "KSWB",
-            "source": "https://www.thesportsmaps.com/tv-markets/san-diego.html"
-          },
-          "CBS:LATE": {
-            "game": "HOU@LAC",
-            "station": "KFMB",
-            "source": "https://www.thesportsmaps.com/tv-markets/san-diego.html"
-          },
-          "FOX:LATE": {
-            "game": "LV@SF",
-            "station": "KSWB",
-            "source": "https://www.thesportsmaps.com/tv-markets/san-diego.html"
           }
         }
       }
