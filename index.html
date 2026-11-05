@@ -1056,6 +1056,20 @@
     .games-view-switch[data-selected="live"] [data-games-view="live"].active{color:#fff}
     .games-view-switch[data-selected="live"] .live-filter-dot{background:#fff;box-shadow:0 0 0 3px rgba(255,255,255,.16)}
     .games-view-switch[data-selected="live"] .games-live-count:not(:empty){background:rgba(0,0,0,.20);color:#fff}
+    /* Local is contextual: three compact segments only when verified,
+       unfinished games exist for the selected market and week. */
+    .games-view-switch.has-local{grid-template-columns:repeat(3,minmax(0,1fr));width:min(205px,54vw)}
+    .games-view-switch.has-local::before{width:calc((100% - 16px)/3)}
+    .games-view-switch.has-local[data-selected="live"]::before{transform:translateX(calc(100% + 4px))}
+    .games-view-switch.has-local[data-selected="local"]::before{transform:translateX(calc(200% + 8px));background:linear-gradient(135deg,#66efba,#40b997)}
+    .games-view-switch.has-local [data-games-view="local"]:not(.active){color:#80eac0}
+    .games-view-switch.has-local [data-games-view="local"].active{color:#071b19}
+    .games-local-count{display:inline-flex;align-items:center;justify-content:center;min-width:16px;height:16px;padding:0 4px;margin-left:3px;border-radius:20px;background:rgba(78,213,161,.17);font-size:.58rem}
+    .games-view-switch.has-local [data-games-view="local"].active .games-local-count{background:rgba(5,30,22,.16)}
+    .games-view-switch.has-local button{min-width:60px;padding:7px 6px;font-size:.68rem}
+    @media(max-width:450px){.games-view-switch.has-local button{min-width:0;padding:7px 3px;font-size:.64rem}.games-view-switch.has-local .games-local-count{min-width:14px;height:14px;padding:0 2px;margin-left:1px;font-size:.52rem}}
+    @media(max-width:359px){.games-section-header .games-view-title{display:none}.games-view-switch.has-local button{font-size:.62rem}}
+    @media(prefers-reduced-motion:reduce){.games-view-switch.has-local[data-selected="local"]::before{transform:translateX(calc(200% + 8px))!important}}
     /* Springy/squishy feedback for fantasy position filters, without changing dimensions. */
     .weekly-position button{will-change:transform;transition:background 170ms ease,box-shadow 170ms ease,color 170ms ease,transform 250ms cubic-bezier(.2,1.7,.3,1)}
     .weekly-position button:active{transform:scaleX(1.10) scaleY(.86);transition:transform 75ms ease-out}
@@ -1396,18 +1410,8 @@
         <p class="settings-hint">Favorite games get a subtle highlight. Favorites are saved on this device.</p>
       </div>
       <div class="settings-section">
-        <h3 class="settings-section-title">Local Availability</h3>
+        <h3 class="settings-section-title">Broadcast Options</h3>
         <div class="settings-toggle">
-          <div class="settings-toggle-copy">
-            <div class="settings-toggle-label">Local Game Sorting</div>
-            <div class="settings-toggle-detail">Put games available in your area first. All games stay visible.</div>
-          </div>
-          <label class="settings-switch" aria-label="Enable Local Game Sorting">
-            <input id="localGamesFilterToggle" type="checkbox">
-            <span class="settings-switch-track"></span>
-          </label>
-        </div>
-        <div class="settings-toggle" style="margin-top:8px">
           <div class="settings-toggle-copy">
             <div class="settings-toggle-label">NFL Sunday Ticket</div>
             <div class="settings-toggle-detail">Show Sunday Ticket for confirmed out-of-market Sunday afternoon games.</div>
@@ -1477,7 +1481,6 @@
     const DIRECTV_MARKET_SOURCE_KEY="gridironGuide.directv.marketSource.v1";
     const DIRECTV_NFL_PACKAGE_KEY="gridironGuide.directv.nflPackage.v1";
     const SUNDAY_TICKET_KEY="gridironGuide.sundayTicket.v1";
-    const LOCAL_FIRST_KEY="gridironGuide.localFirst.v1";
     const FAVORITE_TEAMS_KEY="gridironGuide.favoriteTeams.v1";
     const FOLLOWED_GAMES_KEY="gridironGuide.followedGames.v1";
     const NFL_TEAMS = Object.freeze([
@@ -2394,7 +2397,8 @@
 
     let allGames = [];
     let sortMode = localStorage.getItem("gridironGuide.sortMode") || "kickoff";
-    let gamesSubview=localStorage.getItem("gridironGuide.gamesSubview.v1")==="live"?"live":"all";
+    const SAVED_GAMES_SUBVIEW=localStorage.getItem("gridironGuide.gamesSubview.v1");
+    let gamesSubview=["all","live","local"].includes(SAVED_GAMES_SUBVIEW)?SAVED_GAMES_SUBVIEW:"all";
     if(sortMode==="live")sortMode="kickoff";
     let selectedScheduleWeek = null;
     let scheduleWeeks = [];
@@ -2406,7 +2410,6 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
     let directvMarketSource=localStorage.getItem(DIRECTV_MARKET_SOURCE_KEY)||"";
     let directvNflPackageEnabled=localStorage.getItem(DIRECTV_NFL_PACKAGE_KEY)==="true";
     let sundayTicketEnabled=localStorage.getItem(SUNDAY_TICKET_KEY)==="true";
-    let localFirstEnabled=localStorage.getItem(LOCAL_FIRST_KEY)==="true";
     let favoriteTeams=readFavoriteTeams();
     let followedGameIds=readFollowedGameIds();
     let lastNativeFollowSyncFingerprint="";
@@ -2875,10 +2878,6 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       }
       return {score:2,state:"UNVERIFIED",source:"provider evidence",station:"",weekly:null};
     }
-    function localFirstSort(a,b){
-      const da=new Date(a.dateTime),db=new Date(b.dateTime),delta=da-db;if(Math.abs(delta)>30*60*1000)return delta;
-      const sa=getLocalAvailabilityStatus(a).score,sb=getLocalAvailabilityStatus(b).score;return sb-sa||delta||String(a.awayAbbr||"").localeCompare(String(b.awayAbbr||""));
-    }
 
     function readFavoriteTeams(){
       try{
@@ -2997,7 +2996,6 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
         })
         .map(game=>{
           const kickoffEpochMs=new Date(game.dateTime).getTime();
-          const localStatus=getLocalAvailabilityStatus(game);
           return {
             id:String(game.id),
             kickoffEpochMs,
@@ -3008,7 +3006,7 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
             isFollowed:isGameFollowed(game.id),
             isFavorite:isFavoriteGame(game),
             isNational:isNationalWidgetGame(game),
-            isLocal:localFirstEnabled&&Number(localStatus?.score||0)>=3
+            isLocal:getWeeklyCoverageAssignment(game)?.match===true
           };
         })
         .sort((a,b)=>a.kickoffEpochMs-b.kickoffEpochMs);
@@ -3084,21 +3082,26 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
         : baseAll;
       let selected;
       if(sortMode === "kickoff" && gamesSubview === "live"){
-        selected = base.filter(isLiveGame).sort(localFirstEnabled?localFirstSort:sortByDate);
+        selected = base.filter(isLiveGame).sort(sortByDate);
+      } else if(sortMode === "kickoff" && gamesSubview === "local"){
+        // Only an explicit, confirmed CBS/FOX market assignment can opt into
+        // this user-selected view. Missing data never filters All Games.
+        selected = base.filter(g=>(isScheduledGame(g)||isLiveGame(g))&&getWeeklyCoverageAssignment(g)?.match===true)
+          .sort(sortByDate);
       } else if(sortMode === "scheduled"){
-        selected = base.filter(g => isScheduledGame(g) && new Date(g.dateTime) >= cutoff).sort(localFirstEnabled?localFirstSort:sortByDate);
+        selected = base.filter(g => isScheduledGame(g) && new Date(g.dateTime) >= cutoff).sort(sortByDate);
       } else if(sortMode === "final"){
         selected = base.filter(isFinalGame).sort((a,b) => new Date(b.dateTime) - new Date(a.dateTime));
       } else if(sortMode === "live"){
         // LIVE is a true filter: do not include scheduled or final games.
-        selected = base.filter(isLiveGame).sort(localFirstEnabled?localFirstSort:sortByDate);
+        selected = base.filter(isLiveGame).sort(sortByDate);
       } else {
         // GAMES is the active schedule, not a duplicate results view.
         // Show scheduled + live games only. Once the week is fully complete,
         // completed games remain exclusively under RESULTS.
         selected = base
           .filter(g => !isFinalGame(g))
-          .sort(localFirstEnabled?localFirstSort:sortByDate);
+          .sort(sortByDate);
       }
       return selected.slice(0, MAX_GAMES_TO_SHOW);
     }
@@ -3117,8 +3120,54 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       }, {});
     }
 
+    function remainingConfirmedLocalGames(){
+      // The Local filter is offered only for this week, selected TV market,
+      // and confirmed broadcasts still scheduled or in progress.
+      if(!selectedScheduleWeek||!directvMarket||!weeklyCoverageData?.weeks)return [];
+      return allGames.filter(g=>scheduleWeekKey(g)===selectedScheduleWeek &&
+        (isScheduledGame(g)||isLiveGame(g)) && getWeeklyCoverageAssignment(g)?.match===true);
+    }
+    function syncGamesSubviewControls(localCount=remainingConfirmedLocalGames().length){
+      if(sortMode!=="kickoff")return;
+      const viewSwitch=scheduleEl.querySelector(".games-view-switch");
+      if(!viewSwitch)return;
+      const existingLocal=viewSwitch.querySelector('[data-games-view="local"]');
+      if(localCount>0&&!existingLocal){
+        const button=document.createElement("button");
+        button.type="button";
+        button.dataset.gamesView="local";
+        button.innerHTML='Local <span class="games-local-count"></span>';
+        viewSwitch.append(button);
+      }else if(!localCount&&existingLocal){existingLocal.remove();}
+      viewSwitch.classList.toggle("has-local",localCount>0);
+      if(gamesSubview==="local"&&!localCount){
+        gamesSubview="all";
+        localStorage.setItem("gridironGuide.gamesSubview.v1","all");
+      }
+      viewSwitch.dataset.selected=gamesSubview;
+      const title=scheduleEl.querySelector(".games-view-title");
+      if(title)title.textContent=" · Games";
+      viewSwitch.querySelectorAll("[data-games-view]").forEach(button=>{
+        const active=button.dataset.gamesView===gamesSubview;
+        button.classList.toggle("active",active);
+        button.setAttribute("aria-pressed",String(active));
+      });
+      const liveCount=allGames.filter(g=>scheduleWeekKey(g)===selectedScheduleWeek&&isLiveGame(g)).length;
+      const countEl=viewSwitch.querySelector(".games-live-count");
+      if(countEl)countEl.textContent=liveCount?String(liveCount):"";
+      const localCountEl=viewSwitch.querySelector(".games-local-count");
+      if(localCountEl)localCountEl.textContent=String(localCount);
+      viewSwitch.classList.toggle("has-live",liveCount>0);
+    }
+
     function renderSchedule(){
       if(sortMode==="live"){sortMode="kickoff";gamesSubview="live";}
+      const remainingLocalCount=remainingConfirmedLocalGames().length;
+      // Once the last confirmed game finishes, restore the unfiltered view.
+      if(sortMode==="kickoff"&&gamesSubview==="local"&&!remainingLocalCount){
+        gamesSubview="all";
+        localStorage.setItem("gridironGuide.gamesSubview.v1","all");
+      }
       const games = getDisplayGames();
       updateWeekRange(games);
       updateFilterCounts();
@@ -3132,22 +3181,10 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
         const existingHeader=scheduleEl.querySelector(":scope > .games-section-header");
         const existingContent=scheduleEl.querySelector(":scope > .games-content");
         if(!existingHeader||!existingContent||existingHeader.dataset.weekKey!==weekKey){
-          const subnav=`<div class="results-view-switch games-view-switch" role="group" aria-label="Games views" data-selected="${gamesSubview}"><button type="button" data-games-view="all">All Games</button><button type="button" data-games-view="live"><span class="live-filter-dot"></span>Live <span class="games-live-count"></span></button></div>`;
-          scheduleEl.innerHTML=`<div class="results-section-header games-section-header" data-week-key="${escapeHtml(weekKey)}"><h2 class="results-section-title">${escapeHtml(weekTitle)}<span class="games-view-title"> · ${gamesSubview==="live"?"Live Games":"Games"}</span></h2><span class="results-section-rule" aria-hidden="true"></span>${subnav}</div><div class="games-content"></div>`;
+          const subnav=`<div class="results-view-switch games-view-switch" role="group" aria-label="Games views" data-selected="${gamesSubview}"><button type="button" data-games-view="all" aria-label="All games">All</button><button type="button" data-games-view="live"><span class="live-filter-dot"></span>Live <span class="games-live-count"></span></button></div>`;
+          scheduleEl.innerHTML=`<div class="results-section-header games-section-header" data-week-key="${escapeHtml(weekKey)}"><h2 class="results-section-title">${escapeHtml(weekTitle)}<span class="games-view-title"> · Games</span></h2><span class="results-section-rule" aria-hidden="true"></span>${subnav}</div><div class="games-content"></div>`;
         }
-        const viewSwitch=scheduleEl.querySelector(".games-view-switch");
-        viewSwitch.dataset.selected=gamesSubview;
-        const title=scheduleEl.querySelector(".games-view-title");
-        if(title)title.textContent=gamesSubview==="live"?" · Live Games":" · Games";
-        viewSwitch.querySelectorAll("[data-games-view]").forEach(button=>{
-          const active=button.dataset.gamesView===gamesSubview;
-          button.classList.toggle("active",active);
-          button.setAttribute("aria-pressed",String(active));
-        });
-        const liveCount=allGames.filter(g=>scheduleWeekKey(g)===selectedScheduleWeek&&isLiveGame(g)).length;
-        const countEl=viewSwitch.querySelector(".games-live-count");
-        if(countEl)countEl.textContent=liveCount?String(liveCount):"";
-        viewSwitch.classList.toggle("has-live",liveCount>0);
+        syncGamesSubviewControls(remainingLocalCount);
         resultsContentEl=scheduleEl.querySelector(":scope > .games-content");
       }
       if(sortMode==="final"){
@@ -3182,7 +3219,7 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
         const scoped = selectedScheduleWeek ? allGames.filter(g=>scheduleWeekKey(g)===selectedScheduleWeek) : allGames;
         const allFinal = scoped.length > 0 && scoped.every(isFinalGame);
         const emptyContent=sortMode==="kickoff"&&gamesSubview==="live"
-          ? `<section class="empty"><h2>No games live right now</h2><p>Switch to All Games to see upcoming matchups.</p></section>`
+          ? `<section class="empty"><h2>No games live right now</h2><p>Switch to All to see upcoming matchups.</p></section>`
           : allFinal && sortMode === "kickoff"
           ? `<section class="empty week-complete-cta" role="button" tabindex="0" data-open-results="true" aria-label="Week complete. Open Results to view scores."><h2>Week Complete</h2><p>All games are final. Tap to open RESULTS and view scores.</p></section>`
           : `<section class="empty"><h2>No games found</h2><p>Try another filter or refresh the schedule.</p></section>`;
@@ -3447,8 +3484,6 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
         });
       };
       syncButtons();
-      const localGamesFilterToggle=document.querySelector("#localGamesFilterToggle");
-      if(localGamesFilterToggle){localGamesFilterToggle.checked=localFirstEnabled;localGamesFilterToggle.addEventListener("change",()=>{localFirstEnabled=localGamesFilterToggle.checked;localStorage.setItem(LOCAL_FIRST_KEY,String(localFirstEnabled));renderSchedule();});}
       const sundayTicketToggle=document.querySelector("#sundayTicketEnabled");
       if(sundayTicketToggle){sundayTicketToggle.checked=sundayTicketEnabled;sundayTicketToggle.addEventListener("change",()=>{sundayTicketEnabled=sundayTicketToggle.checked;localStorage.setItem(SUNDAY_TICKET_KEY,String(sundayTicketEnabled));renderSchedule();});}
       const dtvPkg=document.querySelector("#directvNflPackage");
@@ -3718,7 +3753,13 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
     }
     scheduleEl.addEventListener("click",event=>{
       const gamesView=event.target.closest("[data-games-view]");
-      if(gamesView){gamesSubview=gamesView.dataset.gamesView;localStorage.setItem("gridironGuide.gamesSubview.v1",gamesSubview);renderSchedule();resetPageScrollForNavigation();return;}
+      if(gamesView){
+        const next=gamesView.dataset.gamesView;
+        if(next==="local"&&!remainingConfirmedLocalGames().length)return;
+        gamesSubview=next;
+        localStorage.setItem("gridironGuide.gamesSubview.v1",gamesSubview);
+        renderSchedule();resetPageScrollForNavigation();return;
+      }
       const view=event.target.closest("[data-results-view]");
       if(view){resultsSubview=view.dataset.resultsView;localStorage.setItem("gridironGuide.resultsSubview.v1",resultsSubview);renderSchedule();resetPageScrollForNavigation();return;}
       const pos=event.target.closest("[data-weekly-position]");
@@ -4549,6 +4590,9 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
               // scroll position, loaded helmets, and fantasy content stay mounted.
               updateVisibleGameCards(changes);
             }
+            // A game finishing may change the contextual Local count even if
+            // the All Games visible card list was otherwise unchanged.
+            syncGamesSubviewControls();
           }
         }
         scheduleScoreRefresh();
@@ -4719,7 +4763,11 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       const beforeCoverage=weeklyCoverageFingerprint(weeklyCoverageData);
       refreshWeeklyCoverageData(true).then(payload=>{
         if(weeklyCoverageFingerprint(payload)!==beforeCoverage){
+          // Coverage is optional enrichment. In All/Live views, update only
+          // badges and the filter button, never rebuild otherwise-visible cards.
           updateLocalBadgesInPlace();
+          if(sortMode==="kickoff"&&gamesSubview==="local")renderSchedule();
+          else syncGamesSubviewControls();
         }
       }).catch(()=>{});
     },1500);
