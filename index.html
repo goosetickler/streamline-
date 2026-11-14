@@ -1325,9 +1325,228 @@
     .results-final-card .fantasy-player{padding:3px 0}
     .results-final-card .fantasy-player-meta{margin-top:1px}
     .results-content .games{gap:7px}
-  </style>
+  
+/* Dashboard navigation: five destinations, existing game data and handlers retained. */
+.dashboard-nav{display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:0!important;margin-top:12px!important;padding:6px 2px!important;border:1px solid rgba(165,188,219,.20);border-radius:19px;background:linear-gradient(155deg,#142034,#101827);box-shadow:0 8px 25px #0005}
+.dashboard-nav .sort-tab{display:flex!important;flex-direction:column;gap:5px!important;height:65px!important;min-width:0;padding:5px 1px!important;background:transparent!important;border:0!important;border-radius:12px!important;color:#c2d0e6!important;position:relative;font-size:clamp(.52rem,2.4vw,.75rem)!important}
+.dashboard-nav .sort-tab:not(:last-child):after{content:"";position:absolute;right:0;top:14px;bottom:14px;width:1px;background:rgba(185,205,233,.16)}
+.dashboard-nav .sort-tab.active{color:#fff!important;background:rgba(80,184,255,.12)!important}
+.dashboard-nav .nav-icon{font-size:1.65rem;line-height:1.15;color:#dceaff;font-weight:800}
+.dashboard-nav [data-dashboard="live"] .nav-icon{color:#ff426b}
+.dashboard-nav [data-dashboard="local"] .nav-icon{color:#52e5ba}
+.dashboard-nav [data-dashboard="fantasy"] .nav-icon{color:#5ce9c1}
+.dashboard-nav .nav-label{white-space:nowrap;display:flex;align-items:center;justify-content:center;gap:3px;font-weight:900;text-transform:uppercase}
+.dashboard-nav .filter-count{display:inline-flex!important;align-items:center;justify-content:center;min-width:17px;height:17px;padding:0 4px;border-radius:15px;background:#405674;color:white;font-size:.64rem}
+.dashboard-nav [data-dashboard="live"] .filter-count{background:#35465b;color:#d7e3f1}
+.dashboard-nav [data-dashboard="local"] .filter-count{background:#35465b;color:#d7e3f1}
+.dashboard-nav [data-dashboard="results"] .filter-count{background:#35465b;color:#d7e3f1}
+.dashboard-nav .filter-count:empty{display:none!important}
+/* Main dashboard replaces the nested Games/Results switches. */
+.games-section-header .games-view-switch,.results-section-header .results-view-switch{display:none!important}
+.dashboard-nav + *{margin-top:0}
+#weeklyFantasy .weekly-position button:first-child{font-size:0}
+#weeklyFantasy .weekly-position button:first-child:after{content:"ALL";font-size:.75rem}
+@media(max-width:390px){.dashboard-nav .sort-tab{height:59px!important}.dashboard-nav .nav-icon{font-size:1.35rem}.dashboard-nav .nav-label{font-size:.55rem}}
+
+/* Dashboard polish: white idle destinations, selective active color and tighter rhythm. */
+.app-header{padding-bottom:8px!important}
+.week-bar.week-nav-shell{margin-top:9px!important;padding:5px 5px!important;gap:4px!important;border-radius:16px!important}
+.week-timeline{align-items:center!important;min-height:64px!important}
+.week-chip{flex-basis:30%!important;min-width:0!important;height:52px!important;transition:height .16s ease,background .16s ease!important}
+.week-chip.active{height:64px!important;background:linear-gradient(135deg,rgba(22,145,100,.7),rgba(0,86,107,.65))!important;border:1px solid #45efb4!important;border-bottom:3px solid #43efb5!important;border-radius:15px!important;box-shadow:0 4px 14px rgba(0,0,0,.2)!important}
+.week-chip.active .week-chip-title{font-size:1.04rem!important}
+.week-chip.active .week-chip-range{font-size:.55rem!important;opacity:1!important;white-space:nowrap!important;letter-spacing:-.015em}
+.week-chip:not(.active){opacity:.9}
+.week-chip:not(.active) .week-chip-range{white-space:nowrap!important;font-size:.54rem!important;letter-spacing:-.015em}
+.dashboard-nav{margin-top:8px!important;padding:4px 2px!important;border-radius:17px!important}
+.dashboard-nav .sort-tab{height:59px!important;gap:4px!important;color:#c2ccda!important;background:transparent!important}
+.dashboard-nav .nav-icon{height:25px;display:grid;place-items:center;color:inherit!important}
+.dashboard-nav .nav-icon svg{width:26px;height:26px;display:block}
+.dashboard-nav .nav-label{color:inherit!important}
+.dashboard-nav .sort-tab.active{background:rgba(195,216,242,.075)!important;color:#55ecc0!important}
+.dashboard-nav [data-dashboard="live"].active{color:#ff637f!important;background:rgba(195,216,242,.075)!important}
+.dashboard-nav [data-dashboard="results"].active{color:#93caff!important;background:rgba(195,216,242,.075)!important}
+/* Badges stay neutral on inactive destinations. The selected tab supplies the accent. */
+.dashboard-nav .sort-tab.active [data-count="live"]{background:#eb4167;color:#fff}
+.dashboard-nav .sort-tab.active [data-count="local"]{background:#42e2b0;color:#081c1b}
+.dashboard-nav .sort-tab.active [data-count="results"]{background:#397eae;color:#fff}
+.dashboard-nav .sort-tab:not(:last-child):after{top:10px;bottom:10px}
+.dashboard-nav .filter-count{margin-left:2px}
+.results-section-header{margin:2px 0 5px!important;min-height:28px!important}
+#weeklyFantasy{padding-top:8px!important}
+#weeklyFantasy .weekly-controls{margin-top:5px!important}
+@media(max-width:390px){.dashboard-nav .sort-tab{height:56px!important}.dashboard-nav .nav-icon svg{width:23px;height:23px}.week-chip.active .week-chip-title{font-size:.98rem!important}}
+
+/* Dashboard cleanup: the five-tab navigation itself identifies the current view.
+   Keep the old switches mounted, but never expose duplicate view headers. */
+#schedule > .games-section-header,
+#schedule > .results-section-header{display:none!important}
+#schedule .games-content > .day-group,
+#schedule .results-content > .day-group,
+#schedule .results-content > .completed-results-group{margin:0 0 9px!important}
+#schedule .games-content > .day-group .games{gap:9px}
+#schedule .results-content > .weekly-leaders{margin-top:0!important}
+#schedule .games-content .day-heading,
+#schedule .results-content .day-heading{display:none!important}
+
+/* Fantasy: six equal-width position choices, then progress + scoring mode. */
+#weeklyFantasy{padding:10px 12px 11px!important}
+#weeklyFantasy > .weekly-controls{
+  display:flex!important;flex-direction:column!important;align-items:stretch!important;
+  gap:7px!important;width:100%!important;margin:0 0 5px!important
+}
+#weeklyFantasy > .weekly-controls > .weekly-position{
+  display:grid!important;grid-template-columns:repeat(6,minmax(0,1fr))!important;
+  gap:5px!important;width:100%!important;max-width:none!important;flex:none!important;
+  overflow:visible!important
+}
+#weeklyFantasy .weekly-position button{
+  width:100%;min-width:0;flex-shrink:1;padding:8px 0!important;
+  font-size:.74rem!important;text-align:center
+}
+#weeklyFantasy .weekly-position button:first-child{font-size:.74rem!important}
+#weeklyFantasy .weekly-position button:first-child::after{content:none!important}
+#weeklyFantasy .weekly-subcontrols{
+  display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:32px
+}
+#weeklyFantasy .weekly-subcontrols .weekly-progress{
+  flex:1;min-width:0;margin:0!important;line-height:1.25;
+  color:var(--muted);font-size:.72rem;font-weight:700
+}
+#weeklyFantasy .weekly-subcontrols .weekly-scoring-pill{
+  flex:0 0 auto;margin:0;padding:7px 11px!important;font-size:.70rem!important
+}
+@media(max-width:390px){
+  #weeklyFantasy{padding-inline:10px!important}
+  #weeklyFantasy > .weekly-controls > .weekly-position{gap:4px!important}
+  #weeklyFantasy .weekly-position button{font-size:.68rem!important;padding:7px 0!important}
+  #weeklyFantasy .weekly-position button:first-child{font-size:.68rem!important}
+  #weeklyFantasy .weekly-subcontrols .weekly-progress{font-size:.66rem}
+  #weeklyFantasy .weekly-subcontrols .weekly-scoring-pill{font-size:.66rem!important;padding:7px 8px!important}
+}
+
+/* Top-ten viewport fit (v1.0.3 refinement): reclaim ~20 CSS px from
+   navigation and fantasy controls, without compressing player rows. */
+.app-header{padding-bottom:7px!important}
+.week-bar.week-nav-shell{margin-top:8px!important;padding:4px 5px!important}
+.week-timeline{min-height:57px!important}
+.week-chip.active{height:57px!important}
+.week-chip:not(.active){height:50px!important}
+.dashboard-nav{margin-top:6px!important;padding:2px 2px!important}
+.dashboard-nav .sort-tab{height:53px!important;gap:3px!important}
+.dashboard-nav .nav-icon{height:24px}
+.dashboard-nav .nav-icon svg{width:24px;height:24px}
+#weeklyFantasy{padding:8px 12px 9px!important}
+#weeklyFantasy > .weekly-controls{gap:5px!important;margin-bottom:3px!important}
+#weeklyFantasy .weekly-position button{padding:7px 0!important}
+#weeklyFantasy .weekly-subcontrols{min-height:31px!important}
+#weeklyFantasy .weekly-subcontrols .weekly-scoring-pill{padding:6px 11px!important}
+@media (max-width:390px){
+  .dashboard-nav .sort-tab{height:50px!important}
+  .dashboard-nav .nav-icon svg{width:22px;height:22px}
+  #weeklyFantasy{padding-inline:10px!important}
+  #weeklyFantasy .weekly-position button{padding:5.5px 0!important}
+  #weeklyFantasy .weekly-subcontrols .weekly-scoring-pill{padding:6px 8px!important}
+}
+
+/* Counter contrast correction: Games uses the same neutral badge as the other
+   inactive destinations, then a readable green badge only while selected. */
+.dashboard-nav [data-dashboard="games"] .filter-count{
+  background:#35465b;
+  color:#e4ebf4;
+}
+.dashboard-nav [data-dashboard="games"].active .filter-count{
+  background:#45cba7;
+  color:#09231e;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.14);
+}
+/* Match the week navigator more closely to the dark-navy dashboard rail,
+   while preserving a distinct surface and the highlighted selected week. */
+.week-bar.week-nav-shell{
+  background:linear-gradient(155deg,#1c2533 0%,#161d29 100%)!important;
+}
+
+/* Waiver Wire v2: week-scoped lists, starting with Week 10. */
+#weeklyFantasy .waiver-empty-state{padding:20px 8px;text-align:center;color:var(--muted);font-size:.78rem;font-weight:750;line-height:1.4}
+#weeklyFantasy .fantasy-mode-switch{
+  display:grid;grid-template-columns:1fr 1fr;gap:2px;flex:0 0 auto;
+  padding:2px;border:1px solid rgba(184,205,232,.17);border-radius:999px;
+  background:rgba(255,255,255,.055);height:31px;min-width:140px
+}
+#weeklyFantasy .fantasy-mode-switch button{
+  border:0;background:transparent;color:#aab7cb;border-radius:999px;
+  padding:0 8px;font-size:.71rem;font-weight:900;cursor:pointer;white-space:nowrap;
+  -webkit-tap-highlight-color:transparent;touch-action:manipulation;
+  transition:background .15s ease,color .15s ease,transform .1s ease
+}
+#weeklyFantasy .fantasy-mode-switch button.active{
+  background:linear-gradient(115deg,#5bf0b5,#4dbaff);color:#061822;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.24)
+}
+#weeklyFantasy .fantasy-mode-switch button:active{transform:scale(.96)}
+#weeklyFantasy .fantasy-mode-switch button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+#weeklyFantasy .waiver-mode-meta{
+  display:none;align-items:center;justify-content:center;min-height:28px;
+  border-radius:999px;padding:0 10px;font-size:.66rem;color:var(--muted);
+  font-weight:800;white-space:nowrap
+}
+#weeklyFantasy[data-fantasy-mode="waivers"] .weekly-scoring-pill{display:none!important}
+#weeklyFantasy[data-fantasy-mode="waivers"] .waiver-mode-meta{display:inline-flex!important}
+#weeklyFantasy .waiver-player .weekly-player-points{color:#a8b7ca;font-size:.75rem;letter-spacing:.015em}
+#weeklyFantasy .waiver-player .weekly-player-points[data-rostered="Low"]{color:#6affb7}
+#weeklyFantasy .waiver-player .weekly-player-points[data-rostered="Medium"]{color:#f3d18a}
+#weeklyFantasy .waiver-player .weekly-player-points[data-rostered="High"]{color:#9caabe}
+#weeklyFantasy .waiver-player .fantasy-player-meta{gap:5px}
+@media(max-width:390px){
+  #weeklyFantasy .fantasy-mode-switch{min-width:125px;height:29px}
+  #weeklyFantasy .fantasy-mode-switch button{font-size:.65rem;padding-inline:5px}
+  #weeklyFantasy .waiver-mode-meta{font-size:.58rem;padding-inline:5px}
+}
+
+/* Waiver quick takes: same compact collapsed Top 10 row height. */
+#weeklyFantasy .waiver-entry{display:block;margin:0;padding:0;min-width:0}
+#weeklyFantasy .waiver-entry>summary.weekly-player{
+  list-style:none;cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent;
+  margin:0;width:100%;align-items:center;gap:7px
+}
+#weeklyFantasy .waiver-entry>summary.weekly-player::-webkit-details-marker{display:none}
+#weeklyFantasy .waiver-entry>summary.weekly-player::marker{content:""}
+#weeklyFantasy .waiver-entry>summary.weekly-player:focus-visible{
+  outline:2px solid var(--accent);outline-offset:-2px;border-radius:7px
+}
+#weeklyFantasy .waiver-entry>summary .weekly-player-info{min-width:0;flex:1}
+#weeklyFantasy .waiver-trailing{display:flex;align-items:center;gap:8px;flex:0 0 auto}
+#weeklyFantasy .waiver-trailing .weekly-player-points{white-space:nowrap}
+#weeklyFantasy .waiver-expand-chevron{
+  display:inline-flex;align-items:center;justify-content:center;color:#8294ab;opacity:.8;
+  transition:transform .16s ease,color .16s ease
+}
+#weeklyFantasy .waiver-expand-chevron svg{width:13px;height:13px;display:block;stroke:currentColor;stroke-width:2.25;fill:none;stroke-linecap:round;stroke-linejoin:round}
+#weeklyFantasy .waiver-entry[open] .waiver-expand-chevron{transform:rotate(180deg);color:var(--green);opacity:1}
+#weeklyFantasy .waiver-entry[open]>summary.weekly-player{background:rgba(77,183,255,.035)}
+#weeklyFantasy .waiver-quick-take{
+  margin:0 1px 7px 24px;padding:10px 12px;
+  background:linear-gradient(115deg,rgba(29,42,63,.70),rgba(18,29,45,.85));
+  border:1px solid rgba(151,176,212,.18);border-radius:12px
+}
+#weeklyFantasy .waiver-quick-label{
+  display:block;margin:0 0 5px;font-size:.62rem;line-height:1.1;
+  color:var(--green);font-weight:900;letter-spacing:.075em;text-transform:uppercase
+}
+#weeklyFantasy .waiver-quick-copy{
+  margin:0;color:#cbd8e9;font-size:.76rem;line-height:1.48;font-weight:620;
+  overflow-wrap:anywhere
+}
+@media(max-width:390px){
+  #weeklyFantasy .waiver-trailing{gap:5px}
+  #weeklyFantasy .waiver-quick-take{margin-left:19px;padding:9px 10px}
+  #weeklyFantasy .waiver-quick-copy{font-size:.73rem}
+}
+@media(prefers-reduced-motion:reduce){#weeklyFantasy .waiver-expand-chevron{transition:none}}
+</style>
 </head>
 <body class="provider-chip-refresh">
+  <script id="waiverFallbackData" type="application/json">{"season":2026,"updated":"2026-11-14","rosteredNote":"Estimated rostered level, not measured percentages. Low = less widely rostered (more likely available); Medium = mixed; High = widely rostered (less likely available).","weeks":{"10":{"updated":"2026-11-14","players":[{"rank":1,"name":"Jordyn Tyson","team":"NO","position":"WR","rostered":"Medium","summary":"Tyson drew five targets on just 16 routes in his NFL debut, giving him a path to a much bigger role in New Orleans. He is still ramping up after a hamstring injury, so treat him as an upside stash rather than an automatic starter."},{"rank":2,"name":"Corey Kiner","team":"NE","position":"RB","rostered":"Low","summary":"Rhamondre Stevenson's knee injury has opened a path to lead-back touches for Kiner, who has been productive with his carries. His value depends on Stevenson and TreVeyon Henderson's health, so keep an eye on the injury reports."},{"rank":3,"name":"DeMario Douglas","team":"NE","position":"WR","rostered":"Medium","summary":"Douglas has become a useful PPR option and recently drew a season-high nine targets for New England. His receiving volume is encouraging, but the Patriots have enough pass catchers to make his weekly floor uncertain."},{"rank":4,"name":"Tank Dell","team":"HOU","position":"WR","rostered":"Medium","summary":"Dell turned nine targets into 105 yards and a touchdown against the Chargers, flashing the upside that made him a fantasy target. He's still working back into a full route share after a long injury absence, so expect some week-to-week volatility."},{"rank":5,"name":"Audric Estime","team":"NO","position":"RB","rostered":"Low","summary":"Estime ran 15 times for 72 yards and a touchdown as New Orleans searched for backfield production. He could help in the short term, but Travis Etienne's return threatens to cut into his workload."},{"rank":6,"name":"Kaelon Black","team":"SF","position":"RB","rostered":"Low","summary":"Black rushed for 70 yards on 11 carries and has emerged as San Francisco's clear backup to Christian McCaffrey. His increased usage is promising, but he's primarily a high-upside handcuff while McCaffrey is healthy."},{"rank":7,"name":"Caleb Douglas","team":"MIA","position":"WR","rostered":"Low","summary":"Douglas caught six of eight targets against Detroit and is earning a meaningful role in Miami's passing game. The target volume makes him interesting, but shaky quarterback play could limit his weekly ceiling."},{"rank":8,"name":"Chig Okonkwo","team":"WAS","position":"TE","rostered":"Medium","summary":"Okonkwo has been drawing steady targets as Washington's main receiving tight end, making him worth a look in PPR leagues. He managed four catches for 24 yards on Thursday, so view him as a depth or streaming option rather than a must-start."},{"rank":9,"name":"Ryan Flournoy","team":"DAL","position":"WR","rostered":"Low","summary":"Flournoy has shown useful flashes for Dallas and could see more opportunities if George Pickens remains sidelined. His limited targets against Indianapolis highlight the risk of relying on him as a weekly starter."},{"rank":10,"name":"Emmett Johnson","team":"KC","position":"RB","rostered":"Low","summary":"Kenneth Walker has been ruled out for Week 10, putting Johnson in line for a major role against Atlanta. He's an attractive immediate pickup, but his workload could shrink quickly when Walker returns."}]}}}</script>
   <div class="wrap">
     <header class="app-header">
       <div class="title-row">
@@ -1346,9 +1565,12 @@
         <div id="weekTimeline" class="week-timeline" aria-label="Schedule weeks"></div>
         <button id="weekNextBtn" class="week-arrow" type="button" aria-label="Next week">›</button>
       </section>
-      <nav class="sort-tabs" aria-label="Schedule sort options">
-        <button class="sort-tab active" data-sort="kickoff"><span>Games</span><span class="filter-count" data-count="kickoff"></span></button>
-        <button class="sort-tab" data-sort="final"><span>Results</span><span class="filter-count" data-count="final"></span></button>
+      <nav class="sort-tabs dashboard-nav" aria-label="Main navigation">
+        <button class="sort-tab" data-dashboard="games" type="button"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4M17 3v4M3 10h18M7 14h2M12 14h2M17 14h.01M7 18h2"/></svg></span><span class="nav-label">Games <span class="filter-count" data-count="games"></span></span></button>
+        <button class="sort-tab" data-dashboard="live" type="button"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="2"/><path d="M7.7 7.7a6 6 0 0 0 0 8.6m8.6-8.6a6 6 0 0 1 0 8.6M4.8 4.8a10 10 0 0 0 0 14.4m14.4-14.4a10 10 0 0 1 0 14.4"/></svg></span><span class="nav-label">Live <span class="filter-count" data-count="live"></span></span></button>
+        <button class="sort-tab" data-dashboard="local" type="button"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></svg></span><span class="nav-label">Local <span class="filter-count" data-count="local"></span></span></button>
+        <button class="sort-tab" data-dashboard="results" type="button"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4m0 1c5-3 9 3 15 0v11c-6 3-10-3-15 0"/></svg></span><span class="nav-label">Results <span class="filter-count" data-count="results"></span></span></button>
+        <button class="sort-tab" data-dashboard="fantasy" type="button"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="13" width="4" height="8" rx="1"/><rect x="10" y="8" width="4" height="13" rx="1"/><rect x="17" y="3" width="4" height="18" rx="1"/></svg></span><span class="nav-label">Fantasy</span></button>
       </nav>
     </header>
 
@@ -1496,13 +1718,99 @@
     const WEEKLY_COVERAGE_CACHE_KEY="gridironGuide.weeklyCoverage.v2";
     const WEEKLY_COVERAGE_CACHE_TTL_MS=5*60*1000;
     const WEEKLY_COVERAGE_FEED_URL="https://goosetickler.github.io/streamline-/local-coverage-2026.json";
-    const FANTASY_CACHE_PREFIX = "gridironGuide.realFantasy.v3.";
+    // v4/v6 invalidate early-game snapshots incorrectly retained after a game ended.
+    const FANTASY_CACHE_PREFIX = "gridironGuide.realFantasy.v4.";
     const LIVE_FANTASY_CACHE_TTL_MS = 90*1000;
+    const RECENT_FINAL_FANTASY_CACHE_TTL_MS = 10*60*1000;
+    const OLD_FINAL_FANTASY_CACHE_TTL_MS = 6*60*60*1000;
     const fantasyLeaderRequests = new Map();
-    const WEEKLY_FANTASY_CACHE_PREFIX="gridironGuide.weeklyFantasyAll.v5.";
+    const WEEKLY_FANTASY_CACHE_PREFIX="gridironGuide.weeklyFantasyAll.v6.";
     const weeklyFantasyRequests=new Map();
     let resultsSubview=localStorage.getItem("gridironGuide.resultsSubview.v1")==="fantasy"?"fantasy":"games";
     let weeklyFantasyPosition="ALL";
+    let weeklyFantasyMode="leaders";
+    const WAIVER_JSON_URL="waivers.json";
+    const WAIVER_FALLBACK=JSON.parse(document.getElementById("waiverFallbackData")?.textContent||"{}");
+    let waiverData=WAIVER_FALLBACK;
+    let waiverLoadPromise=null;
+    // Waiver recommendations are specific to a REGULAR-SEASON week. The JSON
+    // holds only published weeks, beginning with Week 10 in 2026. New weeks can
+    // be appended without copying old recommendations or changing this HTML.
+    function validWaiverPlayer(p){
+      return p&&typeof p.name==="string"&&typeof p.team==="string"&&
+        ["QB","RB","WR","TE","K"].includes(p.position)&&
+        (["High","Medium","Low"].includes(p.rostered)||["High","Medium","Low"].includes(p.availability))&&
+        (p.summary===undefined||(typeof p.summary==="string"&&p.summary.length<=700));
+    }
+    function validWaiverPayload(data){
+      return data&&Number(data.season)===2026&&data.weeks&&
+        typeof data.weeks==="object"&&!Array.isArray(data.weeks)&&
+        Object.keys(data.weeks).length>0&&
+        Object.entries(data.weeks).every(([week,entry])=>
+          /^(?:[1-9]|1[0-8])$/.test(week)&&entry&&Array.isArray(entry.players)&&
+          entry.players.every(validWaiverPlayer));
+    }
+    function selectedWaiverWeek(){
+      const [type,week]=String(selectedScheduleWeek||"").split(":").map(Number);
+      return type===2&&Number.isInteger(week)&&week>=1&&week<=18?week:null;
+    }
+    async function loadWaivers({force=false}={}){
+      if(waiverLoadPromise&&!force)return waiverLoadPromise;
+      const load=(async()=>{
+        try{
+          const separator=WAIVER_JSON_URL.includes("?")?"&":"?";
+          const response=await fetch(WAIVER_JSON_URL+separator+"v="+Date.now(),{cache:"no-store"});
+          if(!response.ok)throw new Error("Waiver file unavailable");
+          const payload=await response.json();
+          if(validWaiverPayload(payload))waiverData=payload;
+        }catch(_err){
+          // Retain the embedded snapshot for file:// and offline WKWebView loads.
+        }
+        if(weeklyFantasyMode==="waivers")renderWeeklyFantasyPlayers();
+        return waiverData;
+      })();
+      waiverLoadPromise=load;
+      try{return await load;}finally{if(waiverLoadPromise===load)waiverLoadPromise=null;}
+    }
+    // Transitional compatibility for last week's JSON format.
+    function rosteredTier(p){
+      if(["Low","Medium","High"].includes(p.rostered))return p.rostered;
+      return ({High:"Low",Medium:"Medium",Low:"High"})[p.availability]||"Medium";
+    }
+    function renderWaivers(){
+      const content=document.querySelector("#weeklyFantasyContent");
+      if(!content||sortMode!=="final"||resultsSubview!=="fantasy")return;
+      const meta=document.getElementById("waiverModeMeta");
+      if(meta)meta.textContent="Rostered";
+      const week=selectedWaiverWeek();
+      const entry=week!==null&&validWaiverPayload(waiverData)?waiverData.weeks[String(week)]:null;
+      if(!entry){
+        const message=week===null?"Waiver picks are available for regular-season weeks only."
+          :week<10?"Waiver Wire starts in Week 10."
+          :`No waiver picks published for Week ${week} yet.`;
+        content.innerHTML=`<div class="waiver-empty-state">${escapeHtml(message)}</div>`;
+        return;
+      }
+      const players=entry.players.filter(p=>weeklyFantasyPosition==="ALL"||p.position===weeklyFantasyPosition)
+        .slice().sort((a,b)=>Number(a.rank||999)-Number(b.rank||999)).slice(0,10);
+      content.innerHTML=players.length?players.map((p,index)=>{
+        const rank=Number(p.rank)||index+1;
+        return `<details class="waiver-entry" data-waiver-rank="${rank}">
+          <summary class="weekly-player waiver-player" aria-label="${escapeHtml(p.name)}. Show player quick take.">
+            <span class="weekly-rank">${index+1}</span>
+            <div class="weekly-player-info"><div class="weekly-player-name">${escapeHtml(p.name)}</div>
+              <div class="fantasy-player-meta"><span class="fantasy-team">${escapeHtml(p.team)}</span><span class="fantasy-tag">${escapeHtml(p.position)}</span></div></div>
+            <span class="waiver-trailing"><span class="weekly-player-points" data-rostered="${escapeHtml(rosteredTier(p))}" title="Estimated rostered level (not a measured percentage)">${escapeHtml(rosteredTier(p).toUpperCase())}</span>
+              <span class="waiver-expand-chevron" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="m3.5 6 4.5 4 4.5-4"/></svg></span></span>
+          </summary>
+          <div class="waiver-quick-take">
+            <span class="waiver-quick-label">Quick Take</span>
+            <p class="waiver-quick-copy">${escapeHtml(p.summary||"Player scouting note not yet published for this week.")}</p>
+          </div>
+        </details>`;
+      }).join(""):`<p class="weekly-progress">No ${escapeHtml(weeklyFantasyPosition)} picks in Week ${week}'s Top 10.</p>`;
+    }
+
     const WEEKLY_SCORING_MODES=[{key:"ppr",label:"Full PPR",bonus:1},{key:"half",label:"Half PPR",bonus:0.5},{key:"standard",label:"Standard",bonus:0}];
     let weeklyScoringMode=localStorage.getItem("gridironGuide.weeklyScoring.v1")||"ppr";
     if(!WEEKLY_SCORING_MODES.some(mode=>mode.key===weeklyScoringMode))weeklyScoringMode="ppr";
@@ -3140,10 +3448,8 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
         viewSwitch.append(button);
       }else if(!localCount&&existingLocal){existingLocal.remove();}
       viewSwitch.classList.toggle("has-local",localCount>0);
-      if(gamesSubview==="local"&&!localCount){
-        gamesSubview="all";
-        localStorage.setItem("gridironGuide.gamesSubview.v1","all");
-      }
+      // Keep Local selected even when its last game completes. The dashboard
+      // displays a dedicated empty state rather than unexpectedly opening Games.
       viewSwitch.dataset.selected=gamesSubview;
       const title=scheduleEl.querySelector(".games-view-title");
       if(title)title.textContent=" · Games";
@@ -3163,14 +3469,10 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
     function renderSchedule(){
       if(sortMode==="live"){sortMode="kickoff";gamesSubview="live";}
       const remainingLocalCount=remainingConfirmedLocalGames().length;
-      // Once the last confirmed game finishes, restore the unfiltered view.
-      if(sortMode==="kickoff"&&gamesSubview==="local"&&!remainingLocalCount){
-        gamesSubview="all";
-        localStorage.setItem("gridironGuide.gamesSubview.v1","all");
-      }
       const games = getDisplayGames();
       updateWeekRange(games);
       updateFilterCounts();
+      syncDashboardNavigation();
       syncFollowedGamesWithNative();
       syncWidgetDataWithNative();
       let resultsContentEl=null;
@@ -3182,7 +3484,7 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
         const existingContent=scheduleEl.querySelector(":scope > .games-content");
         if(!existingHeader||!existingContent||existingHeader.dataset.weekKey!==weekKey){
           const subnav=`<div class="results-view-switch games-view-switch" role="group" aria-label="Games views" data-selected="${gamesSubview}"><button type="button" data-games-view="all" aria-label="All games">All</button><button type="button" data-games-view="live"><span class="live-filter-dot"></span>Live <span class="games-live-count"></span></button></div>`;
-          scheduleEl.innerHTML=`<div class="results-section-header games-section-header" data-week-key="${escapeHtml(weekKey)}"><h2 class="results-section-title">${escapeHtml(weekTitle)}<span class="games-view-title"> · Games</span></h2><span class="results-section-rule" aria-hidden="true"></span>${subnav}</div><div class="games-content"></div>`;
+          scheduleEl.innerHTML=`<div class="results-section-header games-section-header" data-week-key="${escapeHtml(weekKey)}">${subnav}</div><div class="games-content"></div>`;
         }
         syncGamesSubviewControls(remainingLocalCount);
         resultsContentEl=scheduleEl.querySelector(":scope > .games-content");
@@ -3197,7 +3499,7 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
         // Top 10. Rebuilding the control on every click prevented CSS motion.
         if(!existingHeader||!existingContent||existingHeader.dataset.weekKey!==weekKey){
           const subnav=`<div class="results-view-switch" role="group" aria-label="Results views" data-selected="${resultsSubview}"><button type="button" data-results-view="games" class="${resultsSubview==="games"?"active":""}" aria-pressed="${resultsSubview==="games"}">Games</button><button type="button" data-results-view="fantasy" class="${resultsSubview==="fantasy"?"active":""}" aria-pressed="${resultsSubview==="fantasy"}">🏆 Top 10</button></div>`;
-          scheduleEl.innerHTML=`<div class="results-section-header" data-week-key="${escapeHtml(weekKey)}"><h2 class="results-section-title">${escapeHtml(weekTitle)}<span class="results-view-title"> · ${resultsSubview==="fantasy"?"Fantasy Leaders":"Games"}</span></h2><span class="results-section-rule" aria-hidden="true"></span>${subnav}</div><div class="results-content"></div>`;
+          scheduleEl.innerHTML=`<div class="results-section-header" data-week-key="${escapeHtml(weekKey)}">${subnav}</div><div class="results-content"></div>`;
         }
         const viewSwitch=scheduleEl.querySelector(".results-view-switch");
         viewSwitch.dataset.selected=resultsSubview;
@@ -3210,8 +3512,13 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
         });
         resultsContentEl=scheduleEl.querySelector(":scope > .results-content");
         if(resultsSubview==="fantasy"){
-          resultsContentEl.innerHTML=`<section class="weekly-leaders" id="weeklyFantasy"><div class="weekly-controls"><div class="weekly-position" aria-label="Fantasy position filters">${["ALL","QB","RB","WR","TE","K"].map(pos=>`<button type="button" data-weekly-position="${pos}" class="${weeklyFantasyPosition===pos?"active":""}">${pos==="ALL"?"Overall":pos}</button>`).join("")}</div><button type="button" class="weekly-scoring-pill" data-cycle-scoring="true" aria-label="Change fantasy scoring format">${WEEKLY_SCORING_MODES.find(m=>m.key===weeklyScoringMode).label} ↻</button></div><div id="weeklyFantasyContent" aria-live="polite">Loading weekly player stats…</div></section>`;
-          loadWeeklyFantasy();
+          resultsContentEl.innerHTML=`<section class="weekly-leaders" id="weeklyFantasy" data-fantasy-mode="${weeklyFantasyMode}"><div class="weekly-controls"><div class="weekly-position" role="group" aria-label="Fantasy position filters">${["ALL","QB","RB","WR","TE","K"].map(pos=>`<button type="button" data-weekly-position="${pos}" class="${weeklyFantasyPosition===pos?"active":""}" aria-pressed="${weeklyFantasyPosition===pos}">${pos}</button>`).join("")}</div><div class="weekly-subcontrols"><div class="fantasy-mode-switch" role="group" aria-label="Fantasy list mode"><button type="button" data-fantasy-mode="leaders" class="${weeklyFantasyMode==="leaders"?"active":""}" aria-pressed="${weeklyFantasyMode==="leaders"}">Leaders</button><button type="button" data-fantasy-mode="waivers" class="${weeklyFantasyMode==="waivers"?"active":""}" aria-pressed="${weeklyFantasyMode==="waivers"}">Waivers</button></div><button type="button" class="weekly-scoring-pill" data-cycle-scoring="true" aria-label="Change fantasy scoring format">${WEEKLY_SCORING_MODES.find(m=>m.key===weeklyScoringMode).label} ↻</button><span class="waiver-mode-meta" id="waiverModeMeta" title="Estimated rostered level; Low = more likely available, High = less likely available">Rostered</span></div></div><div id="weeklyFantasyContent" aria-live="polite">Loading weekly player stats…</div></section>`;
+          if(weeklyFantasyMode==="waivers"){
+            renderWaivers();
+            loadWaivers();
+          }else{
+            loadWeeklyFantasy();
+          }
           return;
         }
       }
@@ -3219,7 +3526,9 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
         const scoped = selectedScheduleWeek ? allGames.filter(g=>scheduleWeekKey(g)===selectedScheduleWeek) : allGames;
         const allFinal = scoped.length > 0 && scoped.every(isFinalGame);
         const emptyContent=sortMode==="kickoff"&&gamesSubview==="live"
-          ? `<section class="empty"><h2>No games live right now</h2><p>Switch to All to see upcoming matchups.</p></section>`
+          ? `<section class="empty"><h2>No games live right now</h2><p>Check Games for upcoming matchups.</p></section>`
+          : sortMode==="kickoff"&&gamesSubview==="local"
+          ? `<section class="empty"><h2>No local games remaining</h2><p>No upcoming or live local games are confirmed for this week. Check Results for completed matchups.</p></section>`
           : allFinal && sortMode === "kickoff"
           ? `<section class="empty week-complete-cta" role="button" tabindex="0" data-open-results="true" aria-label="Week complete. Open Results to view scores."><h2>Week Complete</h2><p>All games are final. Tap to open RESULTS and view scores.</p></section>`
           : `<section class="empty"><h2>No games found</h2><p>Try another filter or refresh the schedule.</p></section>`;
@@ -3229,11 +3538,10 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       }
       const groups = groupByDay(games);
       const gamesContent=Object.entries(groups).map(([day, dayGames]) => {
-        // Completed Results cards don't need redundant calendar-day headings.
-        // Keep dates for any scheduled/in-progress games in other views.
-        const hideDayHeading=sortMode==="final" && dayGames.every(isFinalGame);
-        return `<section class="day-group${hideDayHeading?" completed-results-group":""}"${hideDayHeading?"":` aria-labelledby="${slug(day)}"`}>
-          ${hideDayHeading?"":`<h2 class="day-heading" id="${slug(day)}">${day}</h2>`}
+        // Game cards already show their day and kickoff time; keep day as an
+        // accessible group name without duplicating it visually above the cards.
+        const completedDay=sortMode==="final" && dayGames.every(isFinalGame);
+        return `<section class="day-group${completedDay?" completed-results-group":""}" aria-label="${escapeHtml(day)}">
           <div class="games">${dayGames.map(renderGameCard).join("")}</div>
         </section>`;
       }).join("");
@@ -3706,10 +4014,10 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       const byName=new Map(rosters.filter(r=>r.name).map(r=>[r.name,r.position]));
       return players.map(p=>({...p,position:byId.get(String(p.id))||byName.get(String(p.name).trim().toLowerCase())||p.position}));
     }
-    async function getAllFantasyPlayers(game){
+    async function getAllFantasyPlayers(game,{force=false}={}){
       const key=WEEKLY_FANTASY_CACHE_PREFIX+game.id;
       const cached=readFantasyCacheRecord(key);
-      if(cached.leaders.length&&(isFinalGame(game)||Date.now()-cached.savedAt<LIVE_FANTASY_CACHE_TTL_MS))return cached.leaders;
+      if(!force && isGameFantasyCacheFresh(game,cached))return cached.leaders;
       if(weeklyFantasyRequests.has(key))return weeklyFantasyRequests.get(key);
       const request=(async()=>{
         try{
@@ -3729,6 +4037,7 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
     function renderWeeklyFantasyPlayers(){
       const el=document.querySelector("#weeklyFantasyContent");
       if(!el||sortMode!=="final"||resultsSubview!=="fantasy")return;
+      if(weeklyFantasyMode==="waivers"){renderWaivers();return;}
       const weekGames=allGames.filter(game=>!selectedScheduleWeek||scheduleWeekKey(game)===selectedScheduleWeek);
       const finished=weekGames.filter(isFinalGame).length;
       const remaining=weekGames.length-finished;
@@ -3736,21 +4045,31 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       const pending=weeklyFantasyLoaded<weeklyFantasyExpected;
       const notice=pending?`<span class="weekly-stats-pending"> · Updating player stats…</span>`:"";
       const filtered=weeklyFantasyPlayers.filter(p=>weeklyFantasyPosition==="ALL"||p.position===weeklyFantasyPosition).sort((a,b)=>weeklyFantasyScore(b)-weeklyFantasyScore(a)).slice(0,10);
-      el.innerHTML=`<div class="weekly-progress">${progress}${notice}</div>`+(filtered.length?filtered.map((p,i)=>`<div class="weekly-player"><span class="weekly-rank">${i+1}</span><div class="weekly-player-info"><div class="weekly-player-name">${escapeHtml(p.name)}</div>${renderFantasyPlayerMeta(p)}</div><div class="weekly-player-points">${weeklyFantasyScore(p).toFixed(1)} PTS</div></div>`).join(""):`<p class="weekly-progress">${pending?"Loading player performances…":`No ${weeklyFantasyPosition==="ALL"?"player":"position"} stats available for this week yet.`}</p>`);
+      const progressEl=document.getElementById("weeklyProgress");
+      if(progressEl)progressEl.innerHTML=`${escapeHtml(progress)}${notice}`;
+      el.innerHTML=(filtered.length?filtered.map((p,i)=>`<div class="weekly-player"><span class="weekly-rank">${i+1}</span><div class="weekly-player-info"><div class="weekly-player-name">${escapeHtml(p.name)}</div>${renderFantasyPlayerMeta(p)}</div><div class="weekly-player-points">${weeklyFantasyScore(p).toFixed(1)} PTS</div></div>`).join(""):`<p class="weekly-progress">${pending?"Loading player performances…":`No ${weeklyFantasyPosition==="ALL"?"player":"position"} stats available for this week yet.`}</p>`);
     }
-    async function loadWeeklyFantasy(){
+    async function loadWeeklyFantasy({force=false}={}){
       const token=++weeklyFantasyRenderToken;
       const games=weeklyFantasyGames();
       weeklyFantasyPlayers=[];weeklyFantasyLoaded=0;weeklyFantasyExpected=games.length;
       renderWeeklyFantasyPlayers();
       await Promise.allSettled(games.map(async game=>{
-        const players=await getAllFantasyPlayers(game);
+        const players=await getAllFantasyPlayers(game,{force});
         if(token!==weeklyFantasyRenderToken)return;
         if(players.length)weeklyFantasyLoaded++;
         for(const p of players)weeklyFantasyPlayers.push({...p,gameId:game.id});
         renderWeeklyFantasyPlayers();
       }));
     }
+    scheduleEl.addEventListener("toggle",event=>{
+      const entry=event.target;
+      if(!entry.matches?.("details.waiver-entry")||!entry.open)return;
+      scheduleEl.querySelectorAll("details.waiver-entry[open]").forEach(other=>{
+        if(other!==entry)other.open=false;
+      });
+    },true);
+
     scheduleEl.addEventListener("click",event=>{
       const gamesView=event.target.closest("[data-games-view]");
       if(gamesView){
@@ -3762,8 +4081,27 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       }
       const view=event.target.closest("[data-results-view]");
       if(view){resultsSubview=view.dataset.resultsView;localStorage.setItem("gridironGuide.resultsSubview.v1",resultsSubview);renderSchedule();resetPageScrollForNavigation();return;}
+      const modeBtn=event.target.closest(".fantasy-mode-switch button[data-fantasy-mode]");
+      if(modeBtn){
+        weeklyFantasyMode=modeBtn.dataset.fantasyMode==="waivers"?"waivers":"leaders";
+        const panel=document.getElementById("weeklyFantasy");
+        if(panel)panel.dataset.fantasyMode=weeklyFantasyMode;
+        document.querySelectorAll("[data-fantasy-mode]").forEach(button=>{
+          const active=button.dataset.fantasyMode===weeklyFantasyMode;
+          button.classList.toggle("active",active);
+          button.setAttribute("aria-pressed",String(active));
+        });
+        if(weeklyFantasyMode==="waivers"){
+          renderWaivers();
+          loadWaivers();
+        }else{
+          renderWeeklyFantasyPlayers();
+          if(!weeklyFantasyExpected&&!weeklyFantasyPlayers.length)loadWeeklyFantasy();
+        }
+        return;
+      }
       const pos=event.target.closest("[data-weekly-position]");
-      if(pos){pos.classList.remove("squish-pop");void pos.offsetWidth;pos.classList.add("squish-pop");weeklyFantasyPosition=pos.dataset.weeklyPosition;document.querySelectorAll("[data-weekly-position]").forEach(btn=>btn.classList.toggle("active",btn.dataset.weeklyPosition===weeklyFantasyPosition));renderWeeklyFantasyPlayers();return;}
+      if(pos){pos.classList.remove("squish-pop");void pos.offsetWidth;pos.classList.add("squish-pop");weeklyFantasyPosition=pos.dataset.weeklyPosition;document.querySelectorAll("[data-weekly-position]").forEach(btn=>{const active=btn.dataset.weeklyPosition===weeklyFantasyPosition;btn.classList.toggle("active",active);btn.setAttribute("aria-pressed",String(active));});renderWeeklyFantasyPlayers();return;}
       const score=event.target.closest("[data-cycle-scoring]");
       if(score){const i=WEEKLY_SCORING_MODES.findIndex(m=>m.key===weeklyScoringMode);weeklyScoringMode=WEEKLY_SCORING_MODES[(i+1)%WEEKLY_SCORING_MODES.length].key;localStorage.setItem("gridironGuide.weeklyScoring.v1",weeklyScoringMode);score.textContent=WEEKLY_SCORING_MODES.find(m=>m.key===weeklyScoringMode).label+" ↻";renderWeeklyFantasyPlayers();}
     });
@@ -3811,8 +4149,7 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
     async function getFantasyLeaders(game,{force=false}={}){
       const cacheKey = FANTASY_CACHE_PREFIX + game.id;
       const cached = readFantasyCacheRecord(cacheKey);
-      const cacheIsFresh = cached.leaders.length && (isFinalGame(game) || Date.now()-cached.savedAt<LIVE_FANTASY_CACHE_TTL_MS);
-      if(!force && cacheIsFresh) return cached.leaders;
+      if(!force && isGameFantasyCacheFresh(game,cached)) return cached.leaders;
       if(fantasyLeaderRequests.has(cacheKey)) return fantasyLeaderRequests.get(cacheKey);
 
       const request = (async()=>{
@@ -3846,9 +4183,19 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       return readFantasyCacheRecord(key).leaders;
     }
 
+    function fantasyCacheTtlMs(game){
+      if(!isFinalGame(game))return LIVE_FANTASY_CACHE_TTL_MS;
+      // ESPN's scoreboard can become final before its complete boxscore is ready.
+      // Recheck recent finals, then check older finals much less often.
+      const kickoff=new Date(game.dateTime).getTime();
+      const olderThanTwoDays=Number.isFinite(kickoff) && Date.now()-kickoff > 48*60*60*1000;
+      return olderThanTwoDays ? OLD_FINAL_FANTASY_CACHE_TTL_MS : RECENT_FINAL_FANTASY_CACHE_TTL_MS;
+    }
+    function isGameFantasyCacheFresh(game,cached){
+      return Boolean(cached.leaders.length && cached.savedAt > 0 && Date.now()-cached.savedAt < fantasyCacheTtlMs(game));
+    }
     function isFantasyCacheFresh(game){
-      const cached=readFantasyCacheRecord(FANTASY_CACHE_PREFIX+game.id);
-      return Boolean(cached.leaders.length && (isFinalGame(game) || Date.now()-cached.savedAt<LIVE_FANTASY_CACHE_TTL_MS));
+      return isGameFantasyCacheFresh(game,readFantasyCacheRecord(FANTASY_CACHE_PREFIX+game.id));
     }
 
     function cacheFantasy(key, leaders){
@@ -4444,7 +4791,7 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       selectedScheduleWeek=k;
       const scoped=allGames.filter(g=>scheduleWeekKey(g)===selectedScheduleWeek);
       if(sortMode==="live")sortMode="kickoff";
-      if(sortMode==="final"&&!scoped.some(isFinalGame))sortMode="kickoff";
+      // Keep the selected dashboard destination when switching weeks.
       localStorage.setItem("gridironGuide.sortMode",sortMode);
       document.querySelectorAll(".sort-tab").forEach(tab=>tab.classList.toggle("active",tab.dataset.sort===sortMode));
       renderWeekNavigator();
@@ -4485,26 +4832,47 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
     function bellIcon(filled=false){return `<svg viewBox="0 0 24 24" aria-hidden="true" fill="${filled?"currentColor":"none"}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/></svg>`;}
     function slug(value){ return String(value).toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,""); }
     function escapeHtml(value){ return String(value ?? "").replace(/[&<>'"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"}[c])); }
-    function initSortControls(){
-      document.querySelectorAll(".sort-tab").forEach(btn => {
-        btn.classList.toggle("active", btn.dataset.sort === sortMode);
-        btn.addEventListener("click", () => {
-          sortMode = btn.dataset.sort || "kickoff";
-          localStorage.setItem("gridironGuide.sortMode", sortMode);
-          document.querySelectorAll(".sort-tab").forEach(tab => tab.classList.remove("active"));
-          btn.classList.add("active");
-          renderSchedule();
-          resetPageScrollForNavigation();
-        });
+    function dashboardDestination(){
+      return sortMode==="final"?(resultsSubview==="fantasy"?"fantasy":"results"):(gamesSubview==="live"?"live":gamesSubview==="local"?"local":"games");
+    }
+    function syncDashboardNavigation(){
+      const selected=dashboardDestination();
+      document.querySelectorAll("[data-dashboard]").forEach(btn=>{
+        const active=btn.dataset.dashboard===selected;
+        btn.classList.toggle("active",active);
+        btn.setAttribute("aria-current",active?"page":"false");
+        btn.setAttribute("aria-pressed",String(active));
       });
     }
+    function navigateDashboard(destination){
+      if(destination==="results"||destination==="fantasy"){
+        sortMode="final";
+        resultsSubview=destination==="fantasy"?"fantasy":"games";
+        localStorage.setItem("gridironGuide.resultsSubview.v1",resultsSubview);
+      }else{
+        sortMode="kickoff";
+        gamesSubview=destination==="live"?"live":destination==="local"?"local":"all";
+        localStorage.setItem("gridironGuide.gamesSubview.v1",gamesSubview);
+      }
+      localStorage.setItem("gridironGuide.sortMode",sortMode);
+      syncDashboardNavigation();
+      renderSchedule();
+      resetPageScrollForNavigation();
+    }
+    function initSortControls(){
+      document.querySelectorAll("[data-dashboard]").forEach(btn=>{
+        btn.addEventListener("click",()=>navigateDashboard(btn.dataset.dashboard));
+      });
+      syncDashboardNavigation();
+    }
     function openResultsForSelectedWeek(){
-      const resultsTab=document.querySelector('.sort-tab[data-sort="final"]');
+      const resultsTab=document.querySelector('[data-dashboard="results"]');
       if(!resultsTab)return;
       sortMode="final";
       localStorage.setItem("gridironGuide.sortMode",sortMode);
       document.querySelectorAll(".sort-tab").forEach(tab=>tab.classList.remove("active"));
-      resultsTab.classList.add("active");
+      resultsSubview="games";
+      syncDashboardNavigation();
       renderSchedule();
       resetPageScrollForNavigation();
     }
@@ -4527,10 +4895,17 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       const counts={
         kickoff:scoped.filter(g=>!isFinalGame(g)).length,
         live:scoped.filter(isLiveGame).length,
-        final:scoped.filter(isFinalGame).length
+        final:scoped.filter(isFinalGame).length,
+        // Results is the other half of Games: each confirmed final adds one.
+        results:scoped.filter(isFinalGame).length,
+        // The Games counter mirrors the Games tab: only upcoming or live.
+        // Finished matchups remain accessible exclusively in Results.
+        games:scoped.filter(g=>!isFinalGame(g)).length,
+        local:remainingConfirmedLocalGames().length
       };
       document.querySelectorAll(".filter-count[data-count]").forEach(el=>{
         const count=counts[el.dataset.count]||0;
+        // No zero badges: the destination stays tappable and shows an empty state.
         el.textContent=count?String(count):"";
         el.classList.toggle("has-count",count>0);
       });
@@ -4578,12 +4953,25 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
           const beforeSignature=visibleGameSignature();
           const changes=mergeWeekState(updates);
           if(changes.length){
+            // A final scoreboard update can arrive ahead of the complete boxscore.
+            // Discard the live fantasy snapshot so Results requests fresh stats.
+            changes.filter(c=>c.statusChanged&&isFinalGame(c.after)).forEach(c=>{
+              try{
+                localStorage.removeItem(FANTASY_CACHE_PREFIX+String(c.id));
+                localStorage.removeItem(WEEKLY_FANTASY_CACHE_PREFIX+String(c.id));
+              }catch(_){/* Storage may be unavailable in a preview webview. */}
+            });
             const afterSignature=visibleGameSignature();
             if(beforeSignature!==afterSignature){
               // A game entered or left the active view (for example kickoff in
               // Live or completion in Games). Rebuild only for that structural change.
               renderWeekNavigator();
               renderSchedule();
+              const newlyFinal=changes.filter(c=>c.statusChanged&&isFinalGame(c.after)).map(c=>c.after);
+              if(newlyFinal.length){
+                if(sortMode==="final"&&resultsSubview==="fantasy")loadWeeklyFantasy({force:true});
+                else if(sortMode==="final")hydrateFantasyBlocks(newlyFinal,{force:true});
+              }
               animateRenderedScoreChanges(changes);
             }else{
               // Normal live polling patches only changed fields. Existing cards,
@@ -4721,6 +5109,15 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       if(document.visibilityState==="visible")handleNativeResume();
     });
 
+    async function refreshVisibleFantasyOnDemand(){
+      if(sortMode==="final" && resultsSubview==="fantasy"){
+        if(weeklyFantasyMode==="waivers")await loadWaivers({force:true});
+        else await loadWeeklyFantasy({force:true});
+        return;
+      }
+      const games=getDisplayGames().filter(g=>isLiveGame(g)||isFinalGame(g));
+      if(games.length)await hydrateFantasyBlocks(games,{force:true});
+    }
     const refreshBtnEl=document.querySelector("#refreshBtn");
     const MANUAL_REFRESH_COOLDOWN_MS=2000;
     let manualRefreshCooldownUntil=0;
@@ -4742,6 +5139,7 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
 
       try{
         await refreshCurrentWeekState();
+        await refreshVisibleFantasyOnDemand();
         lastForegroundRefreshAt=Date.now();
       }finally{
         // Keep a short post-request cooldown so rapid taps cannot immediately
