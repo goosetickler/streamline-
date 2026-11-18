@@ -1,6 +1,6 @@
 {
   "season": 2026,
-  "updated": "2026-11-14",
+  "updated": "2026-11-17",
   "rosteredNote": "Estimated rostered level, not measured percentages. Low = less widely rostered (more likely available); Medium = mixed; High = widely rostered (less likely available).",
   "weeks": {
     "10": {
@@ -85,6 +85,91 @@
           "position": "RB",
           "rostered": "Low",
           "summary": "Kenneth Walker has been ruled out for Week 10, putting Johnson in line for a major role against Atlanta. He's an attractive immediate pickup, but his workload could shrink quickly when Walker returns."
+        }
+      ]
+    },
+    "11": {
+      "updated": "2026-11-17",
+      "players": [
+        {
+          "rank": 1,
+          "name": "Jordyn Tyson",
+          "team": "NO",
+          "position": "WR",
+          "rostered": "Medium",
+          "summary": "Tyson led New Orleans in Week 10 with 13 targets and 11 catches after expanding to 30 routes in just his second game. His snap role is still developing and the Saints' passing efficiency can cap his weekly ceiling."
+        },
+        {
+          "rank": 2,
+          "name": "Keenan Allen",
+          "team": "SF",
+          "position": "WR",
+          "rostered": "High",
+          "summary": "Allen caught five of seven targets for 61 yards in his first game with San Francisco, giving him immediate PPR appeal. His route load was only 20 and Mike Evans' eventual return could reduce his opportunities."
+        },
+        {
+          "rank": 3,
+          "name": "Kaelon Black",
+          "team": "SF",
+          "position": "RB",
+          "rostered": "Medium",
+          "summary": "Black has logged double-digit carries in three straight games and scored against Dallas while backing up Christian McCaffrey. His weekly ceiling remains game-script dependent unless McCaffrey misses time."
+        },
+        {
+          "rank": 4,
+          "name": "Caleb Douglas",
+          "team": "MIA",
+          "position": "WR",
+          "rostered": "Medium",
+          "summary": "Douglas has reached 70 receiving yards in three of his last four games and drawn eight targets in each of the last two. Miami's unsettled quarterback play and a difficult Buffalo matchup still make him a volatile flex."
+        },
+        {
+          "rank": 5,
+          "name": "Seth McGowan",
+          "team": "IND",
+          "position": "RB",
+          "rostered": "Low",
+          "summary": "McGowan carried 12 times for 77 yards and a touchdown in Week 10 as Indianapolis leaned heavily on the run. Jonathan Taylor remains the lead back, so McGowan is a complementary option with contingent upside."
+        },
+        {
+          "rank": 6,
+          "name": "Chig Okonkwo",
+          "team": "WAS",
+          "position": "TE",
+          "rostered": "Low",
+          "summary": "Okonkwo drew a season-high eight targets in Week 10 and gets a Bengals defense that has been generous to tight ends. He had a back issue before returning, so confirm his health and expect more volume than touchdown upside."
+        },
+        {
+          "rank": 7,
+          "name": "Cam Ward",
+          "team": "TEN",
+          "position": "QB",
+          "rostered": "Low",
+          "summary": "Ward has delivered more than 200 passing yards and multiple touchdowns in consecutive games as Tennessee has increased its offensive pace. The Cowboys matchup boosts his Week 11 streaming case, but his early-season struggles keep the floor uncertain."
+        },
+        {
+          "rank": 8,
+          "name": "Adonai Mitchell",
+          "team": "NYJ",
+          "position": "WR",
+          "rostered": "Medium",
+          "summary": "Mitchell drew eight targets in Week 10 and could see an expanded role if Omar Cooper misses time with an ankle injury. Geno Smith's own ankle issue clouds the quarterback situation and creates downside for Mitchell's efficiency."
+        },
+        {
+          "rank": 9,
+          "name": "Michael Mayer",
+          "team": "LV",
+          "position": "TE",
+          "rostered": "Low",
+          "summary": "Mayer could become a prominent Raiders target if Brock Bowers sits with his ankle issue, and Denver has allowed substantial fantasy production to tight ends. Bowers may be available, so Mayer is a conditional pickup rather than a locked-in starter."
+        },
+        {
+          "rank": 10,
+          "name": "Antonio Williams",
+          "team": "WAS",
+          "position": "WR",
+          "rostered": "Low",
+          "summary": "Williams has run routes on nearly nine in ten Washington dropbacks across the last three games, giving him a substantial role after Terry McLaurin's injury. His modest target share and inconsistent production make him a speculative add despite a favorable upcoming schedule."
         }
       ]
     }
