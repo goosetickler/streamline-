@@ -450,8 +450,54 @@
       pointer-events:none;
       animation:score-card-pulse .95s cubic-bezier(.22,.72,.2,1) both;
     }
+    /* 1.0.5 rolling-score treatment: the score CELL remains fixed while digit
+       strips animate on the compositor. Approved Score Roll Lab settings:
+       900ms, 50% travel keyframe, soft spring, mechanical digit reel. */
     .team-score.score-changed{
-      animation:score-number-pop .95s cubic-bezier(.22,.72,.2,1) both;
+      color:var(--green) !important;
+      text-shadow:0 0 14px rgba(106,255,183,.52);
+    }
+    .team-score .score-roll-number{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      width:100%;
+      height:1em;
+      line-height:1;
+      white-space:nowrap;
+      font-variant-numeric:tabular-nums;
+    }
+    .team-score .score-roll-digit{
+      display:inline-block;
+      position:relative;
+      height:1em;
+      width:.59em;
+      line-height:1em;
+      overflow:hidden;
+      flex:none;
+    }
+    .team-score .score-roll-stack{
+      position:absolute;
+      inset:0 0 auto;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      transform:translate3d(0,0,0);
+      will-change:transform;
+    }
+    .team-score .score-roll-cell{
+      display:block;
+      flex:0 0 1em;
+      height:1em;
+      width:100%;
+      text-align:center;
+      line-height:1em;
+    }
+    .team-score .score-roll-static{
+      display:inline-block;
+      width:.59em;
+      line-height:1em;
+      text-align:center;
     }
     @keyframes score-card-pulse{
       0%{box-shadow:inset 0 0 0 1px rgba(106,255,183,0),0 0 0 rgba(83,183,255,0);opacity:0}
@@ -464,7 +510,9 @@
       100%{transform:scale(1);color:inherit;text-shadow:none}
     }
     @media (prefers-reduced-motion:reduce){
-      .game-card.score-change:after,.team-score.score-changed{animation:none}
+      .game-card.score-change:after{animation:none}
+      .team-score.score-changed{color:inherit !important;text-shadow:none}
+      .team-score .score-roll-stack{will-change:auto}
     }
 
     .live-details{
@@ -1543,6 +1591,654 @@
   #weeklyFantasy .waiver-quick-copy{font-size:.73rem}
 }
 @media(prefers-reduced-motion:reduce){#weeklyFantasy .waiver-expand-chevron{transition:none}}
+
+/* v1.0.4 Watch + Listen presentation: existing openProvider remains unchanged */
+/* Fixed radio directory: two-line station rows; secondary icon-only Listen toggle */
+.media-option .media-radio-detail{display:flex;flex-direction:column;gap:2px;min-width:0}
+.media-radio-team{color:#7aefc0;font-size:.64rem;font-weight:900;line-height:1.15;letter-spacing:.025em;text-transform:uppercase}
+.media-radio-station{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.78rem;line-height:1.25}
+.media-radio-notice{padding:8px 12px 10px;color:#8da4b7;border-top:1px solid rgba(255,255,255,.07);font-size:.65rem;font-weight:650;line-height:1.3}
+.media-panel[data-panel="listen"] .media-option{min-height:49px}
+.media-panel[data-panel="listen"] .media-option small{flex:0 0 auto;white-space:nowrap}
+
+/* Reserve the compact Listen slot even when hidden, keeping Watch exactly the
+   same width between both states (no oversized full-width Watch button). */
+.media-actions{display:grid;grid-template-columns:minmax(0,1fr) 50px;gap:8px;position:relative;z-index:1;margin-top:9px}
+.media-actions.watch-only{grid-template-columns:minmax(0,1fr) 50px}
+/* Listen is secondary: a 50 x 44 icon button that opens the radio choices.
+   Station destinations and existing launch functions are unchanged. */
+.media-control.listen.media-listen-compact{width:50px;min-width:50px}
+.media-listen-compact .media-expand{flex:1 1 auto;width:100%;min-width:0;height:100%;border-left:0;position:relative;padding:0}
+.media-listen-compact .media-headphone-mark{display:grid;place-items:center;width:24px;height:24px;color:#d6e4f4;transition:color .12s ease}
+.media-listen-compact .media-headphone-mark svg{width:23px;height:23px;display:block}
+.media-listen-compact .media-mini-caret{position:absolute;right:4px;bottom:3px;color:#98b3cb;opacity:.85}
+.media-listen-compact .media-mini-caret svg{width:10px;height:10px;display:block;transition:transform .16s ease}
+.media-listen-compact.expanded .media-headphone-mark{color:#80f5c8}
+.media-listen-compact.expanded .media-mini-caret svg{transform:rotate(180deg)}
+.media-control{display:flex;min-width:0;height:44px;border:1px solid #35516a;border-radius:13px;background:#12253a;color:#e9f1fc;overflow:hidden;box-shadow:inset 0 1px rgba(255,255,255,.035)}
+.media-control.expanded{border-color:#62e4b6;box-shadow:0 0 0 1px rgba(98,228,182,.35),0 0 14px rgba(98,228,182,.15)}
+.media-launch,.media-expand{border:0;background:none;color:inherit;cursor:pointer;min-width:0;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+.media-launch{flex:1;gap:8px;padding:0 9px}.media-expand{flex:0 0 39px;border-left:1px solid #35516a}
+.media-launch:active,.media-expand:active{background:rgba(105,237,185,.11)}
+.media-launch:focus-visible,.media-expand:focus-visible{outline:2px solid #62e4b6;outline-offset:-3px}
+.media-icon{width:24px;height:24px;flex:0 0 24px;display:grid;place-items:center;color:#d6e4f4;border-right:1px solid #35516a;padding-right:7px;box-sizing:content-box}
+.media-icon svg{width:23px;height:23px;display:block}
+.media-name{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.77rem;font-weight:950;text-align:center;flex:1}
+.media-chevron{width:18px;height:18px;transition:transform .16s ease}.expanded .media-chevron{transform:rotate(180deg)}
+.media-provider-prime{color:#51c9e9}.media-provider-peacock{color:#bb8af0}.media-provider-espn{color:#ff6682}.media-provider-paramount{color:#70a6ff}.media-provider-fox{color:#f5f7fb}.media-provider-hulu{color:#47e89d}.media-provider-nflnetwork,.media-provider-nflplus{color:#9ad9ff}.media-provider-youtubetv{color:#ff6778}.media-provider-directv{color:#78d4f4}.media-provider-netflix{color:#ff6673}.media-provider-sundayticket{color:#f4d479}
+.media-panel{grid-column:1/-1;min-width:0;background:#101f30;border:1px solid #37516a;border-top:2px solid #62e4b6;border-radius:12px;overflow:hidden;box-shadow:0 0 12px rgba(98,228,182,.10)}
+.media-panel[hidden]{display:none}.media-option{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;padding:11px 13px;min-height:42px;background:transparent;color:#eef4fb;border:0;border-bottom:1px solid rgba(255,255,255,.09);font:inherit;font-size:.76rem;font-weight:850;text-align:left;cursor:pointer}.media-option:last-child{border-bottom:0}.media-option:active{background:rgba(98,228,182,.12)}.media-option small{color:#9fb4c8;font-size:.65rem;font-weight:700}
+@media(max-width:380px){.media-actions{gap:6px;grid-template-columns:minmax(0,1fr) 46px}.media-actions.watch-only{grid-template-columns:minmax(0,1fr) 46px}.media-control.listen.media-listen-compact{width:46px;min-width:46px}.media-launch{padding:0 6px;gap:5px}.media-expand{flex-basis:34px}.media-name{font-size:.70rem}.media-icon{width:20px;flex-basis:20px;padding-right:5px}.media-icon svg{width:20px;height:20px}}
+
+
+/* v1.0.4 UI density + selected-state consistency pass.
+   Presentation only: no changes to provider routing or radio destinations. */
+:root{
+  --gg-active-outline:#62e4b6;
+  --gg-active-fill:linear-gradient(135deg,rgba(22,111,96,.70),rgba(14,79,93,.65));
+  --gg-active-shadow:inset 0 0 0 1px rgba(98,228,182,.11),0 0 0 1px rgba(98,228,182,.20),0 0 13px rgba(98,228,182,.14);
+}
+/* A centered action group: 216px Watch + 46px Listen, not a full-width
+   Watch stretching across short labels. When Listen is off, center Watch
+   itself; never leave a fake empty Listen column on the right. */
+.media-actions,
+.media-actions.watch-only{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  align-items:center;
+  column-gap:8px;
+  row-gap:8px;
+}
+.media-actions .media-control.watch{
+  flex:0 0 min(216px,calc(100% - 54px));
+  width:min(216px,calc(100% - 54px));
+  max-width:216px;
+}
+.media-actions .media-control.listen.media-listen-compact{
+  flex:0 0 46px;
+  width:46px;
+  min-width:46px;
+}
+/* Keep both dropdowns the full content width of the game card, rather
+   than accidentally shrinking with the compact centered buttons. */
+.media-actions .media-panel{
+  flex:0 0 100%;
+  width:100%;
+}
+/* Active selection uses one mint-outline vocabulary in both header rails. */
+.week-chip.active,
+.week-chip.postseason.active,
+.week-chip.championship.active,
+.week-chip.superbowl.active,
+.week-chip.kickoff.active,
+.week-chip.special-week.active{
+  border:1px solid var(--gg-active-outline)!important;
+  border-bottom:1px solid var(--gg-active-outline)!important;
+  background:var(--gg-active-fill)!important;
+  color:#f6fffc!important;
+  box-shadow:var(--gg-active-shadow)!important;
+}
+.dashboard-nav .sort-tab.active,
+.dashboard-nav .sort-tab.active[data-dashboard]{
+  border:1px solid var(--gg-active-outline)!important;
+  border-radius:12px!important;
+  background:var(--gg-active-fill)!important;
+  color:var(--gg-active-outline)!important;
+  box-shadow:var(--gg-active-shadow)!important;
+  z-index:2;
+}
+/* Remove divider strokes through an active tab's outline. */
+.dashboard-nav .sort-tab.active::after,
+.dashboard-nav .sort-tab:has(+ .sort-tab.active)::after{
+  opacity:0;
+}
+/* Same restrained mint ring for expanded Watch and Listen. */
+.media-control.expanded{
+  border-color:var(--gg-active-outline);
+  box-shadow:var(--gg-active-shadow);
+}
+.media-panel{
+  border-top-color:var(--gg-active-outline);
+}
+/* Focus accessibility: put the focus ring around the whole control
+   instead of a random rectangle on the tiny Watch chevron. */
+.media-launch:focus-visible,.media-expand:focus-visible{outline:none}
+.media-control:has(.media-launch:focus-visible),
+.media-control:has(.media-expand:focus-visible){
+  border-color:var(--gg-active-outline);
+  box-shadow:0 0 0 2px rgba(98,228,182,.45),0 0 13px rgba(98,228,182,.16);
+}
+.week-chip:focus-visible,.dashboard-nav .sort-tab:focus-visible{
+  outline:2px solid var(--gg-active-outline);
+  outline-offset:2px;
+}
+@media(max-width:380px){
+  .media-actions .media-control.listen.media-listen-compact{flex-basis:44px;width:44px;min-width:44px}
+  .media-actions .media-control.watch{flex-basis:min(216px,calc(100% - 52px));width:min(216px,calc(100% - 52px))}
+}
+@media(prefers-reduced-motion:reduce){
+  .media-chevron,.media-mini-caret svg{transition:none}
+}
+
+
+/* 1.0.4 layout + selection polish: presentation only. Provider and Listen
+   handlers are unchanged. Keep action placement stable across radio setting. */
+:root{
+  --gg-selected-fill:linear-gradient(135deg,rgba(20,105,90,.78),rgba(16,73,89,.75));
+  --gg-selected-stroke:#62e4b6;
+  --gg-selected-halo:inset 0 1px 0 rgba(255,255,255,.065),0 0 11px rgba(98,228,182,.13);
+}
+/* Watch stays left-aligned at exactly the same compact width (216px).
+   Listen lives on the right edge, with no shift when the preference hides it. */
+.media-actions,.media-actions.watch-only{
+  display:flex;
+  flex-flow:row wrap;
+  justify-content:flex-start;
+  align-items:center;
+  column-gap:8px;
+  row-gap:8px;
+}
+.media-actions .media-control.watch{
+  flex:0 0 min(216px,calc(100% - 54px));
+  width:min(216px,calc(100% - 54px));
+  max-width:216px;
+  margin-right:0;
+}
+.media-actions .media-control.listen.media-listen-compact{
+  flex:0 0 46px;
+  width:46px;
+  min-width:46px;
+  margin-left:auto;
+}
+.media-actions .media-panel{flex:0 0 100%;width:100%;}
+@media(max-width:380px){
+  .media-actions .media-control.watch{flex-basis:min(216px,calc(100% - 52px));width:min(216px,calc(100% - 52px))}
+  .media-actions .media-control.listen.media-listen-compact{flex-basis:44px;width:44px;min-width:44px}
+}
+/* One selected treatment across weeks and the five dashboard destinations:
+   emerald/navy fill, white label+icon, single fine mint border and soft halo. */
+.week-chip.active,
+.week-chip.postseason.active,
+.week-chip.championship.active,
+.week-chip.superbowl.active,
+.week-chip.kickoff.active,
+.week-chip.special-week.active{
+  background:var(--gg-selected-fill)!important;
+  color:#f7fffc!important;
+  border:1px solid var(--gg-selected-stroke)!important;
+  border-bottom:1px solid var(--gg-selected-stroke)!important;
+  box-shadow:var(--gg-selected-halo)!important;
+}
+.week-chip.active .week-chip-title,
+.week-chip.active .week-chip-range{color:#f7fffc!important;}
+.dashboard-nav .sort-tab.active,
+.dashboard-nav .sort-tab.active[data-dashboard]{
+  background:var(--gg-selected-fill)!important;
+  color:#f7fffc!important;
+  border:1px solid var(--gg-selected-stroke)!important;
+  box-shadow:var(--gg-selected-halo)!important;
+  border-radius:12px!important;
+  z-index:2;
+}
+.dashboard-nav .sort-tab.active .nav-icon,
+.dashboard-nav .sort-tab.active .nav-label,
+.dashboard-nav .sort-tab.active .nav-icon svg{color:#f7fffc!important;}
+.dashboard-nav .sort-tab.active::after,
+.dashboard-nav .sort-tab:has(+ .sort-tab.active)::after{opacity:0;}
+/* Fantasy selections get the same mint border + deep green fill, but remain
+   smaller/less emphatic than top-level navigation (no extra sizing). */
+#weeklyFantasy .weekly-position button.active{
+  background:var(--gg-selected-fill)!important;
+  color:#f7fffc!important;
+  border-color:var(--gg-selected-stroke)!important;
+  box-shadow:0 0 9px rgba(98,228,182,.12),inset 0 1px 0 rgba(255,255,255,.045)!important;
+}
+#weeklyFantasy .fantasy-mode-switch button.active{
+  background:var(--gg-selected-fill)!important;
+  color:#f7fffc!important;
+  box-shadow:inset 0 0 0 1px var(--gg-selected-stroke),0 0 8px rgba(98,228,182,.10)!important;
+}
+/* Retain a neutral appearance for scoring mode, which is an action, not a
+   selected tab. Match focus colors for keyboard accessibility. */
+#weeklyFantasy .weekly-position button:focus-visible,
+#weeklyFantasy .fantasy-mode-switch button:focus-visible,
+#weeklyFantasy .weekly-scoring-pill:focus-visible{
+  outline:2px solid var(--gg-selected-stroke);
+  outline-offset:2px;
+}
+
+
+/* Watch button left-third pass (visual-only).
+   Shorten the button so it sits under the away team, not the first score.
+   The radio control remains pinned right, including when hidden. */
+.media-actions .media-control.watch{
+  /* Cancel the original .watch button padding/gap inherited by this wrapper. */
+  padding:0;
+  gap:0;
+  flex:0 0 min(154px,calc(100% - 54px));
+  width:min(154px,calc(100% - 54px));
+  max-width:154px;
+}
+/* Reclaim space inside the button rather than shrinking provider labels. */
+.media-actions .media-control.watch .media-launch{gap:5px;padding:0 6px}
+.media-actions .media-control.watch .media-icon{width:20px;height:22px;flex:0 0 20px;padding-right:5px}
+.media-actions .media-control.watch .media-icon svg{width:20px;height:20px}
+.media-actions .media-control.watch .media-expand{flex:0 0 31px}
+.media-actions .media-control.watch .media-chevron{width:16px;height:16px}
+.media-actions .media-control.watch .media-name{font-size:.74rem}
+@media(max-width:380px){
+  .media-actions .media-control.watch{
+    flex-basis:min(146px,calc(100% - 52px));
+    width:min(146px,calc(100% - 52px));
+    max-width:146px;
+  }
+  .media-actions .media-control.watch .media-launch{gap:4px;padding:0 5px}
+  .media-actions .media-control.watch .media-icon{width:19px;flex-basis:19px;padding-right:4px}
+  .media-actions .media-control.watch .media-expand{flex-basis:29px}
+}
+
+/* v1.0.4 refinement: a smaller Watch action, matching the small Listen caret.
+   The Play/network link and the dropdown remain separate tap targets. */
+.media-actions .media-control.watch {
+  position:relative;
+  flex:0 0 min(138px,calc(100% - 54px));
+  width:min(138px,calc(100% - 54px));
+  max-width:138px;
+}
+.media-actions .media-control.watch .media-launch {
+  flex:1 1 100%;
+  width:100%;
+  height:100%;
+  gap:4px;
+  padding:0 5px;
+}
+.media-actions .media-control.watch .media-icon {
+  width:19px;
+  height:22px;
+  flex:0 0 19px;
+  padding-right:5px;
+}
+.media-actions .media-control.watch .media-icon svg {width:19px;height:19px}
+.media-actions .media-control.watch .media-name {
+  align-self:stretch;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:0;
+  font-size:.74rem;
+  line-height:1.05;
+  letter-spacing:0;
+}
+/* Keep the provider centered vertically; move only its separate options
+   hotspot to the right edge and place its tiny arrow in the bottom corner,
+   like the icon-only Listen button. */
+.media-actions .media-control.watch .media-expand {
+  position:absolute;
+  z-index:2;
+  top:0;
+  right:0;
+  bottom:0;
+  left:auto;
+  transform:none;
+  flex:none;
+  width:27px;
+  height:100%;
+  min-width:0;
+  border:0;
+  border-radius:0;
+  padding:0 0 4px;
+  display:flex;
+  align-items:flex-end;
+  justify-content:center;
+  color:#9ab4ca;
+}
+.media-actions .media-control.watch .media-expand .media-chevron {
+  width:11px;
+  height:11px;
+  opacity:.95;
+}
+.media-actions .media-control.watch.expanded .media-expand{color:#85eec4}
+.media-actions .media-control.watch .media-expand:active{background:rgba(105,237,185,.13)}
+/* The full-width provider panel remains the same size and placement. */
+.media-actions .media-panel {overflow:hidden}
+@media(max-width:380px){
+  .media-actions .media-control.watch{
+    flex-basis:min(134px,calc(100% - 52px));
+    width:min(134px,calc(100% - 52px));
+    max-width:134px;
+  }
+}
+
+/* Center the network against the ENTIRE Watch button, not just the flex
+   space remaining after the play icon. Keep the bottom-right options target. */
+.media-actions .media-control.watch .media-name{
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  display:block;
+  width:auto;
+  max-width:calc(100% - 62px);
+  padding:0;
+  margin:0;
+  flex:none;
+  align-self:auto;
+  text-align:center;
+  line-height:1.1;
+  pointer-events:none;
+}
+/* With the label absolutely centered, keep the remaining play icon left-anchored. */
+.media-actions .media-control.watch .media-launch{justify-content:flex-start;}
+/* The panel animation no longer changes height or triggers layout on frames. */
+.media-actions .media-panel{transform-origin:top center;}
+
+/* Matched Watch + Listen actions (visual-only controls, existing destinations).
+   Both buttons use separate launch and lower-right menu hotspots. */
+.media-actions .media-control.listen:not(.media-listen-compact){
+  position:relative;
+  padding:0;
+  gap:0;
+  flex:0 0 min(138px,calc((100% - 8px)/2));
+  width:min(138px,calc((100% - 8px)/2));
+  max-width:138px;
+  margin-left:auto;
+}
+.media-actions .media-control.listen:not(.media-listen-compact) .media-launch{
+  flex:1 1 100%;
+  width:100%;
+  height:100%;
+  gap:4px;
+  padding:0 5px;
+  justify-content:flex-start;
+}
+.media-actions .media-control.listen:not(.media-listen-compact) .media-icon{
+  width:19px;
+  height:22px;
+  flex:0 0 19px;
+  padding-right:5px;
+}
+.media-actions .media-control.listen:not(.media-listen-compact) .media-icon svg{
+  width:19px;
+  height:19px;
+}
+.media-actions .media-control.listen:not(.media-listen-compact) .media-name{
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  display:block;
+  width:auto;
+  max-width:calc(100% - 54px);
+  min-width:0;
+  padding:0;
+  margin:0;
+  flex:none;
+  align-self:auto;
+  text-align:center;
+  font-size:.71rem;
+  line-height:1.1;
+  letter-spacing:0;
+  color:#e2eefa;
+  pointer-events:none;
+}
+.media-actions .media-control.listen:not(.media-listen-compact) .media-expand{
+  position:absolute;
+  z-index:2;
+  top:0;
+  right:0;
+  bottom:0;
+  left:auto;
+  flex:none;
+  width:27px;
+  height:100%;
+  min-width:0;
+  border:0;
+  border-radius:0;
+  padding:0 0 4px;
+  display:flex;
+  align-items:flex-end;
+  justify-content:center;
+  color:#9ab4ca;
+}
+.media-actions .media-control.listen:not(.media-listen-compact) .media-chevron{
+  width:11px;
+  height:11px;
+  opacity:.95;
+}
+.media-actions .media-control.listen.expanded .media-expand{color:#85eec4}
+.media-actions .media-control.listen .media-expand:active{background:rgba(105,237,185,.13)}
+/* Prevent the two equal-width controls from wrapping on the narrowest phones.
+   Watch keeps a stable size with Listen disabled. */
+@media(max-width:380px){
+  .media-actions .media-control.watch,
+  .media-actions .media-control.listen:not(.media-listen-compact){
+    flex-basis:min(134px,calc((100% - 8px)/2));
+    width:min(134px,calc((100% - 8px)/2));
+    max-width:134px;
+  }
+}
+
+/* Experimental Watch-only identity: muted provider pills within the familiar
+   compact navy action. No changes to tap targets, routing, or Listen visuals. */
+.media-actions .media-control.watch .media-name{
+  box-sizing:border-box;
+  padding:5px 7px;
+  border-radius:7px;
+  line-height:1.05;
+  max-width:calc(100% - 61px);
+  min-width:0;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  font-size:.69rem;
+  letter-spacing:.005em;
+  border:1px solid rgba(255,255,255,.13);
+  box-shadow:inset 0 1px rgba(255,255,255,.055);
+}
+.media-actions .media-control.watch .media-name.media-provider-prime{background:#086f99;color:#baf3ff;border-color:#2188ad}
+.media-actions .media-control.watch .media-name.media-provider-paramount{background:#194a9f;color:#ecf4ff;border-color:#3670c4}
+.media-actions .media-control.watch .media-name.media-provider-peacock{background:#62368a;color:#f5eaff;border-color:#8556a7}
+.media-actions .media-control.watch .media-name.media-provider-espn{background:#902435;color:#fff2f3;border-color:#b63b50}
+.media-actions .media-control.watch .media-name.media-provider-fox{background:#ecf1fa;color:#153c72;border-color:#ffffff}
+.media-actions .media-control.watch .media-name.media-provider-hulu{background:#137b4b;color:#ceffe9;border-color:#249966}
+.media-actions .media-control.watch .media-name.media-provider-youtubetv{background:#a12039;color:#fff3f4;border-color:#d03b53}
+.media-actions .media-control.watch .media-name.media-provider-nflnetwork,
+.media-actions .media-control.watch .media-name.media-provider-nflplus{background:#1e3c67;color:#c1e9ff;border-color:#375b8a}
+.media-actions .media-control.watch .media-name.media-provider-directv{background:#14517a;color:#d0f2ff;border-color:#287da7}
+.media-actions .media-control.watch .media-name.media-provider-netflix{background:#211e27;color:#ff7283;border-color:#7a3643}
+.media-actions .media-control.watch .media-name.media-provider-sundayticket{background:#594a22;color:#ffeb97;border-color:#877032}
+@media(max-width:380px){
+  .media-actions .media-control.watch .media-name{font-size:.66rem;padding:4px 5px;max-width:calc(100% - 57px)}
+}
+
+/* Stable provider pills: equal footprint for PRIME, FOX, P+, ESPN and others.
+   Watch retains its compact 138px outer button; the play and options targets
+   remain separate. The entire launch action keeps the original openProvider. */
+.media-actions .media-control.watch .media-name{
+  width:68px;
+  min-width:68px;
+  max-width:68px;
+  height:28px;
+  padding:0 3px;
+  border-radius:7px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:.67rem;
+  line-height:1;
+  letter-spacing:.005em;
+  overflow:hidden;
+  white-space:nowrap;
+  text-overflow:ellipsis;
+}
+/* Keep very long service labels legible within the same footprint. */
+.media-actions .media-control.watch .media-name.media-provider-sundayticket{
+  font-size:.52rem;
+  white-space:normal;
+  line-height:1.04;
+}
+.media-actions .media-control.watch .media-name.media-provider-peacock,
+.media-actions .media-control.watch .media-name.media-provider-netflix{
+  font-size:.62rem;
+}
+@media(max-width:380px){
+  .media-actions .media-control.watch .media-name{
+    width:64px;min-width:64px;max-width:64px;height:27px;
+    padding:0 2px;font-size:.63rem;
+  }
+}
+
+/* Balance the primary labels in the gap between the icon divider and the
+   bottom-right options chevron. Both controls are 138px wide; the left
+   divider sits ~35px from the edge and the caret region starts ~16px from
+   the right. Shift the label midpoint by half that asymmetric inset. */
+.media-actions .media-control.watch .media-name,
+.media-actions .media-control.listen:not(.media-listen-compact) .media-name{
+  left:calc(50% + 9px);
+}
+</style>
+<style>
+/* v1.0.5 — optional native weekly waiver reminder */
+.waiver-alert-status{margin:8px 2px 0;color:var(--muted);font-size:.70rem;font-weight:750;line-height:1.35}
+.waiver-alert-status.is-active{color:#9ef7cc}
+.waiver-alert-status.is-error{color:#ffb2be}
+#weeklyWaiverAlerts:disabled + .settings-switch-track{opacity:.48;cursor:not-allowed}
+</style>
+
+<style>
+/* v1.0.5 — equal-weight Watch + Listen layout. Card scoreboard untouched. */
+.media-actions,.media-actions.watch-only{
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  column-gap:8px!important;
+  row-gap:8px!important;
+  align-items:stretch!important;
+}
+.media-actions .media-control.watch,
+.media-actions .media-control.listen:not(.media-listen-compact){
+  grid-column:auto!important;
+  flex:none!important;
+  width:100%!important;
+  max-width:none!important;
+  min-width:0!important;
+  margin:0!important;
+}
+.media-actions .media-panel{
+  grid-column:1 / -1!important;
+  width:100%!important;
+  min-width:0!important;
+  max-width:none!important;
+  margin:0!important;
+}
+/* Keep the center of each label between its icon separator and corner chevron. */
+.media-actions .media-control.watch .media-name,
+.media-actions .media-control.listen:not(.media-listen-compact) .media-name{
+  left:calc(50% + 4px);
+}
+/* On a disabled Listen preference, Watch remains precisely half width. */
+.media-actions.watch-only .media-control.watch{grid-column:1!important;}
+.media-actions.watch-only .media-control.listen:not(.media-listen-compact){grid-column:2!important;}
+
+/* Fit two-digit Results count inside one of five equal navigation cells. */
+.dashboard-nav .sort-tab{min-width:0;overflow:hidden;}
+.dashboard-nav .nav-label{max-width:100%;min-width:0;gap:2px!important;letter-spacing:0!important;padding-inline:1px;}
+.dashboard-nav .filter-count{flex:0 0 auto;min-width:15px;height:15px;line-height:15px;padding:0 3px;font-size:.56rem;}
+@media(max-width:450px){
+  .dashboard-nav .nav-label{font-size:.57rem!important;}
+  .dashboard-nav [data-dashboard="results"] .nav-label{font-size:.52rem!important;letter-spacing:-.02em!important;gap:1px!important;}
+}
+@media(max-width:350px){
+  .dashboard-nav .nav-label{font-size:.51rem!important;}
+  .dashboard-nav [data-dashboard="results"] .nav-label{font-size:.48rem!important;}
+  .dashboard-nav .filter-count{min-width:13px;height:14px;line-height:14px;padding:0 2px;font-size:.49rem;}
+}
+
+/* Small native reminder shortcut beside Waivers; the Settings switch remains
+   the authoritative control and both reflect the same iOS reminder request. */
+#weeklyFantasy .waiver-reminder-quick{
+  display:none;flex:0 0 30px;width:30px;height:30px;align-items:center;justify-content:center;
+  border:1px solid rgba(165,188,219,.3);border-radius:999px;
+  color:#aab7cb;background:rgba(255,255,255,.055);padding:6px;
+  cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;
+}
+#weeklyFantasy[data-fantasy-mode="waivers"] .waiver-reminder-quick{display:inline-flex;}
+#weeklyFantasy .waiver-reminder-quick svg{display:block;width:17px;height:17px;}
+#weeklyFantasy .waiver-reminder-quick.is-on{
+  color:#f7fffc;background:var(--gg-selected-fill);border-color:var(--gg-selected-stroke);
+  box-shadow:0 0 7px rgba(98,228,182,.13);
+}
+#weeklyFantasy .waiver-reminder-quick:active{transform:scale(.95);}
+#weeklyFantasy .waiver-reminder-quick:disabled{opacity:.5;cursor:default;}
+#weeklyFantasy .waiver-reminder-quick:focus-visible{outline:2px solid var(--gg-selected-stroke);outline-offset:2px;}
+@media(max-width:390px){#weeklyFantasy .waiver-reminder-quick{flex-basis:28px;width:28px;height:28px;}}
+</style>
+<style>
+/* v1.0.5 refinement: grouped waiver bell, precise Watch centering, and radio spacing. */
+#weeklyFantasy .fantasy-mode-alerts{
+  display:inline-flex;align-items:center;justify-content:flex-start;
+  gap:7px;min-width:0;flex:0 0 auto;
+}
+#weeklyFantasy .fantasy-mode-alerts .fantasy-mode-switch{flex:0 0 auto;}
+#weeklyFantasy .fantasy-mode-alerts .waiver-reminder-quick{margin:0;flex:0 0 30px;}
+@media(max-width:390px){
+  #weeklyFantasy .fantasy-mode-alerts{gap:5px;}
+  #weeklyFantasy .fantasy-mode-alerts .waiver-reminder-quick{flex-basis:28px;}
+}
+/* Center the provider pill on the full Watch button, not the old 138px inset.
+   Icon and bottom-right menu hotspot stay exactly where they were. */
+.media-actions .media-control.watch .media-name{left:50%!important;}
+/* Separate the Broadcast settings tiles and make the radio affordance legible. */
+#broadcastSettings .settings-toggle + .settings-toggle{margin-top:10px;}
+#broadcastSettings .radio-setting-left{
+  display:flex;align-items:center;gap:10px;flex:1 1 auto;min-width:0;
+}
+#broadcastSettings .radio-setting-left .settings-toggle-copy{flex:1;min-width:0;}
+#broadcastSettings .radio-setting-icon{
+  display:grid;place-items:center;flex:0 0 32px;width:32px;height:32px;
+  color:#a9ebd7;border:1px solid rgba(98,228,182,.28);
+  background:rgba(98,228,182,.065);border-radius:10px;
+}
+#broadcastSettings .radio-setting-icon svg{display:block;width:19px;height:19px;}
+#broadcastSettings .radio-broadcast-setting{gap:10px;}
+@media(max-width:350px){
+  #broadcastSettings .radio-setting-left{gap:7px;}
+  #broadcastSettings .radio-setting-icon{width:28px;height:28px;flex-basis:28px;}
+}
+</style>
+<style>
+/* v1.0.5 — align provider pills and station text to the actual optical middle
+   between the fixed icon divider and lower-right chevron. The old 50% Watch
+   override recentered against the entire button and was ~8px too far left.
+   These two controls have matching divider and arrow positions. */
+.media-actions .media-control.watch .media-name,
+.media-actions .media-control.listen:not(.media-listen-compact) .media-name {
+  left:calc(50% + 8px)!important;
+}
+/* Use a slightly fuller fixed-size pill to reduce excess navy space inside
+   each half-width Watch control without making the whole button colorful. */
+@media (min-width:351px) {
+  .media-actions .media-control.watch .media-name {
+    width:76px;min-width:76px;max-width:76px;
+  }
+}
+/* Preserve room for the chevron on the narrowest handsets. */
+@media (max-width:350px) {
+  .media-actions .media-control.watch .media-name {
+    width:60px;min-width:60px;max-width:60px;
+  }
+}
+</style>
+<style>
+/* v1.0.5: expand the primary Watch network badges by ~20% at standard
+   handset widths while preserving the optical center, icon divider,
+   separate corner-chevron hit target, and both 50/50 button sizes.
+   On extra-narrow devices, cap to the room available. */
+.media-actions .media-control.watch .media-name {
+  width:clamp(60px, calc(100% - 65px), 91px);
+  min-width:0;
+  max-width:clamp(60px, calc(100% - 65px), 91px);
+}
 </style>
 </head>
 <body class="provider-chip-refresh">
@@ -1631,8 +2327,15 @@
         <div id="favoriteTeamList" class="favorite-team-list" aria-live="polite"></div>
         <p class="settings-hint">Favorite games get a subtle highlight. Favorites are saved on this device.</p>
       </div>
-      <div class="settings-section">
+      <div class="settings-section" id="broadcastSettings">
         <h3 class="settings-section-title">Broadcast Options</h3>
+        <div class="settings-toggle radio-broadcast-setting">
+          <div class="radio-setting-left">
+            <span class="radio-setting-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 14v-3a9 9 0 0 1 18 0v3"/><rect x="2" y="13" width="5" height="8" rx="2"/><rect x="17" y="13" width="5" height="8" rx="2"/></svg></span>
+            <div class="settings-toggle-copy"><div class="settings-toggle-label">Show Radio Broadcasts</div><div class="settings-toggle-detail">Display Listen on game cards.</div></div>
+          </div>
+          <label class="settings-switch" aria-label="Show radio broadcasts"><input id="showRadioBroadcasts" type="checkbox"><span class="settings-switch-track"></span></label>
+        </div>
         <div class="settings-toggle">
           <div class="settings-toggle-copy">
             <div class="settings-toggle-label">NFL Sunday Ticket</div>
@@ -1646,6 +2349,20 @@
       </div>
       <div class="settings-section">
         <h3 class="settings-section-title">Location & DIRECTV</h3><div class="location-controls"><input id="directvZip" class="location-field" maxlength="5" inputmode="numeric" placeholder="ZIP Code"><button id="directvZipSave" class="location-button">Save ZIP</button></div><div class="location-controls" style="margin-top:8px"><div id="directvMarketStatus" class="location-field" style="display:flex;align-items:center;cursor:default">Market: not detected</div><button id="directvLocate" class="location-button" type="button">Use location</button></div><div class="dtv-package-setting"><div><div class="settings-toggle-label">NFL Network on DIRECTV</div><div class="settings-toggle-detail">Enable if your DIRECTV plan includes NFL Network.</div></div><label class="settings-switch"><input id="directvNflPackage" type="checkbox"><span class="settings-switch-track"></span></label></div><p id="directvZipHint" class="settings-hint">Your ZIP or location identifies local CBS/FOX availability. Results are cached on this device.</p></div>
+      <div class="settings-section" id="waiverAlertSettings">
+        <h3 class="settings-section-title">Fantasy Notifications</h3>
+        <div class="settings-toggle">
+          <div class="settings-toggle-copy">
+            <div class="settings-toggle-label">Weekly Waiver Wire Alerts</div>
+            <div class="settings-toggle-detail">Every Tuesday at 6:00 PM Pacific · Tap to open Waivers</div>
+          </div>
+          <label class="settings-switch" aria-label="Enable weekly waiver wire alerts">
+            <input id="weeklyWaiverAlerts" type="checkbox" disabled>
+            <span class="settings-switch-track"></span>
+          </label>
+        </div>
+        <p class="waiver-alert-status" id="waiverAlertStatus" role="status" aria-live="polite">Available in the iOS app.</p>
+      </div>
       <div id="nativeWidgetSettings" class="settings-section" hidden>
         <h3 class="settings-section-title">Lock Screen</h3>
         <div class="widget-help-card">
@@ -1664,7 +2381,7 @@
 
   <script>
     const DEVICE = detectDevice();
-    const APP_VERSION = "1.0.2";
+    const APP_VERSION = "1.0.5";
 
     // ------------------------------------------------------------
     // DATA SOURCE OVERVIEW
@@ -1729,10 +2446,12 @@
     let resultsSubview=localStorage.getItem("gridironGuide.resultsSubview.v1")==="fantasy"?"fantasy":"games";
     let weeklyFantasyPosition="ALL";
     let weeklyFantasyMode="leaders";
-    const WAIVER_JSON_URL="waivers.json";
+    const WAIVER_JSON_URL="https://goosetickler.github.io/streamline-/waivers.json";
     const WAIVER_FALLBACK=JSON.parse(document.getElementById("waiverFallbackData")?.textContent||"{}");
     let waiverData=WAIVER_FALLBACK;
     let waiverLoadPromise=null;
+    let waiverLoadAttempted=false;
+    let waiverFeedError=false;
     // Waiver recommendations are specific to a REGULAR-SEASON week. The JSON
     // holds only published weeks, beginning with Week 10 in 2026. New weeks can
     // be appended without copying old recommendations or changing this HTML.
@@ -1762,10 +2481,15 @@
           const response=await fetch(WAIVER_JSON_URL+separator+"v="+Date.now(),{cache:"no-store"});
           if(!response.ok)throw new Error("Waiver file unavailable");
           const payload=await response.json();
-          if(validWaiverPayload(payload))waiverData=payload;
+          if(!validWaiverPayload(payload))throw new Error("Invalid waiver payload");
+          waiverData=payload;
+          waiverFeedError=false;
         }catch(_err){
-          // Retain the embedded snapshot for file:// and offline WKWebView loads.
+          // Offline/native loads retain the embedded snapshot without claiming
+          // a published week is missing if the remote request failed.
+          waiverFeedError=true;
         }
+        waiverLoadAttempted=true;
         if(weeklyFantasyMode==="waivers")renderWeeklyFantasyPlayers();
         return waiverData;
       })();
@@ -1787,6 +2511,8 @@
       if(!entry){
         const message=week===null?"Waiver picks are available for regular-season weeks only."
           :week<10?"Waiver Wire starts in Week 10."
+          :!waiverLoadAttempted?`Checking for Week ${week} waiver picks…`
+          :waiverFeedError?"Unable to load the latest waiver list. Check your connection and tap Refresh."
           :`No waiver picks published for Week ${week} yet.`;
         content.innerHTML=`<div class="waiver-empty-state">${escapeHtml(message)}</div>`;
         return;
@@ -2718,6 +3444,7 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
     let directvMarketSource=localStorage.getItem(DIRECTV_MARKET_SOURCE_KEY)||"";
     let directvNflPackageEnabled=localStorage.getItem(DIRECTV_NFL_PACKAGE_KEY)==="true";
     let sundayTicketEnabled=localStorage.getItem(SUNDAY_TICKET_KEY)==="true";
+    let showRadioBroadcasts=localStorage.getItem("gridironGuide.showRadioBroadcasts.v1")!=="false";
     let favoriteTeams=readFavoriteTeams();
     let followedGameIds=readFollowedGameIds();
     let lastNativeFollowSyncFingerprint="";
@@ -3512,7 +4239,8 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
         });
         resultsContentEl=scheduleEl.querySelector(":scope > .results-content");
         if(resultsSubview==="fantasy"){
-          resultsContentEl.innerHTML=`<section class="weekly-leaders" id="weeklyFantasy" data-fantasy-mode="${weeklyFantasyMode}"><div class="weekly-controls"><div class="weekly-position" role="group" aria-label="Fantasy position filters">${["ALL","QB","RB","WR","TE","K"].map(pos=>`<button type="button" data-weekly-position="${pos}" class="${weeklyFantasyPosition===pos?"active":""}" aria-pressed="${weeklyFantasyPosition===pos}">${pos}</button>`).join("")}</div><div class="weekly-subcontrols"><div class="fantasy-mode-switch" role="group" aria-label="Fantasy list mode"><button type="button" data-fantasy-mode="leaders" class="${weeklyFantasyMode==="leaders"?"active":""}" aria-pressed="${weeklyFantasyMode==="leaders"}">Leaders</button><button type="button" data-fantasy-mode="waivers" class="${weeklyFantasyMode==="waivers"?"active":""}" aria-pressed="${weeklyFantasyMode==="waivers"}">Waivers</button></div><button type="button" class="weekly-scoring-pill" data-cycle-scoring="true" aria-label="Change fantasy scoring format">${WEEKLY_SCORING_MODES.find(m=>m.key===weeklyScoringMode).label} ↻</button><span class="waiver-mode-meta" id="waiverModeMeta" title="Estimated rostered level; Low = more likely available, High = less likely available">Rostered</span></div></div><div id="weeklyFantasyContent" aria-live="polite">Loading weekly player stats…</div></section>`;
+          resultsContentEl.innerHTML=`<section class="weekly-leaders" id="weeklyFantasy" data-fantasy-mode="${weeklyFantasyMode}"><div class="weekly-controls"><div class="weekly-position" role="group" aria-label="Fantasy position filters">${["ALL","QB","RB","WR","TE","K"].map(pos=>`<button type="button" data-weekly-position="${pos}" class="${weeklyFantasyPosition===pos?"active":""}" aria-pressed="${weeklyFantasyPosition===pos}">${pos}</button>`).join("")}</div><div class="weekly-subcontrols"><div class="fantasy-mode-alerts"><div class="fantasy-mode-switch" role="group" aria-label="Fantasy list mode"><button type="button" data-fantasy-mode="leaders" class="${weeklyFantasyMode==="leaders"?"active":""}" aria-pressed="${weeklyFantasyMode==="leaders"}">Leaders</button><button type="button" data-fantasy-mode="waivers" class="${weeklyFantasyMode==="waivers"?"active":""}" aria-pressed="${weeklyFantasyMode==="waivers"}">Waivers</button></div>${nativeWaiverReminderHandler()?`<button type="button" class="waiver-reminder-quick" data-waiver-reminder-quick aria-label="Enable weekly waiver reminders" aria-pressed="false" title="Weekly waiver reminders · Tuesdays at 6 PM Pacific"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/></svg></button>`:''}</div><button type="button" class="weekly-scoring-pill" data-cycle-scoring="true" aria-label="Change fantasy scoring format">${WEEKLY_SCORING_MODES.find(m=>m.key===weeklyScoringMode).label} ↻</button><span class="waiver-mode-meta" id="waiverModeMeta" title="Estimated rostered level; Low = more likely available, High = less likely available">Rostered</span></div></div><div id="weeklyFantasyContent" aria-live="polite">Loading weekly player stats…</div></section>`;
+          syncWaiverReminderQuickControl();
           if(weeklyFantasyMode==="waivers"){
             renderWaivers();
             loadWaivers();
@@ -3564,6 +4292,163 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       return providerKeys[0];
     }
 
+    const MEDIA_PLAY_ICON='<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6 3.8 20 12 6 20.2Z"/></svg>';
+    const MEDIA_HEADPHONES_ICON='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 14v-3a8.5 8.5 0 0 1 17 0v3"/><rect x="2.5" y="13" width="4.5" height="8" rx="1.5"/><rect x="17" y="13" width="4.5" height="8" rx="1.5"/></svg>';
+    const MEDIA_CHEVRON='<svg class="media-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 9 7 7 7-7"/></svg>';
+    // Verified 2026 team radio directory. URLs are official team broadcast pages or
+    // verified broadcaster station player pages, not scraped/unauthorized audio streams.
+    // Station game audio may be region-restricted or replaced by other programming.
+    // This directory is independent of Watch/provider routing and may be refreshed seasonally.
+    const RADIO_STATIONS=Object.freeze({"ARI":{"name":"Arizona Sports 98.7","short":"Arizona 98.7","url":"https://www.azcardinals.com/gameday/how-to-listen","type":"team-radio"},"ATL":{"name":"92.9 The Game","short":"92.9 The Game","url":"https://www.iheart.com/live/92-9-the-game-10795/","type":"station"},"BAL":{"name":"98 Rock / WBAL","short":"98 Rock","url":"https://www.baltimoreravens.com/broadcast/gameday-radio/","type":"team-radio"},"BUF":{"name":"97 Rock WGRF","short":"97 Rock","url":"https://www.iheart.com/live/97-rock-5355/","type":"station"},"CAR":{"name":"99.7 The Fox","short":"99.7 The Fox","url":"https://www.panthers.com/audio/panthers-radio-24-hours","type":"team-radio"},"CHI":{"name":"ESPN 1000","short":"ESPN 1000","url":"https://www.iheart.com/live/espn-1000-7907/","type":"station"},"CIN":{"name":"700 WLW","short":"700 WLW","url":"https://www.iheart.com/live/newsradio-700-wlw-1713/","type":"station"},"CLE":{"name":"92.3 The Fan","short":"92.3 The Fan","url":"https://www.iheart.com/live/923-the-fan-10821/","type":"station"},"DAL":{"name":"105.3 The Fan","short":"105.3 The Fan","url":"https://www.iheart.com/live/1053-the-fan-10840/","type":"station"},"DEN":{"name":"KOA 850 / 94.1","short":"KOA 850","url":"https://www.iheart.com/live/850-941-koa-389/","type":"station"},"DET":{"name":"97.1 The Ticket","short":"97.1 The Ticket","url":"https://www.iheart.com/live/971-the-ticket-10827/","type":"station"},"GB":{"name":"95.7 BIG FM / Packers Radio","short":"95.7 BIG FM","url":"https://www.packers.com/video/radio-network","type":"team-radio"},"HOU":{"name":"95.7 The Fan","short":"95.7 The Fan","url":"https://www.iheart.com/live/957-the-fan-10864/","type":"station"},"IND":{"name":"107.5 The Fan","short":"107.5 The Fan","url":"https://www.iheart.com/live/1075-the-fan-6056/","type":"station"},"JAX":{"name":"1010XL / 92.5 FM","short":"1010XL","url":"https://www.jaguars.com/broadcast/","type":"radio-info","note":"1010XL does not stream live Jaguars game audio; listen on AM/FM locally or use NFL+."},"KC":{"name":"96.5 The Fan","short":"96.5 The Fan","url":"https://www.chiefs.com/listen/","type":"team-radio"},"LV":{"name":"Raider Nation Radio 920 / KOMP 92.3","short":"Raider 920","url":"https://www.raiders.com/audio/live-gameday-radio","type":"team-radio"},"LAC":{"name":"KFI AM 640 / Chargers Radio","short":"KFI 640","url":"https://www.chargers.com/live-audio/game","type":"team-radio"},"LAR":{"name":"ESPN LA 710","short":"ESPN LA 710","url":"https://www.audacy.com/stations/espnla","type":"station"},"MIA":{"name":"Fox Sports 940 / BIG 105.9","short":"Fox Sports 940","url":"https://www.iheart.com/live/fox-sports-940-565/","type":"station"},"MIN":{"name":"KFAN 100.3","short":"KFAN 100.3","url":"https://www.iheart.com/live/kfan-fm-1003-1209/","type":"station"},"NE":{"name":"98.5 The Sports Hub","short":"98.5 Sports Hub","url":"https://www.iheart.com/live/985-the-sports-hub-8808/","type":"station"},"NO":{"name":"WWL 870 / 105.3","short":"WWL 870","url":"https://www.iheart.com/live/870-1053-wwl-10981/","type":"station"},"NYG":{"name":"WFAN 101.9 / 660","short":"WFAN 101.9","url":"https://www.iheart.com/live/sportsradio-1019-66-wfan-10930/","type":"station"},"NYJ":{"name":"Q104.3","short":"Q104.3","url":"https://www.iheart.com/live/q1043-1465/","type":"station"},"PHI":{"name":"SportsRadio 94WIP","short":"94 WIP","url":"https://www.iheart.com/live/sportsradio-94wip-10934/","type":"station"},"PIT":{"name":"102.5 WDVE","short":"102.5 DVE","url":"https://www.iheart.com/live/1025-dve-2017/","type":"station"},"SF":{"name":"KNBR 680 / 104.5","short":"KNBR 680","url":"https://www.iheart.com/live/680-1045-knbr-5530/","type":"station"},"SEA":{"name":"Seattle Sports 710","short":"710 Seattle","url":"https://www.iheart.com/live/seattle-sports-710-11726/","type":"station"},"TB":{"name":"98ROCK 97.9","short":"98ROCK","url":"https://www.iheart.com/live/98rock-tampa-bay-697/","type":"station"},"TEN":{"name":"104.5 The Zone","short":"104.5 The Zone","url":"https://www.iheart.com/live/1045-the-zone-5453/","type":"station"},"WSH":{"name":"BIG 100","short":"BIG 100","url":"https://www.iheart.com/live/big-100-2505/","type":"station"}});
+    const RADIO_ABBR_ALIASES={WSH:'WSH',WAS:'WSH',JAC:'JAX',LA:'LAR',OAK:'LV'};
+    function radioStationForAbbr(abbr){
+      const key=String(abbr||'').toUpperCase();
+      return RADIO_STATIONS[RADIO_ABBR_ALIASES[key]||key]||null;
+    }
+    // Home call first, away call second; NFL+ always offers the two audio calls
+    // when a station's own stream doesn't carry the game in the listener's market.
+    function radioOptionsForGame(game){
+      const teams=[
+        {abbr:game.homeAbbr,team:teamShortName(game.homeTeam,game.homeAbbr),side:'Home'},
+        {abbr:game.awayAbbr,team:teamShortName(game.awayTeam,game.awayAbbr),side:'Away'}
+      ];
+      const options=teams.map(t=>{
+        const s=radioStationForAbbr(t.abbr);
+        return s?{label:s.short,name:s.name,url:s.url,team:t.team,side:t.side,
+          type:s.type,caption:s.type==='radio-info'?'AM/FM info ↗':'Station ↗',note:s.note||''}:null;
+      }).filter(Boolean);
+      const nflAudio={label:'NFL+ Audio',name:'NFL+ · Home & Away Audio',url:'https://www.nfl.com/plus',
+        team:'NFL+',side:'Any market',type:'subscription',caption:'Subscription ↗'};
+      // Don't send a Jaguars listener to a station player that explicitly mutes games.
+      // Put NFL+ first when the home station is information-only.
+      if(options[0]?.type==='radio-info')options.unshift(nflAudio);
+      else options.push(nflAudio);
+      return options;
+    }
+    // Compact on-card radio identifier; the expanded list retains full station
+    // names and the original links. Never label NFL+ as SiriusXM unless the
+    // selected destination actually points to SiriusXM.
+    function compactRadioLabel(label){
+      const labels={
+        'Arizona 98.7':'98.7',
+        '92.9 The Game':'92.9',
+        '98 Rock':'98 ROCK',
+        '97 Rock':'97 ROCK',
+        '99.7 The Fox':'99.7 FOX',
+        'ESPN 1000':'ESPN 1000',
+        '700 WLW':'700 WLW',
+        '92.3 The Fan':'92.3 FAN',
+        '105.3 The Fan':'105.3 FAN',
+        'KOA 850':'KOA 850',
+        '97.1 The Ticket':'97.1',
+        '95.7 BIG FM':'95.7 BIG',
+        '95.7 The Fan':'95.7 FAN',
+        '107.5 The Fan':'107.5 FAN',
+        '1010XL':'1010XL',
+        '96.5 The Fan':'96.5 FAN',
+        'Raider 920':'920 AM',
+        'KFI 640':'KFI 640',
+        'ESPN LA 710':'ESPN 710',
+        'Fox Sports 940':'940 AM',
+        'KFAN 100.3':'KFAN',
+        '98.5 Sports Hub':'98.5 HUB',
+        'WWL 870':'WWL 870',
+        'WFAN 101.9':'WFAN',
+        'Q104.3':'Q104.3',
+        '94 WIP':'94 WIP',
+        '102.5 DVE':'WDVE',
+        'KNBR 680':'KNBR',
+        '710 Seattle':'710 AM',
+        '98ROCK':'98ROCK',
+        '104.5 The Zone':'104.5',
+        'BIG 100':'BIG 100',
+        'NFL+ Audio':'NFL+',
+        'SiriusXM':'SIRIUS',
+        'SiriusXM NFL Radio':'SIRIUS'
+      };
+      return labels[label]||label;
+    }
+    function mediaControl(type,label,cssClass,icon,game,providerKey,hasAlternatives=true){
+      const launch=type==='watch'
+        ? `openProvider(${JSON.stringify(providerKey)}, ${JSON.stringify(game).replace(/'/g,"&#39;")})`
+        : `openRadioForGame(${JSON.stringify(game).replace(/'/g,"&#39;")},0)`;
+      const dropdown=hasAlternatives
+        ? `<button class="media-expand" type="button" aria-label="Show ${type} options" aria-expanded="false" onclick="toggleMediaOptions(this)">${MEDIA_CHEVRON}</button>`
+        : '';
+      return `<div class="media-control ${type}" data-media-type="${type}"><button class="media-launch" type="button" onclick='${launch}' aria-label="${type==='watch'?'Watch on':'Listen on'} ${escapeHtml(label)}"><span class="media-icon">${icon}</span><span class="media-name ${cssClass}">${escapeHtml(label)}</span></button>${dropdown}</div>`;
+    }
+    function renderMediaActions(game,providerKeys,providerKey){
+      if(!providerKeys.length&&!showRadioBroadcasts)return '';
+      const radio=radioOptionsForGame(game);
+      // The selected provider is already shown on the primary Watch button;
+      // reserve its dropdown for alternative destinations only.
+      const watchAlternatives=providerKeys.filter(key=>key!==providerKey);
+      const watch=providerKeys.length?mediaControl('watch',providerIconLabel(providerKey),`media-provider-${providerKey}`,MEDIA_PLAY_ICON,game,providerKey,watchAlternatives.length>0):'';
+      // Match Watch: the station name/headphones launch the recommended radio
+      // destination; the separate lower-right chevron expands the same options.
+      // Keep existing openRadioForGame() and Watch's openProvider() untouched.
+      const listen=showRadioBroadcasts&&radio.length
+        ? mediaControl('listen',compactRadioLabel(radio[0].label),'media-station-label',MEDIA_HEADPHONES_ICON,game)
+        : '';
+      const gameArg=JSON.stringify(game).replace(/'/g,"&#39;");
+      const watchOptions=watchAlternatives.length?`<div class="media-panel" data-panel="watch" hidden>${watchAlternatives.map(key=>`<button type="button" class="media-option" onclick='openProvider(${JSON.stringify(key)}, ${gameArg})'><span class="media-provider-${key}">${escapeHtml(PROVIDER_LINKS[key].label)}</span><small>↗</small></button>`).join('')}</div>`:'';
+      // Radio is intentionally more descriptive: keep the recommended station
+      // as well as the away-team call and NFL+ in the menu, with full names.
+      const listenOptions=showRadioBroadcasts?`<div class="media-panel" data-panel="listen" hidden>${radio.map((station,i)=>{
+        const identity=station.type==='subscription'?'NFL+ · GAME AUDIO'
+          : station.type==='radio-info'?`${station.team} · RADIO INFORMATION`
+          : `${station.team} · ${station.side==='Home'?'OFFICIAL HOME RADIO':'OFFICIAL AWAY RADIO'}`;
+        return `<button type="button" class="media-option" onclick='openRadioForGame(${gameArg},${i})'><span class="media-radio-detail"><span class="media-radio-team">${escapeHtml(identity)}</span><span class="media-radio-station">${escapeHtml(station.name)}</span></span><small>${escapeHtml(station.caption)}</small></button>`;
+      }).join('')}<div class="media-radio-notice">Game audio may be limited by market. NFL+ requires a subscription.</div></div>`:'';
+      return `<div class="media-actions${!listen||!watch?' watch-only':''}">${watch}${listen}${watchOptions}${listenOptions}</div>`;
+    }
+    // Lightweight dropdown feedback: animate only compositor-friendly visual
+    // properties. The old height animation reflowed the game-card stack every
+    // frame and could stutter on phones. Navigation handlers are unaffected.
+    function setMediaPanelVisibility(panel,open,animate=true){
+      if(!panel)return;
+      if(panel._mediaTransition){panel._mediaTransition.cancel();panel._mediaTransition=null;}
+      const reduced=window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+      if(!animate||reduced||!panel.animate){panel.hidden=!open;return;}
+      if(open){
+        panel.hidden=false;
+        const transition=panel.animate([
+          {opacity:0,transform:'translate3d(0,-3px,0) scaleY(.975)'},
+          {opacity:1,transform:'translate3d(0,0,0) scaleY(1)'}
+        ],{duration:130,easing:'ease-out'});
+        panel._mediaTransition=transition;
+        transition.onfinish=()=>{if(panel._mediaTransition===transition)panel._mediaTransition=null;};
+      }else if(!panel.hidden){
+        const transition=panel.animate([
+          {opacity:1,transform:'translate3d(0,0,0) scaleY(1)'},
+          {opacity:0,transform:'translate3d(0,-2px,0) scaleY(.98)'}
+        ],{duration:95,easing:'ease-in'});
+        panel._mediaTransition=transition;
+        transition.onfinish=()=>{
+          if(panel._mediaTransition===transition){panel.hidden=true;panel._mediaTransition=null;}
+        };
+      }
+    }
+    function toggleMediaOptions(button){
+      const row=button.closest('.media-actions');const control=button.closest('.media-control');
+      if(!row||!control)return;
+      const type=control.dataset.mediaType;const panel=row.querySelector(`.media-panel[data-panel="${type}"]`);
+      if(!panel)return;
+      // Use the selection state so rapid taps can reverse an in-flight animation.
+      const opening=!control.classList.contains('expanded');
+      row.querySelectorAll('.media-panel').forEach(p=>{
+        // Close other menus immediately when switching type to avoid overlapping panels.
+        if(p!==panel)setMediaPanelVisibility(p,false,false);
+      });
+      row.querySelectorAll('.media-control').forEach(c=>{c.classList.remove('expanded');c.querySelector('.media-expand')?.setAttribute('aria-expanded','false');});
+      setMediaPanelVisibility(panel,opening,true);
+      if(opening){control.classList.add('expanded');button.setAttribute('aria-expanded','true');}
+    }
+    function openRadioForGame(game,index){
+      const station=radioOptionsForGame(game)[index];if(!station)return;
+      // Radio is additive: do not modify the production openProvider() / WKWebView launch policy.
+      window.location.href=station.url;
+    }
     function renderGameCard(game){
       const providerKeys = getEnabledProviderKeysForGame(game);
       const providerKey = getPreferredProviderForGame(providerKeys) || providerFromNetwork(game.network);
@@ -3590,11 +4475,7 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
         : ((isLive||isFinal) ? `<span class="badge ${statusClass}" data-game-field="status">${displayStatus(game.status)}</span>` : "");
       // A completed Results card does not need a blank header above the score.
       const showCardHeader=!isResultsFinal || Boolean(localBadge || statusBadge);
-      const actionRow = isFinal ? "" : `
-          <div class="lower-row">
-            ${providerIcons || `<div class="no-provider">No streams available</div>`}
-            ${providerKeys.length ? `<button class="watch" aria-label="Open ${escapeHtml(provider.label)} for ${escapeHtml(game.awayAbbr)} at ${escapeHtml(game.homeAbbr)}" onclick='openProvider("${providerKey}", ${JSON.stringify(game).replace(/'/g,"&#39;")})'>${playIcon()} WATCH</button>` : ""}
-          </div>`;
+      const actionRow = isFinal ? "" : renderMediaActions(game,providerKeys,providerKey);
       return `
         <article class="game-card${isResultsFinal ? " results-final-card" : ""}${liveClass}${favoriteClass}${winnerSideClass}" data-game-id="${escapeHtml(String(game.id))}" aria-label="${escapeHtml(isResultsFinal ? `Final: ${game.awayTeam} ${game.awayScore ?? ""}, ${game.homeTeam} ${game.homeScore ?? ""}${isOvertimeFinal ? ", overtime" : ""}` : matchup)}">
           ${showCardHeader ? `<div class="game-top">
@@ -3670,21 +4551,116 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       }
     }
 
+    // Score FX integration: presentation only. mergeWeekState() still detects the
+    // real ESPN score changes; no polling, cache or provider logic is modified.
+    const SCORE_ROLL_DURATION_MS=900;
+    const SCORE_ROLL_TRAVEL=.50;
+    const SCORE_ROLL_SPRING="cubic-bezier(.22,1.24,.35,1)";
+    const scoreRollAnimations=new WeakMap();
+    const scoreRollReduceMotion=window.matchMedia("(prefers-reduced-motion: reduce)");
+
+    function applyScoreRoll(scoreEl,fromValue,toValue){
+      if(!scoreEl)return;
+      // A later scoring play must win over an in-flight reel. Each score cell
+      // owns its own token and active compositor animations.
+      const previous=scoreRollAnimations.get(scoreEl);
+      if(previous){
+        previous.animations.forEach(animation=>{try{animation.cancel();}catch(_){}});
+        scoreRollAnimations.delete(scoreEl);
+      }
+      const oldText=String(fromValue??"");
+      const newText=String(toValue??"");
+      if(oldText===newText || !/^\d{1,2}$/.test(oldText) ||
+         !/^\d{1,2}$/.test(newText) || scoreRollReduceMotion.matches ||
+         typeof scoreEl.animate!=="function"){
+        scoreEl.textContent=newText;
+        scoreEl.classList.remove("score-changed");
+        return;
+      }
+
+      const digits=Math.max(oldText.length,newText.length);
+      const oldDigits=oldText.padStart(digits," ");
+      const newDigits=newText.padStart(digits," ");
+      const number=document.createElement("span");
+      number.className="score-roll-number";
+      const animations=[];
+      for(let i=0;i<digits;i++){
+        const oldDigit=oldDigits[i],newDigit=newDigits[i];
+        if(oldDigit===newDigit){
+          const staticDigit=document.createElement("span");
+          staticDigit.className="score-roll-static";
+          staticDigit.textContent=newDigit===" "?"\u00a0":newDigit;
+          number.appendChild(staticDigit);
+          continue;
+        }
+        const clip=document.createElement("span");
+        clip.className="score-roll-digit";
+        const stack=document.createElement("span");
+        stack.className="score-roll-stack";
+        let steps=1;
+        if(/^\d$/.test(oldDigit) && /^\d$/.test(newDigit)){
+          // Mechanical ascending odometer, including 9 -> 0 wrapping.
+          steps=(Number(newDigit)-Number(oldDigit)+10)%10 || 10;
+        }
+        for(let j=0;j<=steps;j++){
+          const cell=document.createElement("span");
+          cell.className="score-roll-cell";
+          cell.textContent=(/^\d$/.test(oldDigit) && /^\d$/.test(newDigit))
+            ? String((Number(oldDigit)+j)%10)
+            : (j===0?(oldDigit===" "?"\u00a0":oldDigit):(newDigit===" "?"\u00a0":newDigit));
+          stack.appendChild(cell);
+        }
+        clip.appendChild(stack);
+        number.appendChild(clip);
+        animations.push({stack,steps});
+      }
+      scoreEl.replaceChildren(number);
+      scoreEl.classList.add("score-changed");
+      // WAAPI transform animations avoid 900ms of repeated card-layout work.
+      const playing=animations.map(({stack,steps})=>stack.animate([
+        {transform:"translate3d(0,0,0)",offset:0},
+        {transform:`translate3d(0,-${steps*SCORE_ROLL_TRAVEL}em,0)`,offset:.78},
+        {transform:`translate3d(0,-${steps}em,0)`,offset:1}
+      ],{duration:SCORE_ROLL_DURATION_MS,easing:SCORE_ROLL_SPRING,fill:"forwards"}));
+      const token=Symbol("score-roll");
+      scoreRollAnimations.set(scoreEl,{token,animations:playing});
+      Promise.allSettled(playing.map(animation=>animation.finished)).then(()=>{
+        if(scoreRollAnimations.get(scoreEl)?.token!==token)return;
+        scoreRollAnimations.delete(scoreEl);
+        scoreEl.textContent=newText;
+        scoreEl.classList.remove("score-changed");
+      });
+    }
+
     function triggerScoreChangeAnimation(card,change){
       if(!card || !change.scoreChanged)return;
-      const changedScores=[];
-      if(change.awayScored)changedScores.push(card.querySelector('[data-score-side="away"]'));
-      if(change.homeScored)changedScores.push(card.querySelector('[data-score-side="home"]'));
+      if(change.awayScored){
+        applyScoreRoll(card.querySelector('[data-score-side="away"]'),
+          change.before.awayScore,change.after.awayScore);
+      }
+      if(change.homeScored){
+        applyScoreRoll(card.querySelector('[data-score-side="home"]'),
+          change.before.homeScore,change.after.homeScore);
+      }
+      // Non-scoring side should still reflect any score correction. No reel.
+      if(!change.awayScored){
+        const el=card.querySelector('[data-score-side="away"]');
+        if(el)el.textContent=change.after.awayScore ?? "";
+      }
+      if(!change.homeScored){
+        const el=card.querySelector('[data-score-side="home"]');
+        if(el)el.textContent=change.after.homeScore ?? "";
+      }
+      if(scoreRollReduceMotion.matches)return;
       card.classList.remove("score-change");
-      changedScores.forEach(score=>score?.classList.remove("score-changed"));
-      // Force a style read so a later scoring play can restart the one-shot animation.
+      // Only the border flash restarts here; digit strips start above.
       void card.offsetWidth;
       card.classList.add("score-change");
-      changedScores.forEach(score=>score?.classList.add("score-changed"));
+      const pulseToken=Symbol("card-score-flash");
+      card._scoreFlashToken=pulseToken;
       window.setTimeout(()=>{
-        card.classList.remove("score-change");
-        changedScores.forEach(score=>score?.classList.remove("score-changed"));
-      },1050);
+        if(card._scoreFlashToken===pulseToken)card.classList.remove("score-change");
+      },1000);
     }
 
     function animateRenderedScoreChanges(changes){
@@ -3718,10 +4694,8 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
         const clock=card.querySelector('[data-game-field="clock"]');
         if(clock)clock.innerHTML=isLiveGame(change.after)?getClockLine(change.after):"";
 
-        const awayScore=card.querySelector('[data-score-side="away"]');
-        const homeScore=card.querySelector('[data-score-side="home"]');
-        if(awayScore)awayScore.textContent=change.after.awayScore ?? "";
-        if(homeScore)homeScore.textContent=change.after.homeScore ?? "";
+        // triggerScoreChangeAnimation applies the new score, rolling only the
+        // team(s) whose points increased. Avoid overwriting the DOM beforehand.
 
         syncPossessionIndicator(card,"away",change.after.possessionAbbr===change.after.awayAbbr);
         syncPossessionIndicator(card,"home",change.after.possessionAbbr===change.after.homeAbbr);
@@ -3763,6 +4737,98 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       try{ localStorage.setItem(PROVIDER_PREF_KEY, JSON.stringify(enabledProviders)); }catch(err){}
     }
 
+
+    // v1.0.5: the native wrapper owns a single weekly repeating reminder.
+    // Never claim this is scheduled until the native bridge confirms it.
+    const WAIVER_REMINDER_PREFERENCE_KEY="gridironGuide.waiverReminder.v1";
+    function nativeWaiverReminderHandler(){
+      return window.webkit?.messageHandlers?.waiverReminder||null;
+    }
+    function waiverReminderElements(){
+      return {toggle:document.getElementById("weeklyWaiverAlerts"),status:document.getElementById("waiverAlertStatus")};
+    }
+    function setWaiverReminderStatus(message,state=""){
+      const {status}=waiverReminderElements();
+      if(!status)return;
+      status.textContent=message;
+      status.classList.toggle("is-active",state==="active");
+      status.classList.toggle("is-error",state==="error");
+    }
+    function syncWaiverReminderStatus(){
+      const handler=nativeWaiverReminderHandler();
+      if(handler){handler.postMessage({action:"status"});}
+    }
+    function syncWaiverReminderQuickControl(enabled){
+      const quick=document.querySelector("[data-waiver-reminder-quick]");
+      if(!quick)return;
+      const active=typeof enabled==="boolean"
+        ?enabled:(localStorage.getItem(WAIVER_REMINDER_PREFERENCE_KEY)==="true");
+      quick.disabled=false;
+      quick.removeAttribute("aria-busy");
+      quick.classList.toggle("is-on",active);
+      quick.setAttribute("aria-pressed",String(active));
+      quick.setAttribute("aria-label",active?"Disable weekly waiver reminders":"Enable weekly waiver reminders");
+      quick.title=active?"Weekly waiver reminders on · Tuesdays at 6 PM Pacific":"Enable weekly waiver reminders · Tuesdays at 6 PM Pacific";
+    }
+    function requestWaiverReminder(enabled){
+      const handler=nativeWaiverReminderHandler();
+      if(!handler)return;
+      const {toggle}=waiverReminderElements();
+      if(toggle)toggle.disabled=true;
+      const quick=document.querySelector("[data-waiver-reminder-quick]");
+      if(quick){quick.disabled=true;quick.setAttribute("aria-busy","true");}
+      setWaiverReminderStatus(enabled?"Enabling weekly alerts…":"Disabling weekly alerts…");
+      handler.postMessage({action:enabled?"enable":"disable"});
+    }
+    // Called by the Xcode wrapper after checking UNUserNotificationCenter.
+    window.gridironGuideWaiverReminderResult=function(result){
+      const {toggle}=waiverReminderElements();
+      if(!toggle||!result)return;
+      const enabled=result.enabled===true;
+      toggle.disabled=!nativeWaiverReminderHandler();
+      toggle.checked=enabled;
+      syncWaiverReminderQuickControl(enabled);
+      try{localStorage.setItem(WAIVER_REMINDER_PREFERENCE_KEY,String(enabled));}catch(_err){}
+      if(result.reason==="permissionDenied"){
+        setWaiverReminderStatus("Notifications are blocked in iOS Settings. Enable alerts there and try again.","error");
+      }else if(result.reason==="schedulingFailed"){
+        setWaiverReminderStatus("Could not schedule the reminder. Try again.","error");
+      }else if(enabled){
+        setWaiverReminderStatus("On · Repeats Tuesdays at 6:00 PM Pacific until switched off.","active");
+      }else{
+        setWaiverReminderStatus("Off · No weekly waiver reminder is scheduled.");
+      }
+    };
+    function initWaiverReminderSettings(){
+      const {toggle}=waiverReminderElements();
+      if(!toggle)return;
+      const handler=nativeWaiverReminderHandler();
+      if(!handler){
+        toggle.checked=false;
+        toggle.disabled=true;
+        setWaiverReminderStatus("Available in the iOS app after native notification support is installed.");
+        return;
+      }
+      toggle.disabled=true;
+      setWaiverReminderStatus("Checking iOS notification settings…");
+      handler.postMessage({action:"status"});
+      toggle.addEventListener("change",()=>{
+        if(!nativeWaiverReminderHandler()){toggle.checked=false;toggle.disabled=true;return;}
+        requestWaiverReminder(toggle.checked);
+      });
+      window.addEventListener("gridironGuideNativeResume",syncWaiverReminderStatus);
+    }
+    // The native notification tap handler calls this after WKWebView has loaded.
+    // Uses existing Fantasy navigation; no game-card or provider routing changes.
+    window.gridironGuideOpenWaiversFromNotification=function(){
+      if(typeof closeSettings==="function")closeSettings();
+      if(typeof restoreCurrentWeekSelection==="function")restoreCurrentWeekSelection();
+      weeklyFantasyMode="waivers";
+      weeklyFantasyPosition="ALL";
+      navigateDashboard("fantasy");
+      loadWaivers({force:true});
+    };
+
     function initSettingsControls(){
       renderFavoriteTeamSettings();
       const widgetHelpHandler=window.webkit?.messageHandlers?.widgetHelp;
@@ -3792,6 +4858,8 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
         });
       };
       syncButtons();
+      const radioToggle=document.querySelector("#showRadioBroadcasts");
+      if(radioToggle){radioToggle.checked=showRadioBroadcasts;radioToggle.addEventListener("change",()=>{showRadioBroadcasts=radioToggle.checked;localStorage.setItem("gridironGuide.showRadioBroadcasts.v1",String(showRadioBroadcasts));renderSchedule();});}
       const sundayTicketToggle=document.querySelector("#sundayTicketEnabled");
       if(sundayTicketToggle){sundayTicketToggle.checked=sundayTicketEnabled;sundayTicketToggle.addEventListener("change",()=>{sundayTicketEnabled=sundayTicketToggle.checked;localStorage.setItem(SUNDAY_TICKET_KEY,String(sundayTicketEnabled));renderSchedule();});}
       const dtvPkg=document.querySelector("#directvNflPackage");
@@ -4062,15 +5130,52 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
         renderWeeklyFantasyPlayers();
       }));
     }
+    // Keep expanded scouting notes visible, especially picks 9/10 on small iPhones.
+    // This is a one-shot scroll after the native <details> layout updates; it
+    // doesn't animate panel height or alter the normal collapse interaction.
+    function focusExpandedWaiver(entry){
+      if(!entry.open||!entry.isConnected)return;
+      const rect=entry.getBoundingClientRect();
+      const headerBottom=Math.max(0,document.querySelector(".app-header")?.getBoundingClientRect().bottom||0);
+      const viewportBottom=Math.min(window.innerHeight,
+        (window.visualViewport?.offsetTop||0)+(window.visualViewport?.height||window.innerHeight));
+      const visibleTop=headerBottom+12;
+      const visibleBottom=viewportBottom-28;
+      const available=Math.max(100,visibleBottom-visibleTop);
+      let offset=0;
+      if(rect.height>available){
+        // Tall notes: show the player's heading directly under the nav rail.
+        offset=rect.top-visibleTop;
+      }else if(rect.bottom>visibleBottom){
+        // Normally just reveal the clipped bottom without moving more than needed.
+        offset=rect.bottom-visibleBottom;
+        if(rect.top-offset<visibleTop)offset=rect.top-visibleTop;
+      }else if(rect.top<visibleTop){
+        offset=rect.top-visibleTop;
+      }
+      if(Math.abs(offset)>3){
+        const reduced=window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+        window.scrollBy({top:offset,behavior:reduced?"instant":"smooth"});
+      }
+    }
     scheduleEl.addEventListener("toggle",event=>{
       const entry=event.target;
       if(!entry.matches?.("details.waiver-entry")||!entry.open)return;
       scheduleEl.querySelectorAll("details.waiver-entry[open]").forEach(other=>{
         if(other!==entry)other.open=false;
       });
+      requestAnimationFrame(()=>{
+        if(entry.open)focusExpandedWaiver(entry);
+      });
     },true);
 
     scheduleEl.addEventListener("click",event=>{
+      const quickBell=event.target.closest("[data-waiver-reminder-quick]");
+      if(quickBell){
+        if(quickBell.disabled)return;
+        requestWaiverReminder(quickBell.getAttribute("aria-pressed")!=="true");
+        return;
+      }
       const gamesView=event.target.closest("[data-games-view]");
       if(gamesView){
         const next=gamesView.dataset.gamesView;
@@ -5103,6 +6208,7 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
     weekNextBtnEl?.addEventListener("click",()=>scrollWeekTimeline(1));
     initSortControls();
     initSettingsControls();
+    initWaiverReminderSettings();
 
     window.addEventListener("gridironGuideNativeResume",handleNativeResume);
     document.addEventListener("visibilitychange",()=>{
