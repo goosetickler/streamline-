@@ -2721,7 +2721,9 @@ body{width:100%;max-width:100%;box-sizing:border-box;overflow-x:clip!important}
 @media(max-width:699px) and (prefers-reduced-motion:no-preference){
  html:has(#schedule .game-card){scroll-snap-type:y proximity;scroll-padding-top:var(--header-height,245px);scroll-padding-bottom:12px}
  #schedule .game-card{scroll-snap-align:start;scroll-snap-stop:normal}
- #schedule .game-card:has(details[open]){scroll-snap-align:none}
+ #schedule .games-content .game-card:has(details[open]){scroll-snap-align:none}
+ #schedule .results-content .game-card{scroll-snap-align:start}
+ #schedule .results-content .completed-results-group{scroll-snap-align:none}
  #schedule > .games-section-header,#schedule > .results-section-header{scroll-snap-align:start}
 }
 </style>
