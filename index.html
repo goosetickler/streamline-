@@ -2727,7 +2727,19 @@ body{width:100%;max-width:100%;box-sizing:border-box;overflow-x:clip!important}
  #schedule > .games-section-header,#schedule > .results-section-header{scroll-snap-align:start}
 }
 </style>
-</head>
+<style>
+.preview-selectors,.preview-filters{display:grid;gap:4px;margin:0 0 7px}
+.preview-selectors{grid-template-columns:1fr 1fr}
+.preview-selectors button,.preview-selectors select{min-width:0;width:100%;font:inherit;font-size:.8rem;font-weight:800;color:#e9f1fc;background:#17283a;border:1px solid #344b62;border-radius:10px;padding:10px 8px}
+.preview-selectors button{display:flex;justify-content:space-between}
+.preview-filters{grid-template-columns:repeat(5,minmax(0,1fr));border:1px solid var(--gg-nav-edge);border-radius:999px;background:var(--gg-nav-surface);padding:4px;gap:2px}
+.preview-filters button{min-width:0;border:1px solid transparent;border-radius:999px;background:transparent;color:var(--muted);font-size:clamp(.59rem,2.8vw,.76rem);font-weight:800;padding:9px 1px;white-space:nowrap}
+.preview-filters button.active{background:var(--gg-selected-fill);border-color:var(--gg-selected-stroke);color:white}
+.preview-filters button:active{transform:scale(.94)}
+.preview-filters span{font-size:.55rem;background:#35465b;border-radius:10px;padding:1px 3px}
+#schedule>.games-section-header{display:none!important}
+.header-week-pill{display:none!important}
+</style></head>
 <body class="provider-chip-refresh">
   <script id="waiverFallbackData" type="application/json">{"season":2026,"updated":"2026-11-14","rosteredNote":"Estimated rostered level, not measured percentages. Low = less widely rostered (more likely available); Medium = mixed; High = widely rostered (less likely available).","weeks":{"10":{"updated":"2026-11-14","players":[{"rank":1,"name":"Jordyn Tyson","team":"NO","position":"WR","rostered":"Medium","summary":"Tyson drew five targets on just 16 routes in his NFL debut, giving him a path to a much bigger role in New Orleans. He is still ramping up after a hamstring injury, so treat him as an upside stash rather than an automatic starter."},{"rank":2,"name":"Corey Kiner","team":"NE","position":"RB","rostered":"Low","summary":"Rhamondre Stevenson's knee injury has opened a path to lead-back touches for Kiner, who has been productive with his carries. His value depends on Stevenson and TreVeyon Henderson's health, so keep an eye on the injury reports."},{"rank":3,"name":"DeMario Douglas","team":"NE","position":"WR","rostered":"Medium","summary":"Douglas has become a useful PPR option and recently drew a season-high nine targets for New England. His receiving volume is encouraging, but the Patriots have enough pass catchers to make his weekly floor uncertain."},{"rank":4,"name":"Tank Dell","team":"HOU","position":"WR","rostered":"Medium","summary":"Dell turned nine targets into 105 yards and a touchdown against the Chargers, flashing the upside that made him a fantasy target. He's still working back into a full route share after a long injury absence, so expect some week-to-week volatility."},{"rank":5,"name":"Audric Estime","team":"NO","position":"RB","rostered":"Low","summary":"Estime ran 15 times for 72 yards and a touchdown as New Orleans searched for backfield production. He could help in the short term, but Travis Etienne's return threatens to cut into his workload."},{"rank":6,"name":"Kaelon Black","team":"SF","position":"RB","rostered":"Low","summary":"Black rushed for 70 yards on 11 carries and has emerged as San Francisco's clear backup to Christian McCaffrey. His increased usage is promising, but he's primarily a high-upside handcuff while McCaffrey is healthy."},{"rank":7,"name":"Caleb Douglas","team":"MIA","position":"WR","rostered":"Low","summary":"Douglas caught six of eight targets against Detroit and is earning a meaningful role in Miami's passing game. The target volume makes him interesting, but shaky quarterback play could limit his weekly ceiling."},{"rank":8,"name":"Chig Okonkwo","team":"WAS","position":"TE","rostered":"Medium","summary":"Okonkwo has been drawing steady targets as Washington's main receiving tight end, making him worth a look in PPR leagues. He managed four catches for 24 yards on Thursday, so view him as a depth or streaming option rather than a must-start."},{"rank":9,"name":"Ryan Flournoy","team":"DAL","position":"WR","rostered":"Low","summary":"Flournoy has shown useful flashes for Dallas and could see more opportunities if George Pickens remains sidelined. His limited targets against Indianapolis highlight the risk of relying on him as a weekly starter."},{"rank":10,"name":"Emmett Johnson","team":"KC","position":"RB","rostered":"Low","summary":"Kenneth Walker has been ruled out for Week 10, putting Johnson in line for a major role against Atlanta. He's an attractive immediate pickup, but his workload could shrink quickly when Walker returns."}]}}}</script>
   <div class="wrap">
@@ -2746,21 +2758,13 @@ body{width:100%;max-width:100%;box-sizing:border-box;overflow-x:clip!important}
         </div>
       </div>
 
-      <div class="dashboard-panel">
-      <nav class="sort-tabs dashboard-nav" aria-label="Main navigation">
-        <button class="sort-tab" data-dashboard="games" type="button"><span class="nav-icon"><svg viewBox="0 0 64 48" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M5 35 C12 13 35 2 58 11 C36 6 17 17 5 35Z" fill="currentColor"/><path d="M7 40 C25 47 48 42 60 23 C55 43 31 52 7 40Z" fill="currentColor"/><path d="M8 38 C20 23 37 15 58 16 C40 17 23 26 8 38Z" fill="currentColor"/><path d="M27 23.2 C35 19.3 42 17.4 50 16.8" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><path d="M30 19.5 L33 26 M35 17.9 L38 24 M40 16.8 L43 22.5 M45 16.5 L48 21" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg></span><span class="nav-label">Games <span class="filter-count" data-count="games"></span></span></button>
-        <button class="sort-tab" data-dashboard="results" type="button"><span class="nav-icon"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 13H43V24C43 34 38 40 32 40S21 34 21 24V13Z"/><path d="M21 18H12V23C12 31 17 35 24 35M43 18H52V23C52 31 47 35 40 35"/><path d="M32 40V49M23 54H41M26 49H38"/><path d="M32 19L34.5 24L40 24.8L36 28.7L37 34L32 31.4L27 34L28 28.7L24 24.8L29.5 24Z" fill="currentColor" stroke="none"/></svg></span><span class="nav-label">Results</span></button>
-        <button class="sort-tab" data-dashboard="fantasy" type="button"><span class="nav-icon"><svg viewBox="0 0 64 64" fill="currentColor" aria-hidden="true"><path d="M11 39Q11 35 15 35H21Q25 35 25 39V53H11Z"/><path d="M27 28Q27 24 31 24H37Q41 24 41 28V53H27Z"/><path d="M43 17Q43 13 47 13H53Q57 13 57 17V53H43Z"/></svg></span><span class="nav-label">Fantasy</span></button>
-        
-      </nav>
-      <button id="headerWeekBtn" class="week-disclosure" type="button" aria-label="Choose schedule week" aria-controls="inlineWeekPicker" aria-expanded="false"><span class="week-grab-handle" aria-hidden="true"></span></button>
-      <section class="week-bar week-nav-shell" id="inlineWeekPicker" hidden aria-label="NFL week schedule navigation">
+<div class="preview-selectors"><button type="button" id="previewSport">Games <span>⌄</span></button><select id="previewWeek" aria-label="Schedule week"></select></div>
+<nav class="preview-filters" aria-label="Game views"><button type="button" data-dashboard="all">All <span data-preview-count="all"></span></button><button type="button" data-dashboard="live">Live <span data-preview-count="live"></span></button><button type="button" data-dashboard="local">Local <span data-preview-count="local"></span></button><button type="button" data-dashboard="results">Results</button><button type="button" data-dashboard="fantasy">Fantasy</button></nav>
+<div hidden><button id="headerWeekBtn" type="button"></button><section class="week-bar week-nav-shell" id="inlineWeekPicker" hidden aria-label="NFL week schedule navigation">
         <button id="weekPrevBtn" class="week-arrow" type="button" aria-label="Previous week">‹</button>
         <div id="weekTimeline" class="week-timeline" aria-label="Schedule weeks"></div>
         <button id="weekNextBtn" class="week-arrow" type="button" aria-label="Next week">›</button>
-      </section>
-      
-      </div>
+      </section></div>
     </header>
 
     <main id="schedule" aria-live="polite"></main>
@@ -4743,6 +4747,8 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
     function renderSchedule(){
       if(sortMode==="live"){sortMode="kickoff";gamesSubview="live";}
       const remainingLocalCount=remainingConfirmedLocalGames().length;
+      const previewScoped=selectedScheduleWeek?allGames.filter(g=>scheduleWeekKey(g)===selectedScheduleWeek):allGames;
+      for(const [key,n] of Object.entries({all:previewScoped.filter(g=>!isFinalGame(g)).length,live:previewScoped.filter(isLiveGame).length,local:remainingLocalCount})){const el=document.querySelector(`[data-preview-count="${key}"]`);if(el)el.textContent=n;}
       const games = getDisplayGames();
       updateWeekRange(games);
       updateFilterCounts();
@@ -6498,6 +6504,8 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
     function renderWeekNavigator(center=false){
       buildScheduleWeeks();
       syncHeaderWeekLabel();
+      const previewWeek=document.getElementById("previewWeek");
+      if(previewWeek){const options=scheduleWeeks.map(w=>`<option value="${escapeHtml(w.key)}">${escapeHtml(weekLabel(w))} · ${escapeHtml(weekDateRange(w)||"")}</option>`).join("");if(previewWeek.dataset.options!==options){previewWeek.innerHTML=options;previewWeek.dataset.options=options;}previewWeek.value=selectedScheduleWeek;}
       if(!weekTimelineEl)return;
       const markup=scheduleWeeks.map(w=>{
         const special=specialWeekMetaFor(w);
@@ -6626,7 +6634,7 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       (kind==="week"?document.getElementById("headerWeekBtn"):document.querySelector(`[data-dashboard='${kind}']`))?.setAttribute("aria-expanded",String(opening));
     }
     function syncDashboardNavigation(){
-      const selected=dashboardDestination();
+      const selected=dashboardDestination()==="games"?gamesSubview:dashboardDestination();
       syncResultsNavMenu();
       const weekButton=document.getElementById("headerWeekBtn");
       weekButton?.classList.remove("active");
@@ -6656,6 +6664,8 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       resetPageScrollForNavigation();
     }
     function initSortControls(){
+      document.getElementById("previewWeek").addEventListener("change",e=>selectScheduleWeek(e.target.value));
+      document.getElementById("previewSport").addEventListener("click",()=>navigateDashboard("all"));
       document.getElementById("headerWeekBtn")?.addEventListener("click",event=>{event.stopPropagation();weekPanelActive=!weekPanelActive;try{localStorage.setItem(WEEK_PANEL_STATE_KEY,String(weekPanelActive));}catch(_){}closeResultsNavMenu();syncDashboardNavigation();if(weekPanelActive){renderWeekNavigator();requestAnimationFrame(()=>centerSelectedWeek(false));}updateHeaderOffset();});
       document.querySelectorAll("[data-dashboard]").forEach(btn=>{
         btn.addEventListener("click",()=>{
