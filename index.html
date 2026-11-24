@@ -5874,9 +5874,9 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
     const expandedFantasyGames = new Map();
     function fantasyViewKey(){return sortMode === "final" ? "results" : "games";}
     function fantasyStateKey(id){return fantasyViewKey()+":"+id;}
-    function focusExpandedFantasy(block){
+    function focusExpandedFantasy(block,expectedOpen=true){
       requestAnimationFrame(()=>requestAnimationFrame(()=>{
-        if(!block.isConnected || !block.open)return;
+        if(!block.isConnected || block.open!==expectedOpen)return;
         const card=block.closest('.game-card');
         if(!card)return;
         const header=document.querySelector('.app-header');
@@ -5891,7 +5891,7 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
     }
     function animateFantasyDisclosure(block,opening){
       block.open=opening;
-      if(opening)focusExpandedFantasy(block);
+      focusExpandedFantasy(block,opening);
     }
     // A game card toggles its fantasy leaders unless the user tapped an actual control.
     document.addEventListener('click',event=>{
