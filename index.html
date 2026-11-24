@@ -2648,14 +2648,14 @@ body{width:100%;max-width:100%;box-sizing:border-box;overflow-x:clip!important}
 @media(max-width:390px){.app-header .dashboard-panel .dashboard-nav > .sort-tab{height:50px!important}}
 
 /* Consistent border-anchored disclosure in both states. */
-.app-header .dashboard-panel{position:relative;padding-bottom:13px;margin-bottom:15px}
+.app-header .dashboard-panel{position:relative;padding-bottom:15px;margin-bottom:0}
 .dashboard-panel .week-summary{display:flex;align-items:center;justify-content:center;gap:6px;color:#a5b8cb;font-size:.68rem;font-weight:750;letter-spacing:.035em;padding:2px 0 5px;line-height:1.15}
 .dashboard-panel .week-summary svg{width:13px;height:13px;flex:none}
 .dashboard-panel:has(.week-disclosure[aria-expanded="true"]) .week-summary{display:none}
-.dashboard-panel .week-disclosure,.dashboard-panel .week-disclosure[aria-expanded="true"]{position:absolute;z-index:2;left:50%;bottom:0;transform:translate(-50%,50%);width:44px;height:44px;min-height:44px;padding:0;isolation:isolate;color:var(--gg-selected-stroke)}
-.dashboard-panel .week-disclosure::before{content:"";position:absolute;z-index:-1;width:28px;height:28px;box-sizing:border-box;border:1px solid var(--gg-selected-stroke);border-radius:50%;background:#142235;box-shadow:0 0 7px rgba(98,228,182,.12)}
+.dashboard-panel .week-disclosure,.dashboard-panel .week-disclosure[aria-expanded="true"]{position:absolute;z-index:2;left:auto;right:3px;bottom:0;transform:none;width:44px;height:24px;min-height:24px;padding:0 7px 0 0;justify-content:flex-end;color:#a5b8cb}
+.dashboard-panel .week-disclosure::before{content:none}
 .dashboard-panel .week-disclosure .week-disclosure-chevron,.dashboard-panel .week-disclosure[aria-expanded="true"] > svg.week-disclosure-chevron:first-child{display:block;width:16px;height:16px}
-.dashboard-panel .week-disclosure:focus-visible{border-radius:50%}
+.dashboard-panel .week-disclosure:focus-visible{border-radius:6px}
 </style>
 <style id="gg-static-week-indicator">
 .app-header .brand{display:flex;flex-direction:column;align-items:flex-start}
