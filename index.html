@@ -2159,6 +2159,13 @@
 .game-card .fantasy-line{white-space:normal;overflow:visible;text-overflow:clip;overflow-wrap:anywhere;flex:1 1 175px;line-height:1.35}
 @media(prefers-reduced-motion:reduce){.game-card .fantasy-block > summary .fantasy-tab-arrow{transition:none}}
 
+
+/* Persistent compact schedule context beneath the wordmark. */
+.app-header .header-week-pill{display:inline-flex;align-items:center;gap:5px;max-width:100%;box-sizing:border-box;margin-top:4px;padding:3px 7px;border:1px solid #344b62;border-radius:999px;background:#192b3e;color:#b9c9da;font-size:clamp(.48rem,2.1vw,.65rem);font-weight:750;line-height:1.15;letter-spacing:.015em;text-transform:uppercase;white-space:nowrap}
+.header-week-pill #headerWeekLabel{color:#e3edf6;font-weight:850}
+.header-week-pill #headerWeekDates:not(:empty)::before{content:"·";margin-right:5px;color:#8299ae}
+.header-week-pill #headerWeekDates:empty{display:none}
+.app-header .title-row{align-items:center}
 </style>
 <style>
 /* v1.0.5 — optional native weekly waiver reminder */
@@ -2616,6 +2623,45 @@ body{width:100%;max-width:100%;box-sizing:border-box;overflow-x:clip!important}
 @keyframes gg-week-reveal{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
 @media(prefers-reduced-motion:reduce){#inlineWeekPicker{animation:none!important}#inlineWeekPicker .week-timeline{scroll-behavior:auto}}
 </style>
+<style id="gg-expandable-dashboard">
+.app-header .dashboard-panel{width:100%;box-sizing:border-box;border:1px solid #344b62;border-radius:16px;background:linear-gradient(145deg,#142235,#101a29);padding:4px;overflow:hidden}
+.app-header .dashboard-panel .dashboard-nav{grid-template-columns:repeat(3,minmax(0,1fr))!important;background:transparent!important;border:0!important;box-shadow:none!important;margin:0!important;padding:0!important;gap:3px!important}
+.app-header .dashboard-panel #inlineWeekPicker:not([hidden]){margin:4px 0 0!important;border:0!important;border-top:1px solid #344b62!important;border-radius:0!important;background:transparent!important;padding:6px 0 2px!important}
+.dashboard-panel .week-disclosure{appearance:none;display:flex;align-items:center;justify-content:center;gap:6px;width:100%;min-height:30px;padding:5px 0 2px;border:0;background:transparent;color:#a5b8cb;font:inherit;font-size:.68rem;font-weight:750;letter-spacing:.035em;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.week-disclosure svg{width:14px;height:14px;flex:none}.week-disclosure .week-disclosure-chevron{transition:transform .18s ease}.week-disclosure[aria-expanded="true"] .week-disclosure-chevron{transform:rotate(180deg)}.week-disclosure:active{opacity:.65}.week-disclosure:focus-visible{outline:2px solid var(--gg-selected-stroke);outline-offset:-2px;border-radius:6px}
+@media(prefers-reduced-motion:reduce){.week-disclosure .week-disclosure-chevron{transition:none}}
+
+/* Compact expanded disclosure and reserve space for header controls. */
+.dashboard-panel .week-disclosure[aria-expanded="true"]{min-height:24px;padding:2px 0}
+.app-header .title-row{gap:10px!important}
+.app-header .brand{container-type:inline-size;min-width:0;flex:1 1 0}
+.app-header .brand-wordmark{font-size:clamp(.7rem,4.4vw,1.55rem)!important;letter-spacing:.012em!important;line-height:1.08}
+@supports(font-size:1cqi){.app-header .brand-wordmark{font-size:min(1.55rem,9.1cqi)!important}}
+.app-header .header-actions{flex:0 0 auto}
+/* Keep the selected outline clear of the rounded parent corners. */
+.app-header .dashboard-panel{padding:5px;overflow:visible}
+.app-header .dashboard-panel .dashboard-nav{overflow:visible!important;padding:1px 2px!important;box-sizing:border-box}
+.app-header .dashboard-panel .dashboard-nav > .sort-tab{height:54px!important;min-height:0!important;grid-template-rows:25px 16px;row-gap:2px!important;padding-block:4px!important;border-radius:12px!important}
+.app-header .dashboard-panel .dashboard-nav .nav-icon{width:25px;height:25px}
+.app-header .dashboard-panel .dashboard-nav .nav-icon svg{width:25px;height:25px}
+.app-header .title-row{margin-bottom:6px!important;gap:12px!important}
+@media(max-width:390px){.app-header .dashboard-panel .dashboard-nav > .sort-tab{height:50px!important}}
+
+/* Consistent border-anchored disclosure in both states. */
+.app-header .dashboard-panel{position:relative;padding-bottom:13px;margin-bottom:15px}
+.dashboard-panel .week-summary{display:flex;align-items:center;justify-content:center;gap:6px;color:#a5b8cb;font-size:.68rem;font-weight:750;letter-spacing:.035em;padding:2px 0 5px;line-height:1.15}
+.dashboard-panel .week-summary svg{width:13px;height:13px;flex:none}
+.dashboard-panel:has(.week-disclosure[aria-expanded="true"]) .week-summary{display:none}
+.dashboard-panel .week-disclosure,.dashboard-panel .week-disclosure[aria-expanded="true"]{position:absolute;z-index:2;left:50%;bottom:0;transform:translate(-50%,50%);width:44px;height:44px;min-height:44px;padding:0;isolation:isolate;color:var(--gg-selected-stroke)}
+.dashboard-panel .week-disclosure::before{content:"";position:absolute;z-index:-1;width:28px;height:28px;box-sizing:border-box;border:1px solid var(--gg-selected-stroke);border-radius:50%;background:#142235;box-shadow:0 0 7px rgba(98,228,182,.12)}
+.dashboard-panel .week-disclosure .week-disclosure-chevron,.dashboard-panel .week-disclosure[aria-expanded="true"] > svg.week-disclosure-chevron:first-child{display:block;width:16px;height:16px}
+.dashboard-panel .week-disclosure:focus-visible{border-radius:50%}
+</style>
+<style id="gg-static-week-indicator">
+.app-header .brand{display:flex;flex-direction:column;align-items:flex-start}
+.app-header .header-week-pill{align-self:flex-start;color:#9cacc0;border-color:#30445a;background:#172536;cursor:default;padding:3px 9px;box-shadow:none}
+.app-header .header-week-pill #headerWeekLabel{color:#9cacc0}
+</style>
 </head>
 <body class="provider-chip-refresh">
   <script id="waiverFallbackData" type="application/json">{"season":2026,"updated":"2026-11-14","rosteredNote":"Estimated rostered level, not measured percentages. Low = less widely rostered (more likely available); Medium = mixed; High = widely rostered (less likely available).","weeks":{"10":{"updated":"2026-11-14","players":[{"rank":1,"name":"Jordyn Tyson","team":"NO","position":"WR","rostered":"Medium","summary":"Tyson drew five targets on just 16 routes in his NFL debut, giving him a path to a much bigger role in New Orleans. He is still ramping up after a hamstring injury, so treat him as an upside stash rather than an automatic starter."},{"rank":2,"name":"Corey Kiner","team":"NE","position":"RB","rostered":"Low","summary":"Rhamondre Stevenson's knee injury has opened a path to lead-back touches for Kiner, who has been productive with his carries. His value depends on Stevenson and TreVeyon Henderson's health, so keep an eye on the injury reports."},{"rank":3,"name":"DeMario Douglas","team":"NE","position":"WR","rostered":"Medium","summary":"Douglas has become a useful PPR option and recently drew a season-high nine targets for New England. His receiving volume is encouraging, but the Patriots have enough pass catchers to make his weekly floor uncertain."},{"rank":4,"name":"Tank Dell","team":"HOU","position":"WR","rostered":"Medium","summary":"Dell turned nine targets into 105 yards and a touchdown against the Chargers, flashing the upside that made him a fantasy target. He's still working back into a full route share after a long injury absence, so expect some week-to-week volatility."},{"rank":5,"name":"Audric Estime","team":"NO","position":"RB","rostered":"Low","summary":"Estime ran 15 times for 72 yards and a touchdown as New Orleans searched for backfield production. He could help in the short term, but Travis Etienne's return threatens to cut into his workload."},{"rank":6,"name":"Kaelon Black","team":"SF","position":"RB","rostered":"Low","summary":"Black rushed for 70 yards on 11 carries and has emerged as San Francisco's clear backup to Christian McCaffrey. His increased usage is promising, but he's primarily a high-upside handcuff while McCaffrey is healthy."},{"rank":7,"name":"Caleb Douglas","team":"MIA","position":"WR","rostered":"Low","summary":"Douglas caught six of eight targets against Detroit and is earning a meaningful role in Miami's passing game. The target volume makes him interesting, but shaky quarterback play could limit his weekly ceiling."},{"rank":8,"name":"Chig Okonkwo","team":"WAS","position":"TE","rostered":"Medium","summary":"Okonkwo has been drawing steady targets as Washington's main receiving tight end, making him worth a look in PPR leagues. He managed four catches for 24 yards on Thursday, so view him as a depth or streaming option rather than a must-start."},{"rank":9,"name":"Ryan Flournoy","team":"DAL","position":"WR","rostered":"Low","summary":"Flournoy has shown useful flashes for Dallas and could see more opportunities if George Pickens remains sidelined. His limited targets against Indianapolis highlight the risk of relying on him as a weekly starter."},{"rank":10,"name":"Emmett Johnson","team":"KC","position":"RB","rostered":"Low","summary":"Kenneth Walker has been ruled out for Week 10, putting Johnson in line for a major role against Atlanta. He's an attractive immediate pickup, but his workload could shrink quickly when Walker returns."}]}}}</script>
@@ -2626,6 +2672,7 @@ body{width:100%;max-width:100%;box-sizing:border-box;overflow-x:clip!important}
           <h1 class="brand-wordmark" aria-label="Gridiron Guide">
             <span class="brand-gridiron">GRIDIRON</span><span class="brand-guide"> GUIDE</span>
           </h1>
+          <div class="header-week-pill"><span id="headerWeekLabel">WEEK --</span></div>
         </div>
         <div class="header-actions">
           
@@ -2634,8 +2681,8 @@ body{width:100%;max-width:100%;box-sizing:border-box;overflow-x:clip!important}
         </div>
       </div>
 
+      <div class="dashboard-panel">
       <nav class="sort-tabs dashboard-nav" aria-label="Main navigation">
-        <div class="week-nav-cell"><button id="headerWeekBtn" class="sort-tab week-nav-tab" type="button" aria-label="Choose schedule week" aria-controls="inlineWeekPicker" aria-expanded="false"><span class="nav-icon"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="7" width="22" height="21" rx="3"/><path d="M5 13h22M11 4v6M21 4v6"/><path d="M11 18h2m6 0h2m-10 5h2m6 0h2"/></svg></span><span class="nav-label" id="headerWeekLabel">WEEK --</span></button></div>
         <button class="sort-tab" data-dashboard="games" type="button"><span class="nav-icon"><svg viewBox="0 0 64 48" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M5 35 C12 13 35 2 58 11 C36 6 17 17 5 35Z" fill="currentColor"/><path d="M7 40 C25 47 48 42 60 23 C55 43 31 52 7 40Z" fill="currentColor"/><path d="M8 38 C20 23 37 15 58 16 C40 17 23 26 8 38Z" fill="currentColor"/><path d="M27 23.2 C35 19.3 42 17.4 50 16.8" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><path d="M30 19.5 L33 26 M35 17.9 L38 24 M40 16.8 L43 22.5 M45 16.5 L48 21" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg></span><span class="nav-label">Games <span class="filter-count" data-count="games"></span></span></button>
         <button class="sort-tab" data-dashboard="results" type="button"><span class="nav-icon"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 13H43V24C43 34 38 40 32 40S21 34 21 24V13Z"/><path d="M21 18H12V23C12 31 17 35 24 35M43 18H52V23C52 31 47 35 40 35"/><path d="M32 40V49M23 54H41M26 49H38"/><path d="M32 19L34.5 24L40 24.8L36 28.7L37 34L32 31.4L27 34L28 28.7L24 24.8L29.5 24Z" fill="currentColor" stroke="none"/></svg></span><span class="nav-label">Results</span></button>
         <button class="sort-tab" data-dashboard="fantasy" type="button"><span class="nav-icon"><svg viewBox="0 0 64 64" fill="currentColor" aria-hidden="true"><path d="M11 39Q11 35 15 35H21Q25 35 25 39V53H11Z"/><path d="M27 28Q27 24 31 24H37Q41 24 41 28V53H27Z"/><path d="M43 17Q43 13 47 13H53Q57 13 57 17V53H43Z"/></svg></span><span class="nav-label">Fantasy</span></button>
@@ -2646,6 +2693,8 @@ body{width:100%;max-width:100%;box-sizing:border-box;overflow-x:clip!important}
         <div id="weekTimeline" class="week-timeline" aria-label="Schedule weeks"></div>
         <button id="weekNextBtn" class="week-arrow" type="button" aria-label="Next week">›</button>
       </section>
+      <button id="headerWeekBtn" class="week-disclosure" type="button" aria-label="Choose schedule week" aria-controls="inlineWeekPicker" aria-expanded="false"><svg class="week-disclosure-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+      </div>
     </header>
 
     <main id="schedule" aria-live="polite"></main>
@@ -2752,14 +2801,14 @@ body{width:100%;max-width:100%;box-sizing:border-box;overflow-x:clip!important}
         </div>
       </div>
       <div class="settings-version-wrap">
-        <div id="appVersionLabel" class="settings-version" aria-label="Gridiron Guide version 1.0.2">Gridiron Guide · Version 1.0.2</div>
+        <div id="appVersionLabel" class="settings-version" aria-label="Gridiron Guide version 1.0.6">Gridiron Guide · Version 1.0.6</div>
       </div>
       </div></section>
   </div>
 
   <script>
     const DEVICE = detectDevice();
-    const APP_VERSION = "1.0.5";
+    const APP_VERSION = "1.0.6";
 
     // ------------------------------------------------------------
     // DATA SOURCE OVERVIEW
@@ -6467,7 +6516,9 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
     function bellIcon(filled=false){return `<svg viewBox="0 0 24 24" aria-hidden="true" fill="${filled?"currentColor":"none"}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/></svg>`;}
     function slug(value){ return String(value).toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,""); }
     function escapeHtml(value){ return String(value ?? "").replace(/[&<>'"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"}[c])); }
+    const WEEK_PANEL_STATE_KEY="gridironGuide.weekPanelExpanded.v1";
     let weekPanelActive=false;
+    try{weekPanelActive=localStorage.getItem(WEEK_PANEL_STATE_KEY)==="true";}catch(_){}
     function dashboardDestination(){
       return sortMode==="final"?(resultsSubview==="fantasy"?"fantasy":"results"):"games";
     }
@@ -6543,7 +6594,7 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       resetPageScrollForNavigation();
     }
     function initSortControls(){
-      document.getElementById("headerWeekBtn")?.addEventListener("click",event=>{event.stopPropagation();weekPanelActive=!weekPanelActive;closeResultsNavMenu();syncDashboardNavigation();if(weekPanelActive){renderWeekNavigator();requestAnimationFrame(()=>centerSelectedWeek(false));}updateHeaderOffset();});
+      document.getElementById("headerWeekBtn")?.addEventListener("click",event=>{event.stopPropagation();weekPanelActive=!weekPanelActive;try{localStorage.setItem(WEEK_PANEL_STATE_KEY,String(weekPanelActive));}catch(_){}closeResultsNavMenu();syncDashboardNavigation();if(weekPanelActive){renderWeekNavigator();requestAnimationFrame(()=>centerSelectedWeek(false));}updateHeaderOffset();});
       document.querySelectorAll("[data-dashboard]").forEach(btn=>{
         btn.addEventListener("click",()=>{
           const kind=btn.dataset.dashboard;
