@@ -5875,22 +5875,18 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
     function fantasyViewKey(){return sortMode === "final" ? "results" : "games";}
     function fantasyStateKey(id){return fantasyViewKey()+":"+id;}
     function focusExpandedFantasy(block){
-      if(!block?.open)return;
       requestAnimationFrame(()=>requestAnimationFrame(()=>{
         if(!block.isConnected || !block.open)return;
+        const card=block.closest('.game-card');
+        if(!card)return;
         const header=document.querySelector('.app-header');
-        const topInset=(header?.getBoundingClientRect().height||0)+12;
-        const rect=block.getBoundingClientRect();
-        const bottomInset=18;
-        // Only move when the expanded section is clipped; keep its header
-        // below the fixed navigation whenever possible.
-        if(rect.bottom>innerHeight-bottomInset || rect.top<topInset){
-          const available=innerHeight-topInset-bottomInset;
-          const target=rect.height<=available
-            ? rect.bottom-(innerHeight-bottomInset)
-            : rect.top-topInset;
-          if(Math.abs(target)>3)window.scrollBy({top:target,behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'});
-        }
+        const topInset=Math.max(0,header?.getBoundingClientRect().bottom||0)+12;
+        const bottom=innerHeight-18;
+        const rect=card.getBoundingClientRect();
+        if(rect.top>=topInset && rect.bottom<=bottom)return;
+        const delta=rect.height>bottom-topInset || rect.top<topInset
+          ? rect.top-topInset : rect.bottom-bottom;
+        if(Math.abs(delta)>3)window.scrollBy({top:delta,behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'});
       }));
     }
     // A game card toggles its fantasy leaders unless the user tapped an actual control.
@@ -5904,6 +5900,7 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       if(event.target.closest('.fantasy-body'))return;
       const opening=!block.open;
       block.open=opening;
+      if(opening)focusExpandedFantasy(block);
 
     });
     document.addEventListener('click',event=>{
@@ -5917,6 +5914,7 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       if(!summary)return;
       const block=summary.parentElement;
       // A user opening the section is the only action allowed to trigger focus scrolling.
+      if(!block.open)focusExpandedFantasy(block);
 
     });
     document.addEventListener("toggle", event => {
