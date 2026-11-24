@@ -2672,6 +2672,12 @@ body{width:100%;max-width:100%;box-sizing:border-box;overflow-x:clip!important}
 @media(prefers-reduced-motion:reduce){:is(.dashboard-panel .week-disclosure,.game-card .fantasy-block > summary) :is(.week-disclosure-chevron,.fantasy-tab-arrow){transition:none}}
 @media (hover:none) and (pointer:coarse){.app-header .dashboard-panel #inlineWeekPicker:not([hidden]){grid-template-columns:minmax(0,1fr);gap:0}#inlineWeekPicker .week-arrow{display:none!important}}
 
+/* Keep disclosure hit area below the week chips and normalize section rhythm. */
+.app-header .dashboard-panel:has(.week-disclosure[aria-expanded="true"]){padding-bottom:44px}
+#schedule{--gg-card-gap:12px}
+#schedule .games-content > .day-group,#schedule .results-content > .day-group{margin-top:0!important;margin-bottom:var(--gg-card-gap)!important}
+#schedule .games-content .games,#schedule .results-content .games{gap:var(--gg-card-gap)!important}
+#schedule > .games-section-header,#schedule > .results-section-header{margin-bottom:var(--gg-card-gap)!important}
 </style>
 <style id="gg-static-week-indicator">
 .app-header .brand{display:flex;flex-direction:column;align-items:flex-start}
