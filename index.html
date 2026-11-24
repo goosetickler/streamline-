@@ -6385,7 +6385,7 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       // Use the fixed header's actual viewport bottom (including iOS safe area)
       // instead of a pre-navigation height estimate.
       const bottom=Math.ceil(header.getBoundingClientRect().bottom);
-      document.documentElement.style.setProperty("--header-height",`${Math.max(0,bottom)+5}px`);
+      document.documentElement.style.setProperty("--header-height",`${Math.max(0,bottom)}px`);
     }
 
     function resetPageScrollForNavigation(){
