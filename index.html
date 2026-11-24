@@ -2678,6 +2678,15 @@ body{width:100%;max-width:100%;box-sizing:border-box;overflow-x:clip!important}
 #schedule .games-content > .day-group,#schedule .results-content > .day-group{margin-top:0!important;margin-bottom:var(--gg-card-gap)!important}
 #schedule .games-content .games,#schedule .results-content .games{gap:var(--gg-card-gap)!important}
 #schedule > .games-section-header,#schedule > .results-section-header{margin-bottom:var(--gg-card-gap)!important}
+/* Chevron-free card disclosure trial */
+.app-header .dashboard-panel,.app-header .dashboard-panel:has(.week-disclosure[aria-expanded="true"]){padding-bottom:6px!important;cursor:pointer}
+.dashboard-panel .week-disclosure,.game-card .fantasy-block > summary{position:absolute!important;width:1px!important;height:1px!important;overflow:hidden!important;clip-path:inset(50%);pointer-events:none}
+.game-card:has(> .fantasy-block){padding-bottom:12px!important}
+#schedule{--gg-card-gap:12px}
+#schedule :is(.games-content,.results-content){display:grid;gap:var(--gg-card-gap)!important}
+#schedule :is(.games-content,.results-content) > :is(.day-group,.completed-results-group){margin:0!important}
+#schedule :is(.games-content,.results-content) .games{gap:var(--gg-card-gap)!important}
+#schedule :is(.games-content,.results-content) .game-card{margin:0!important}
 </style>
 <style id="gg-static-week-indicator">
 .app-header .brand{display:flex;flex-direction:column;align-items:flex-start}
@@ -6616,6 +6625,10 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       resetPageScrollForNavigation();
     }
     function initSortControls(){
+      document.querySelector(".dashboard-panel")?.addEventListener("click",event=>{
+ if(event.target.closest("button,a,input,select,textarea,[role='button'],#inlineWeekPicker"))return;
+ document.getElementById("headerWeekBtn")?.click();
+});
       document.getElementById("headerWeekBtn")?.addEventListener("click",event=>{event.stopPropagation();weekPanelActive=!weekPanelActive;try{localStorage.setItem(WEEK_PANEL_STATE_KEY,String(weekPanelActive));}catch(_){}closeResultsNavMenu();syncDashboardNavigation();if(weekPanelActive){renderWeekNavigator();requestAnimationFrame(()=>centerSelectedWeek(false));}updateHeaderOffset();});
       document.querySelectorAll("[data-dashboard]").forEach(btn=>{
         btn.addEventListener("click",()=>{
