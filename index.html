@@ -2711,12 +2711,6 @@ body{width:100%;max-width:100%;box-sizing:border-box;overflow-x:clip!important}
 #headerWeekBtn[aria-expanded="true"] .week-grab-handle,#headerWeekBtn:active .week-grab-handle{background:#57dfb8;box-shadow:0 0 0 3px #142235,0 0 9px 2px rgba(87,223,184,.65)}
 @media(max-width:390px){.app-header .dashboard-panel{--gg-nav-row:52px}}
 </style>
-<style id="gg-week-pull">
-#headerWeekBtn{touch-action:none;user-select:none;-webkit-user-select:none}
-#headerWeekBtn .week-grab-handle{transform:translateY(var(--week-pull-offset,0px));transition:transform .16s ease,background .15s ease,box-shadow .15s ease}
-#headerWeekBtn.week-pulling .week-grab-handle{transition:none;background:#57dfb8;box-shadow:0 0 0 3px #142235,0 0 9px 2px rgba(87,223,184,.65)}
-@media(prefers-reduced-motion:reduce){#headerWeekBtn .week-grab-handle{transition:none;transform:none}}
-</style>
 </head>
 <body class="provider-chip-refresh">
   <script id="waiverFallbackData" type="application/json">{"season":2026,"updated":"2026-11-14","rosteredNote":"Estimated rostered level, not measured percentages. Low = less widely rostered (more likely available); Medium = mixed; High = widely rostered (less likely available).","weeks":{"10":{"updated":"2026-11-14","players":[{"rank":1,"name":"Jordyn Tyson","team":"NO","position":"WR","rostered":"Medium","summary":"Tyson drew five targets on just 16 routes in his NFL debut, giving him a path to a much bigger role in New Orleans. He is still ramping up after a hamstring injury, so treat him as an upside stash rather than an automatic starter."},{"rank":2,"name":"Corey Kiner","team":"NE","position":"RB","rostered":"Low","summary":"Rhamondre Stevenson's knee injury has opened a path to lead-back touches for Kiner, who has been productive with his carries. His value depends on Stevenson and TreVeyon Henderson's health, so keep an eye on the injury reports."},{"rank":3,"name":"DeMario Douglas","team":"NE","position":"WR","rostered":"Medium","summary":"Douglas has become a useful PPR option and recently drew a season-high nine targets for New England. His receiving volume is encouraging, but the Patriots have enough pass catchers to make his weekly floor uncertain."},{"rank":4,"name":"Tank Dell","team":"HOU","position":"WR","rostered":"Medium","summary":"Dell turned nine targets into 105 yards and a touchdown against the Chargers, flashing the upside that made him a fantasy target. He's still working back into a full route share after a long injury absence, so expect some week-to-week volatility."},{"rank":5,"name":"Audric Estime","team":"NO","position":"RB","rostered":"Low","summary":"Estime ran 15 times for 72 yards and a touchdown as New Orleans searched for backfield production. He could help in the short term, but Travis Etienne's return threatens to cut into his workload."},{"rank":6,"name":"Kaelon Black","team":"SF","position":"RB","rostered":"Low","summary":"Black rushed for 70 yards on 11 carries and has emerged as San Francisco's clear backup to Christian McCaffrey. His increased usage is promising, but he's primarily a high-upside handcuff while McCaffrey is healthy."},{"rank":7,"name":"Caleb Douglas","team":"MIA","position":"WR","rostered":"Low","summary":"Douglas caught six of eight targets against Detroit and is earning a meaningful role in Miami's passing game. The target volume makes him interesting, but shaky quarterback play could limit his weekly ceiling."},{"rank":8,"name":"Chig Okonkwo","team":"WAS","position":"TE","rostered":"Medium","summary":"Okonkwo has been drawing steady targets as Washington's main receiving tight end, making him worth a look in PPR leagues. He managed four catches for 24 yards on Thursday, so view him as a depth or streaming option rather than a must-start."},{"rank":9,"name":"Ryan Flournoy","team":"DAL","position":"WR","rostered":"Low","summary":"Flournoy has shown useful flashes for Dallas and could see more opportunities if George Pickens remains sidelined. His limited targets against Indianapolis highlight the risk of relying on him as a weekly starter."},{"rank":10,"name":"Emmett Johnson","team":"KC","position":"RB","rostered":"Low","summary":"Kenneth Walker has been ruled out for Week 10, putting Johnson in line for a major role against Atlanta. He's an attractive immediate pickup, but his workload could shrink quickly when Walker returns."}]}}}</script>
@@ -6650,38 +6644,7 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       resetPageScrollForNavigation();
     }
     function initSortControls(){
-      const pullHandle=document.getElementById("headerWeekBtn");
-      let weekPull=null, suppressWeekClickUntil=0;
-      pullHandle?.addEventListener("pointerdown",e=>{
-        if(!e.isPrimary||e.button!==0)return;
-        weekPull={id:e.pointerId,x:e.clientX,y:e.clientY,dy:0,open:weekPanelActive};
-        pullHandle.setPointerCapture(e.pointerId);
-      });
-      pullHandle?.addEventListener("pointermove",e=>{
-        if(!weekPull||weekPull.id!==e.pointerId)return;
-        weekPull.dy=e.clientY-weekPull.y;
-        if(Math.abs(weekPull.dy)>8&&Math.abs(weekPull.dy)>Math.abs(e.clientX-weekPull.x)){
-          pullHandle.classList.add("week-pulling");
-          pullHandle.style.setProperty("--week-pull-offset",Math.max(-12,Math.min(12,weekPull.dy*.25))+"px");
-        }
-      });
-      function finishWeekPull(e,cancelled=false){
-        if(!weekPull||weekPull.id!==e.pointerId)return;
-        const p=weekPull;weekPull=null;
-        pullHandle.classList.remove("week-pulling");
-        pullHandle.style.removeProperty("--week-pull-offset");
-        if(cancelled)return;
-        const dy=e.clientY-p.y,dx=e.clientX-p.x;
-        if(Math.abs(dy)>12&&Math.abs(dy)>Math.abs(dx)){
-          const target=dy>0;
-          if(Math.abs(dy)>=24&&target!==weekPanelActive){suppressWeekClickUntil=0;pullHandle.click();}
-          suppressWeekClickUntil=performance.now()+450;
-        }
-      }
-      pullHandle?.addEventListener("pointerup",e=>finishWeekPull(e));
-      pullHandle?.addEventListener("pointercancel",e=>finishWeekPull(e,true));
-      pullHandle?.addEventListener("lostpointercapture",e=>finishWeekPull(e,true));
-      document.getElementById("headerWeekBtn")?.addEventListener("click",event=>{event.stopPropagation();if(event.detail!==0&&performance.now()<suppressWeekClickUntil)return;weekPanelActive=!weekPanelActive;try{localStorage.setItem(WEEK_PANEL_STATE_KEY,String(weekPanelActive));}catch(_){}closeResultsNavMenu();syncDashboardNavigation();if(weekPanelActive){renderWeekNavigator();requestAnimationFrame(()=>centerSelectedWeek(false));}updateHeaderOffset();});
+      document.getElementById("headerWeekBtn")?.addEventListener("click",event=>{event.stopPropagation();weekPanelActive=!weekPanelActive;try{localStorage.setItem(WEEK_PANEL_STATE_KEY,String(weekPanelActive));}catch(_){}closeResultsNavMenu();syncDashboardNavigation();if(weekPanelActive){renderWeekNavigator();requestAnimationFrame(()=>centerSelectedWeek(false));}updateHeaderOffset();});
       document.querySelectorAll("[data-dashboard]").forEach(btn=>{
         btn.addEventListener("click",()=>{
           const kind=btn.dataset.dashboard;
