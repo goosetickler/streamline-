@@ -2797,9 +2797,12 @@ html:has(#schedule .fantasy-block[open]){scroll-snap-type:none!important}
 @keyframes gg-stats-reveal{from{opacity:0;clip-path:inset(0 0 100% 0)}to{opacity:1;clip-path:inset(0 0 0 0)}}
 @media(prefers-reduced-motion:reduce){.game-card>details.fantasy-block[open]>.fantasy-body{animation:none}}
 </style><style id="gg-card-handle-anchor">
-/* The collapsed card ends 12px below its content. Anchor both states there. */
-.game-card>details.fantasy-block[open]>summary{top:-8px!important}
-.game-card>details.fantasy-block[open]{margin-top:20px!important}
+/* Both states share the same in-flow anchor after the matchup/media content. */
+.game-card:has(>details.fantasy-block:not([open])){padding-bottom:0!important}
+.game-card>details.fantasy-block:not([open]),.game-card>details.fantasy-block[open]{position:relative!important;margin:12px 0 0!important;overflow:visible!important}
+.game-card>details.fantasy-block:not([open]){display:block!important;height:0!important;min-height:0!important;padding:0!important;border:0!important}
+.game-card>details.fantasy-block:not([open])>summary,.game-card>details.fantasy-block[open]>summary{top:0!important;bottom:auto!important;transform:translate(-50%,-50%)!important}
+.game-card>details.fantasy-block[open]>summary{top:-1px!important}
 .game-card>details.fantasy-block>summary .card-grab-handle{transition:background .15s,box-shadow .15s}
 </style><style id="gg-selector-soft-corners">
 .app-header .preview-selectors #previewSport,.app-header .preview-selectors #previewWeek{border-radius:15px}
