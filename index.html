@@ -2652,14 +2652,12 @@ body{width:100%;max-width:100%;box-sizing:border-box;overflow-x:clip!important}
 .dashboard-panel .week-summary{display:flex;align-items:center;justify-content:center;gap:6px;color:#a5b8cb;font-size:.68rem;font-weight:750;letter-spacing:.035em;padding:2px 0 5px;line-height:1.15}
 .dashboard-panel .week-summary svg{width:13px;height:13px;flex:none}
 .dashboard-panel:has(.week-disclosure[aria-expanded="true"]) .week-summary{display:none}
-.dashboard-panel .week-disclosure,.dashboard-panel .week-disclosure[aria-expanded="true"]{position:absolute;z-index:2;left:auto;right:3px;bottom:0;transform:none;width:44px;height:24px;min-height:24px;padding:0 7px 0 0;justify-content:flex-end;color:#a5b8cb}
 .dashboard-panel .week-disclosure::before{content:none}
-.dashboard-panel .week-disclosure .week-disclosure-chevron,.dashboard-panel .week-disclosure[aria-expanded="true"] > svg.week-disclosure-chevron:first-child{display:block;width:16px;height:16px}
 .dashboard-panel .week-disclosure:focus-visible{border-radius:6px}
 /* Shared lower-right disclosure control for navigation and game cards. */
 :is(.dashboard-panel .week-disclosure,.game-card .fantasy-block > summary){
- position:absolute;left:auto;right:8px;bottom:7px;display:flex;align-items:center;justify-content:center;
- width:27px;height:27px;min-height:0!important;padding:0!important;margin:0!important;
+ position:absolute;left:auto;right:0;bottom:0;z-index:4;display:flex;align-items:center;justify-content:center;
+ width:44px;height:44px;min-height:0!important;padding:0!important;margin:0!important;
  border:0;background:transparent;color:#b5c8dc;gap:0;transform:none;
 }
 :is(.dashboard-panel .week-disclosure,.game-card .fantasy-block > summary) :is(.week-disclosure-chevron,.fantasy-tab-arrow){
@@ -2670,7 +2668,7 @@ body{width:100%;max-width:100%;box-sizing:border-box;overflow-x:clip!important}
 .dashboard-panel .week-disclosure .week-disclosure-chevron path{display:none}
 :is(.dashboard-panel .week-disclosure[aria-expanded="true"],.game-card .fantasy-block[open] > summary) :is(.week-disclosure-chevron,.fantasy-tab-arrow){transform:rotate(225deg)}
 .dashboard-panel .week-disclosure[aria-expanded="true"]{min-height:0!important;padding:0!important}
-.dashboard-panel{padding-bottom:25px}
+.app-header .dashboard-panel{padding-bottom:25px}
 @media(prefers-reduced-motion:reduce){:is(.dashboard-panel .week-disclosure,.game-card .fantasy-block > summary) :is(.week-disclosure-chevron,.fantasy-tab-arrow){transition:none}}
 @media (hover:none) and (pointer:coarse){.app-header .dashboard-panel #inlineWeekPicker:not([hidden]){grid-template-columns:minmax(0,1fr);gap:0}#inlineWeekPicker .week-arrow{display:none!important}}
 
