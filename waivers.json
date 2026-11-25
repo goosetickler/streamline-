@@ -1,6 +1,6 @@
 {
   "season": 2026,
-  "updated": "2026-11-17",
+  "updated": "2026-11-24",
   "rosteredNote": "Estimated rostered level, not measured percentages. Low = less widely rostered (more likely available); Medium = mixed; High = widely rostered (less likely available).",
   "weeks": {
     "10": {
@@ -170,6 +170,91 @@
           "position": "WR",
           "rostered": "Low",
           "summary": "Williams has run routes on nearly nine in ten Washington dropbacks across the last three games, giving him a substantial role after Terry McLaurin's injury. His modest target share and inconsistent production make him a speculative add despite a favorable upcoming schedule."
+        }
+      ]
+    },
+    "12": {
+      "updated": "2026-11-24",
+      "players": [
+        {
+          "rank": 1,
+          "name": "Jacory Croskey-Merritt",
+          "team": "WAS",
+          "position": "RB",
+          "rostered": "Medium",
+          "summary": "In his return from a groin injury, Croskey-Merritt carried 13 times for 54 yards and a touchdown, positioning him for useful work against Arizona. Austin Ekeler remains involved, so a dominant workload is not guaranteed."
+        },
+        {
+          "rank": 2,
+          "name": "Antonio Williams",
+          "team": "WAS",
+          "position": "WR",
+          "rostered": "Medium",
+          "summary": "Williams caught nine passes for 122 yards against Cincinnati and now faces Arizona. His breakout is promising, but one big game does not establish a dependable weekly target floor."
+        },
+        {
+          "rank": 3,
+          "name": "Justice Hill",
+          "team": "BAL",
+          "position": "RB",
+          "rostered": "Low",
+          "summary": "Hill has exceeded 90 scrimmage yards twice in his last three games and offers receiving value against Houston. Derrick Henry remains a major obstacle to consistent rushing volume."
+        },
+        {
+          "rank": 4,
+          "name": "Caleb Douglas",
+          "team": "MIA",
+          "position": "WR",
+          "rostered": "Medium",
+          "summary": "Douglas drew ten targets in Week 11 and has a chance to turn that volume into production against the Jets. He caught only two of those passes, illustrating the efficiency risk in Miami's offense."
+        },
+        {
+          "rank": 5,
+          "name": "Chimere Dike",
+          "team": "TEN",
+          "position": "WR",
+          "rostered": "Low",
+          "summary": "Dike recorded six receptions for 69 yards against Dallas after Wan'Dale Robinson suffered a season-ending injury. Carnell Tate remains a competing target as Tennessee visits Jacksonville."
+        },
+        {
+          "rank": 6,
+          "name": "Konata Mumpfield",
+          "team": "LAR",
+          "position": "WR",
+          "rostered": "Low",
+          "summary": "Puka Nacua's season-ending injury opens receiving opportunities for Mumpfield ahead of Wednesday's game against Green Bay. Matthew Stafford can distribute those targets among several receivers, leaving Mumpfield's weekly workload uncertain."
+        },
+        {
+          "rank": 7,
+          "name": "Dylan Sampson",
+          "team": "CLE",
+          "position": "RB",
+          "rostered": "Low",
+          "summary": "Sampson's receiving role gives him a route to PPR production against Las Vegas following Cleveland's bye. His backup status limits his rushing ceiling unless the backfield rotation changes."
+        },
+        {
+          "rank": 8,
+          "name": "Ted Hurst",
+          "team": "TB",
+          "position": "WR",
+          "rostered": "Low",
+          "summary": "Hurst caught five passes for 56 yards and two touchdowns against Detroit before a matchup with Carolina. He ran fewer routes than Chris Godwin and Emeka Egbuka, making a repeat of that scoring output unlikely."
+        },
+        {
+          "rank": 9,
+          "name": "Cam Ward",
+          "team": "TEN",
+          "position": "QB",
+          "rostered": "Medium",
+          "summary": "Ward has surpassed 19 fantasy points in three consecutive games and visits Jacksonville this week. His recent improvement makes him a streaming candidate, but his earlier inconsistency argues against treating him as a set-and-forget starter."
+        },
+        {
+          "rank": 10,
+          "name": "Evan Engram",
+          "team": "DEN",
+          "position": "TE",
+          "rostered": "Low",
+          "summary": "Engram caught six passes for 74 yards against Las Vegas and faces Pittsburgh on Friday. His recent receiving volume is encouraging, but it has not established a reliable touchdown floor."
         }
       ]
     }
