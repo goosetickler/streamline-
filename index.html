@@ -2351,8 +2351,9 @@
 <style>
 /* Conference selector sits in the first division card's title row. */
 .division-conference{margin:0 0 18px}
-.division-card-header{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:30px;margin-bottom:10px}
-.division-card-header .division-card-title{margin-bottom:0}
+.division-card-header{display:flex;align-items:center;justify-content:flex-end;gap:8px;margin-bottom:8px}
+.division-table th.division-card-title{font-size:.9rem;font-weight:950;letter-spacing:.06em;color:var(--green);padding-left:0;vertical-align:middle}
+.division-table th{vertical-align:middle}
 .division-card-header .division-conference-toggle{margin:0;gap:6px;flex-shrink:0}
 .division-card-header .division-conference-toggle button{padding:7px 11px}
 </style>
@@ -4811,7 +4812,7 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       host.dataset.display="divisions";
       host.innerHTML=`${completed===0?'<p class="division-note">No completed regular-season games available.</p>':seasonGames<200?'<p class="division-note">Partial season data — standings may be incomplete.</p>':''}`+[resultsConferenceView].map(conf=>{
         const divisions=groups.filter(g=>g.conference===conf);
-        return `<section class="division-conference"><div class="division-grid">${divisions.map((group,index)=>`<div class="division-card"><div class="division-card-header"><div class="division-card-title">${escapeHtml(group.name)}</div>${index===0?`<div class="division-conference-toggle" role="group" aria-label="Conference"><button type="button" data-results-conference="AFC" class="${resultsConferenceView==="AFC"?"active":""}" aria-pressed="${resultsConferenceView==="AFC"}">AFC</button><button type="button" data-results-conference="NFC" class="${resultsConferenceView==="NFC"?"active":""}" aria-pressed="${resultsConferenceView==="NFC"}">NFC</button></div>`:""}</div><table class="division-table"><thead><tr><th scope="col" aria-label="Team"></th><th scope="col">W–L–T</th><th>DIV</th></tr></thead><tbody>${group.entries.map(e=>`<tr><td><span class="division-team-cell">${renderTeamHelmet(e.id,e.name,"away")}<span class="division-team-name">${escapeHtml(e.name)}</span></span></td><td>${fmt(e.overall)}</td><td class="division-record">${fmt(e.division)}</td></tr>`).join("")}</tbody></table></div>`).join("")}</div></section>`;
+        return `<section class="division-conference"><div class="division-grid">${divisions.map((group,index)=>`<div class="division-card">${index===0?`<div class="division-card-header"><div class="division-conference-toggle" role="group" aria-label="Conference"><button type="button" data-results-conference="AFC" class="${resultsConferenceView==="AFC"?"active":""}" aria-pressed="${resultsConferenceView==="AFC"}">AFC</button><button type="button" data-results-conference="NFC" class="${resultsConferenceView==="NFC"?"active":""}" aria-pressed="${resultsConferenceView==="NFC"}">NFC</button></div></div>`:""}<table class="division-table"><thead><tr><th scope="col" aria-label="${escapeHtml(group.name)} teams" class="division-card-title">${escapeHtml(group.name)}</th><th scope="col">W–L–T</th><th>DIV</th></tr></thead><tbody>${group.entries.map(e=>`<tr><td><span class="division-team-cell">${renderTeamHelmet(e.id,e.name,"away")}<span class="division-team-name">${escapeHtml(e.name)}</span></span></td><td>${fmt(e.overall)}</td><td class="division-record">${fmt(e.division)}</td></tr>`).join("")}</tbody></table></div>`).join("")}</div></section>`;
       }).join("");
     }
 
