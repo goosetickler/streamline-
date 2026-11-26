@@ -2787,7 +2787,6 @@ body{width:100%;max-width:100%;box-sizing:border-box;overflow-x:clip!important}
 
 .game-card:has(>details.fantasy-block):not(.score-change):active::after{background:transparent}
 html.gg-card-moving{overflow-anchor:none!important}
-.gg-flip-ghost{pointer-events:none!important;position:fixed!important;margin:0!important;z-index:20!important;overflow:visible!important;contain:none!important}
 html.gg-card-moving #schedule .game-card *{animation-play-state:paused!important}
 </style><style id="gg-card-handle-anchor">
 /* Anchor the disclosure to the outer card border in both states. */
@@ -5906,7 +5905,7 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       document.documentElement.classList.add('gg-card-moving');
       const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
       const body=block.querySelector('.fantasy-body');
-      let ghost=null,animations=[],hidden=false;
+      let animations=[];
       const began=performance.now();
       let frames=0,slow=0,last=began,raf=0;
       const debug=new URLSearchParams(location.search).has('perf');
@@ -5917,12 +5916,6 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
         const first=new Map(cards.map(el=>[el,el.getBoundingClientRect()]));
         const before=first.get(card);
         if(opening&&body){const html=initialFantasyBody(block.dataset.fantasyGame);if(body.innerHTML!==html)body.innerHTML=html;}
-        if(!opening&&!reduced&&card.animate){
-          ghost=card.cloneNode(true);
-          ghost.removeAttribute('id');ghost.querySelectorAll('[id]').forEach(el=>el.removeAttribute('id'));
-          ghost.classList.add('gg-flip-ghost');ghost.setAttribute('aria-hidden','true');ghost.inert=true;
-          Object.assign(ghost.style,{top:before.top+'px',left:before.left+'px',width:before.width+'px',height:before.height+'px',boxSizing:'border-box'});
-        }
         block.open=opening;
         const after=card.getBoundingClientRect();
         if(!reduced&&card.animate){
@@ -5941,23 +5934,17 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
             const handle=block.querySelector('summary');
             if(handle)animations.push(handle.animate([{translate:'0 -'+delta+'px'},{translate:'0 0'}],timing));
             if(body)animations.push(body.animate([{opacity:0},{opacity:1}],{duration:160,delay:80,fill:'both'}));
-          }else if(ghost&&delta>1){
-            document.body.append(ghost);
-            card.style.visibility='hidden';hidden=true;
-            const handle=ghost.querySelector('summary');
-            if(handle)animations.push(handle.animate([{translate:'0 0'},{translate:'0 -'+delta+'px'}],timing));
-            animations.push(ghost.animate([{clipPath:'inset(0 -12px -12px -12px round 12px)'},{clipPath:'inset(0 -12px '+delta+'px -12px round 12px)'}],timing));
+          }else if(!opening&&delta>1){
+            // Keep the real collapsed card visible; animate only displaced siblings.
+            // No detached clone or visibility handoff, which could flash offscreen.
           }
           await Promise.allSettled(animations.map(a=>a.finished));
         }
         animations.forEach(a=>a.cancel());animations=[];
-        ghost?.remove();ghost=null;
-        if(hidden){card.style.removeProperty('visibility');hidden=false;}
         if(opening)await focusExpandedFantasy(block);
         await new Promise(resolve=>setTimeout(resolve,50));
       }finally{
-        animations.forEach(a=>a.cancel());ghost?.remove();
-        if(hidden)card.style.removeProperty('visibility');
+        animations.forEach(a=>a.cancel());
         movingFantasyCards.delete(block);
         document.documentElement.classList.remove('gg-card-moving');
         for(const resolve of fantasyMotionWaiters)resolve();
