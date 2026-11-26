@@ -5906,11 +5906,6 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
       const body=block.querySelector('.fantasy-body');
       let animations=[];
-      const began=performance.now();
-      let frames=0,slow=0,last=began,raf=0;
-      const debug=new URLSearchParams(location.search).has('perf');
-      function sample(now){frames++;if(now-last>25)slow++;last=now;raf=requestAnimationFrame(sample);}
-      if(debug)raf=requestAnimationFrame(sample);
       try{
         const cards=[...document.querySelectorAll('#schedule .game-card')];
         const first=new Map(cards.map(el=>[el,el.getBoundingClientRect()]));
@@ -5949,12 +5944,7 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
         document.documentElement.classList.remove('gg-card-moving');
         for(const resolve of fantasyMotionWaiters)resolve();
         fantasyMotionWaiters.clear();
-        if(debug){
-          cancelAnimationFrame(raf);
-          let panel=document.querySelector('#gg-perf-debug');
-          if(!panel){panel=document.createElement('div');panel.id='gg-perf-debug';Object.assign(panel.style,{position:'fixed',bottom:'80px',left:'8px',zIndex:'9999',background:'#142235',color:'#fff',padding:'8px',borderRadius:'8px',font:'12px monospace',pointerEvents:'none'});document.body.append(panel);}
-          panel.textContent=(opening?'Open':'Close')+' '+Math.round(performance.now()-began)+'ms | '+frames+' frames | '+slow+' >25ms';
-        }
+
       }
       if(opening&&block.isConnected&&block.open){
         const game=allGames.find(g=>String(g.id)===block.dataset.fantasyGame);
