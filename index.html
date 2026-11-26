@@ -2790,18 +2790,19 @@ body{width:100%;max-width:100%;box-sizing:border-box;overflow-x:clip!important}
 </style><style id="gg-stable-card-reveal">
 .game-card:has(>details.fantasy-block){overflow-anchor:none}
 .game-card>details.fantasy-block>summary{transition:none!important;animation:none!important;-webkit-tap-highlight-color:transparent}
-.game-card>details.fantasy-block[open]{margin-top:20px!important}
+
 .game-card:has(>details.fantasy-block):not(.score-change):active::after{background:transparent}
-html:has(#schedule .fantasy-block[open]){scroll-snap-type:none!important}
-.game-card>details.fantasy-block[open]>.fantasy-body{animation:gg-stats-reveal 170ms ease-out both}
-@keyframes gg-stats-reveal{from{opacity:0;clip-path:inset(0 0 100% 0)}to{opacity:1;clip-path:inset(0 0 0 0)}}
-@media(prefers-reduced-motion:reduce){.game-card>details.fantasy-block[open]>.fantasy-body{animation:none}}
+html.gg-card-moving{scroll-snap-type:none!important;overflow-anchor:none!important}
+.game-card>details.fantasy-block.gg-moving{overflow:visible!important}
+.game-card>details.fantasy-block.gg-moving>.fantasy-body{overflow:hidden;animation:none!important;max-height:100%;box-sizing:border-box}
+.game-card>details.fantasy-block.gg-moving{min-height:0!important}
+.game-card>details.fantasy-block.gg-moving::details-content{overflow:hidden}
 </style><style id="gg-card-handle-anchor">
 /* Anchor the disclosure to the outer card border in both states. */
 .game-card:has(>details.fantasy-block){position:relative!important;overflow:visible!important}
 .game-card>details.fantasy-block:not([open]),.game-card>details.fantasy-block[open]{position:static!important;overflow:visible!important}
 .game-card>details.fantasy-block:not([open]){display:block!important;height:0!important;min-height:0!important;padding:0!important;border:0!important;margin:0!important}
-.game-card>details.fantasy-block[open]{margin-top:12px!important}
+.game-card>details.fantasy-block[open]{margin-top:12px}
 .game-card>details.fantasy-block:not([open])>summary,.game-card>details.fantasy-block[open]>summary{top:auto!important;bottom:0!important;left:50%!important;transform:translate(-50%,50%)!important}
 .game-card>details.fantasy-block>summary .card-grab-handle{transition:background .15s,box-shadow .15s}
 </style><style id="gg-selector-soft-corners">
@@ -5874,52 +5875,84 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
     const expandedFantasyGames = new Map();
     function fantasyViewKey(){return sortMode === "final" ? "results" : "games";}
     function fantasyStateKey(id){return fantasyViewKey()+":"+id;}
-    function focusExpandedFantasy(block,expectedOpen=true){
-      requestAnimationFrame(()=>requestAnimationFrame(()=>{
-        if(!block.isConnected || block.open!==expectedOpen)return;
-        const card=block.closest('.game-card');
-        if(!card)return;
-        const header=document.querySelector('.app-header');
-        const topInset=Math.max(0,header?.getBoundingClientRect().bottom||0)+12;
-        const bottom=innerHeight-18;
-        const rect=card.getBoundingClientRect();
-        if(rect.top>=topInset && rect.bottom<=bottom)return;
-        const delta=rect.height>bottom-topInset || rect.top<topInset
-          ? rect.top-topInset : rect.bottom-bottom;
-        if(Math.abs(delta)>3)window.scrollBy({top:delta,behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'});
-      }));
+    const movingFantasyCards=new Set();
+    const fantasyMotionWaiters=new Set();
+    function waitForFantasyMotion(){
+      return movingFantasyCards.size?new Promise(resolve=>fantasyMotionWaiters.add(resolve)):Promise.resolve();
     }
-    function animateFantasyDisclosure(block,opening){
-      block.open=opening;
-      focusExpandedFantasy(block,opening);
+    async function focusExpandedFantasy(block){
+      if(!block.isConnected)return;
+      const card=block.closest('.game-card');
+      if(!card)return;
+      const top=Math.max(0,document.querySelector('.app-header')?.getBoundingClientRect().bottom||0)+12;
+      const bottom=innerHeight-18, rect=card.getBoundingClientRect();
+      const delta=rect.top<top||rect.height>bottom-top?rect.top-top:Math.max(0,rect.bottom-bottom);
+      if(Math.abs(delta)<=3)return;
+      const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if(reduced){window.scrollBy(0,delta);return;}
+      await new Promise(resolve=>{
+        let timer,limit;
+        const finish=()=>{clearTimeout(timer);clearTimeout(limit);window.removeEventListener('scroll',onScroll);resolve();};
+        const onScroll=()=>{clearTimeout(timer);timer=setTimeout(finish,100);};
+        window.addEventListener('scroll',onScroll,{passive:true});
+        timer=setTimeout(finish,180);limit=setTimeout(finish,750);
+        window.scrollBy({top:delta,behavior:'smooth'});
+      });
     }
-    // A game card toggles its fantasy leaders unless the user tapped an actual control.
+    async function animateFantasyDisclosure(block,opening){
+      if(movingFantasyCards.has(block)||!block.isConnected||block.open===opening)return;
+      movingFantasyCards.add(block);
+      document.documentElement.classList.add('gg-card-moving');
+      const body=block.querySelector('.fantasy-body');
+      const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+      try{
+        if(!body||reduced||!block.animate){block.open=opening;}
+        else{
+          const before=block.getBoundingClientRect().height;
+          block.open=true;
+          const after=block.getBoundingClientRect().height;
+          const style=getComputedStyle(block);
+          const full={height:after+'px',marginTop:style.marginTop,marginBottom:style.marginBottom,paddingTop:style.paddingTop,paddingBottom:style.paddingBottom,borderTopWidth:style.borderTopWidth,borderBottomWidth:style.borderBottomWidth};
+          const zero={height:'0px',marginTop:'0px',marginBottom:'0px',paddingTop:'0px',paddingBottom:'0px',borderTopWidth:'0px',borderBottomWidth:'0px'};
+          block.classList.add('gg-moving');
+          block.style.boxSizing='border-box';
+          const timing={duration:opening?240:220,easing:'cubic-bezier(.22,.75,.25,1)',fill:'both'};
+          const animation=block.animate(opening?[zero,full]:[full,zero],timing);
+          const fade=body.animate(opening?[{opacity:0},{opacity:1}]:[{opacity:1},{opacity:0}],{duration:opening?160:100,delay:opening?80:0,fill:'both'});
+          body.style.clipPath='inset(0)';
+          block.style.clipPath='none';
+          // Clip only the stats, leaving the outer-border handle visible.
+          body.style.maxHeight='100%';
+          await animation.finished.catch(()=>{});
+          block.open=opening;
+          animation.cancel();fade.cancel();
+        }
+        if(opening)await focusExpandedFantasy(block);
+        await new Promise(resolve=>setTimeout(resolve,50));
+      }finally{
+        block.classList.remove('gg-moving');
+        block.style.removeProperty('box-sizing');block.style.removeProperty('clip-path');
+        if(body){body.style.removeProperty('clip-path');body.style.removeProperty('max-height');}
+        movingFantasyCards.delete(block);
+        if(!movingFantasyCards.size){
+          document.documentElement.classList.remove('gg-card-moving');
+          for(const resolve of fantasyMotionWaiters)resolve();
+          fantasyMotionWaiters.clear();
+        }
+      }
+      if(opening&&block.isConnected&&block.open){
+        const game=allGames.find(g=>String(g.id)===block.dataset.fantasyGame);
+        if(game)hydrateFantasyBlocks([game]);
+      }
+    }
     document.addEventListener('click',event=>{
       const card=event.target.closest('.game-card[data-game-id]');
-      if(!card)return;
-      const block=card.querySelector(':scope > details.fantasy-block');
+      const block=card?.querySelector(':scope > details.fantasy-block');
       if(!block)return;
-      if(event.target.closest('a,button,input,select,textarea,summary,.media-control,.media-panel,[role="button"]'))return;
-      // Existing body-click logic closes open blocks; let that handler own body taps.
-      if(event.target.closest('.fantasy-body'))return;
-      const opening=!block.open;
-      animateFantasyDisclosure(block,opening);
-
-    });
-    document.addEventListener('click',event=>{
-      const body=event.target.closest('.fantasy-block[open] > .fantasy-body');
-      if(!body || event.target.closest('a,button,input,select,textarea'))return;
-      const block=body.closest('details.fantasy-block');
-      if(block)animateFantasyDisclosure(block,false);
-    });
-    document.addEventListener('click', event=>{
       const summary=event.target.closest('details.fantasy-block > summary');
-      if(!summary)return;
-      const block=summary.parentElement;
-      // A user opening the section is the only action allowed to trigger focus scrolling.
-      event.preventDefault();
-      animateFantasyDisclosure(block,!block.open);
-
+      if(summary){event.preventDefault();animateFantasyDisclosure(block,!block.open);return;}
+      if(event.target.closest('a,button,input,select,textarea,.media-control,.media-panel,[role="button"]'))return;
+      animateFantasyDisclosure(block,event.target.closest('.fantasy-body')?false:!block.open);
     });
     document.addEventListener("toggle", event => {
       const block=event.target;
@@ -5947,6 +5980,7 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
     }
 
     async function hydrateFantasyBlocks(games,{force=false}={}){
+      await waitForFantasyMotion();
       const fantasyGames = games.filter(game => isLiveGame(game) || isFinalGame(game));
       await Promise.allSettled(fantasyGames.map(async game => {
         const el = document.querySelector(`#fantasy-${slug(game.id)} .fantasy-body`);
@@ -5954,10 +5988,13 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
         const title = "FANTASY LEADERS";
         try{
           const leaders = await getFantasyLeaders(game,{force});
-          if(!leaders.length){ el.innerHTML = renderFantasyUnavailable(title, "No player stats returned"); return; }
-          el.innerHTML = renderFantasyLeadersContent(title,leaders);
+          await waitForFantasyMotion();
+          if(!el.isConnected)return;
+          const html=leaders.length?renderFantasyLeadersContent(title,leaders):renderFantasyUnavailable(title,"No player stats returned");
+          if(el.innerHTML!==html)el.innerHTML=html;
         }catch(err){
-          el.innerHTML = renderFantasyUnavailable(title, "ESPN stats unavailable");
+          await waitForFantasyMotion();
+          if(el.isConnected)el.innerHTML = renderFantasyUnavailable(title, "ESPN stats unavailable");
         }
       }));
     }
@@ -6858,7 +6895,9 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       if(currentWeekRefreshPromise)return currentWeekRefreshPromise;
 
       currentWeekRefreshPromise=(async()=>{
+        await waitForFantasyMotion();
         const updates=await fetchCurrentWeekState();
+        await waitForFantasyMotion();
         if(updates.length){
           const beforeSignature=visibleGameSignature();
           const changes=mergeWeekState(updates);
