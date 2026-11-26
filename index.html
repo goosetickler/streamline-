@@ -2719,12 +2719,6 @@ body{width:100%;max-width:100%;box-sizing:border-box;overflow-x:clip!important}
  .team-row .team-name .team-name-fit{font-size:min(1em,calc(100cqi / var(--gg-name-width,6)))}
 }
 @media(max-width:699px) and (prefers-reduced-motion:no-preference){
- html:has(#schedule .game-card){scroll-snap-type:y proximity;scroll-padding-top:var(--header-height,245px);scroll-padding-bottom:12px}
- #schedule .game-card{scroll-snap-align:start;scroll-snap-stop:normal}
- #schedule .games-content .game-card:has(details[open]){scroll-snap-align:none}
- #schedule .results-content .game-card{scroll-snap-align:start}
- #schedule .results-content .completed-results-group{scroll-snap-align:none}
- #schedule > .games-section-header,#schedule > .results-section-header{scroll-snap-align:start}
 }
 </style>
 <style>
@@ -2792,7 +2786,9 @@ body{width:100%;max-width:100%;box-sizing:border-box;overflow-x:clip!important}
 .game-card>details.fantasy-block>summary{transition:none!important;animation:none!important;-webkit-tap-highlight-color:transparent}
 
 .game-card:has(>details.fantasy-block):not(.score-change):active::after{background:transparent}
-html.gg-card-moving{scroll-snap-type:none!important;overflow-anchor:none!important}
+html.gg-card-moving{overflow-anchor:none!important}
+.gg-flip-ghost{pointer-events:none!important;position:fixed!important;margin:0!important;z-index:20!important;overflow:visible!important;contain:none!important}
+html.gg-card-moving #schedule .game-card *{animation-play-state:paused!important}
 </style><style id="gg-card-handle-anchor">
 /* Anchor the disclosure to the outer card border in both states. */
 .game-card:has(>details.fantasy-block){position:relative!important;overflow:visible!important}
@@ -2803,10 +2799,7 @@ html.gg-card-moving{scroll-snap-type:none!important;overflow-anchor:none!importa
 .game-card>details.fantasy-block>.gg-fantasy-reveal>.fantasy-body{margin:12px 0 0;padding:16px 10px 9px;border:1px solid rgba(255,255,255,.10);border-radius:14px;background:rgba(255,255,255,.045)}
 .results-final-card>details.fantasy-block>.gg-fantasy-reveal>.fantasy-body{padding:14px 9px 6px}
 #schedule .game-card{contain:layout style}
-@supports (content-visibility:auto) and (contain-intrinsic-size:auto 180px){
- #schedule .results-content .game-card:not(:has(details[open])):not(:focus-within){content-visibility:auto;contain-intrinsic-size:auto 180px;overflow-clip-margin:12px}
-}
-html.gg-card-moving #schedule .game-card{scroll-snap-align:none!important}
+
 html.gg-card-moving #schedule .game-card .card-grab-handle{transition:none}
 
 .game-card>details.fantasy-block:not([open])>summary,.game-card>details.fantasy-block[open]>summary{top:auto!important;bottom:0!important;left:50%!important;transform:translate(-50%,50%)!important}
@@ -5886,12 +5879,6 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
     function waitForFantasyMotion(){
       return movingFantasyCards.size?new Promise(resolve=>fantasyMotionWaiters.add(resolve)):Promise.resolve();
     }
-    function restoreCardSnap(){
-      if(!movingFantasyCards.size)document.documentElement.classList.remove('gg-card-moving');
-    }
-    window.addEventListener('touchstart',restoreCardSnap,{passive:true});
-    window.addEventListener('wheel',restoreCardSnap,{passive:true});
-    window.addEventListener('keydown',event=>{if(['ArrowUp','ArrowDown','PageUp','PageDown','Home','End',' '].includes(event.key))restoreCardSnap();});
     async function focusExpandedFantasy(block){
       if(!block.isConnected)return;
       const card=block.closest('.game-card');
@@ -5912,32 +5899,74 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       });
     }
     async function animateFantasyDisclosure(block,opening){
-      if(movingFantasyCards.has(block)||!block.isConnected||block.open===opening)return;
+      if(movingFantasyCards.size||!block.isConnected||block.open===opening)return;
+      const card=block.closest('.game-card');
+      if(!card)return;
       movingFantasyCards.add(block);
       document.documentElement.classList.add('gg-card-moving');
-      const body=block.querySelector('.fantasy-body');
-      const reveal=block.querySelector('.gg-fantasy-reveal');
       const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const body=block.querySelector('.fantasy-body');
+      let ghost=null,animations=[],hidden=false;
+      const began=performance.now();
+      let frames=0,slow=0,last=began,raf=0;
+      const debug=new URLSearchParams(location.search).has('perf');
+      function sample(now){frames++;if(now-last>25)slow++;last=now;raf=requestAnimationFrame(sample);}
+      if(debug)raf=requestAnimationFrame(sample);
       try{
-        if(!body||!reveal||reduced||!reveal.animate){block.open=opening;}
-        else{
-          block.open=true;
-          const height=reveal.getBoundingClientRect().height;
-          const timing={duration:opening?240:220,easing:'cubic-bezier(.22,.75,.25,1)',fill:'both'};
-          const animation=reveal.animate(opening?[{height:'0px'},{height:height+'px'}]:[{height:height+'px'},{height:'0px'}],timing);
-          const fade=body.animate(opening?[{opacity:0},{opacity:1}]:[{opacity:1},{opacity:0}],{duration:opening?160:100,delay:opening?80:0,fill:'both'});
-          await animation.finished.catch(()=>{});
-          block.open=opening;
-          animation.cancel();fade.cancel();
+        const cards=[...document.querySelectorAll('#schedule .game-card')];
+        const first=new Map(cards.map(el=>[el,el.getBoundingClientRect()]));
+        const before=first.get(card);
+        if(opening&&body){const html=initialFantasyBody(block.dataset.fantasyGame);if(body.innerHTML!==html)body.innerHTML=html;}
+        if(!opening&&!reduced&&card.animate){
+          ghost=card.cloneNode(true);
+          ghost.removeAttribute('id');ghost.querySelectorAll('[id]').forEach(el=>el.removeAttribute('id'));
+          ghost.classList.add('gg-flip-ghost');ghost.setAttribute('aria-hidden','true');ghost.inert=true;
+          Object.assign(ghost.style,{top:before.top+'px',left:before.left+'px',width:before.width+'px',height:before.height+'px',boxSizing:'border-box'});
         }
+        block.open=opening;
+        const after=card.getBoundingClientRect();
+        if(!reduced&&card.animate){
+          const timing={duration:opening?240:220,easing:'cubic-bezier(.22,.75,.25,1)',fill:'both'};
+          const delta=Math.abs(after.height-before.height);
+          // Read all final positions before writing animation styles.
+          const positions=cards.map(el=>({el,old:first.get(el),next:el.getBoundingClientRect()}));
+          for(const {el,old,next} of positions){
+            if(el===card)continue;
+            const dy=old.top-next.top;
+            if(Math.abs(dy)<1||Math.max(old.bottom,next.bottom)<0||Math.min(old.top,next.top)>innerHeight)continue;
+            animations.push(el.animate([{transform:'translateY('+dy+'px)'},{transform:'translateY(0)'}],timing));
+          }
+          if(opening&&delta>1){
+            animations.push(card.animate([{clipPath:'inset(0 -12px '+delta+'px -12px round 12px)'},{clipPath:'inset(0 -12px -12px -12px round 12px)'}],timing));
+            const handle=block.querySelector('summary');
+            if(handle)animations.push(handle.animate([{translate:'0 -'+delta+'px'},{translate:'0 0'}],timing));
+            if(body)animations.push(body.animate([{opacity:0},{opacity:1}],{duration:160,delay:80,fill:'both'}));
+          }else if(ghost&&delta>1){
+            document.body.append(ghost);
+            card.style.visibility='hidden';hidden=true;
+            const handle=ghost.querySelector('summary');
+            if(handle)animations.push(handle.animate([{translate:'0 0'},{translate:'0 -'+delta+'px'}],timing));
+            animations.push(ghost.animate([{clipPath:'inset(0 -12px -12px -12px round 12px)'},{clipPath:'inset(0 -12px '+delta+'px -12px round 12px)'}],timing));
+          }
+          await Promise.allSettled(animations.map(a=>a.finished));
+        }
+        animations.forEach(a=>a.cancel());animations=[];
+        ghost?.remove();ghost=null;
+        if(hidden){card.style.removeProperty('visibility');hidden=false;}
         if(opening)await focusExpandedFantasy(block);
-        await new Promise(resolve=>setTimeout(resolve,opening?50:120));
+        await new Promise(resolve=>setTimeout(resolve,50));
       }finally{
+        animations.forEach(a=>a.cancel());ghost?.remove();
+        if(hidden)card.style.removeProperty('visibility');
         movingFantasyCards.delete(block);
-        if(!movingFantasyCards.size){
-          if(opening)document.documentElement.classList.remove('gg-card-moving');
-          for(const resolve of fantasyMotionWaiters)resolve();
-          fantasyMotionWaiters.clear();
+        document.documentElement.classList.remove('gg-card-moving');
+        for(const resolve of fantasyMotionWaiters)resolve();
+        fantasyMotionWaiters.clear();
+        if(debug){
+          cancelAnimationFrame(raf);
+          let panel=document.querySelector('#gg-perf-debug');
+          if(!panel){panel=document.createElement('div');panel.id='gg-perf-debug';Object.assign(panel.style,{position:'fixed',bottom:'80px',left:'8px',zIndex:'9999',background:'#142235',color:'#fff',padding:'8px',borderRadius:'8px',font:'12px monospace',pointerEvents:'none'});document.body.append(panel);}
+          panel.textContent=(opening?'Open':'Close')+' '+Math.round(performance.now()-began)+'ms | '+frames+' frames | '+slow+' >25ms';
         }
       }
       if(opening&&block.isConnected&&block.open){
@@ -5963,11 +5992,16 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       // Do not auto-scroll on initial render, tab navigation or restored state.
     },true);
 
-    function renderFantasyBlock(game){
-      if(!isLiveGame(game) && !isFinalGame(game)) return "";
+    function initialFantasyBody(id){
       const title="FANTASY LEADERS";
-      const cached=readCachedFantasy(FANTASY_CACHE_PREFIX + game.id);
-      const body=cached.length ? renderFantasyLeadersContent(title,cached) : `<div class="fantasy-list"><div class="fantasy-player"><span class="fantasy-player-name">Loading player stats<span class="fantasy-player-meta"><span class="fantasy-line">Fetching ESPN box score</span></span></span></div></div>`;
+      const cached=readCachedFantasy(FANTASY_CACHE_PREFIX + id);
+      return cached.length ? renderFantasyLeadersContent(title,cached) : `<div class="fantasy-list"><div class="fantasy-player"><span class="fantasy-player-name">Loading player stats<span class="fantasy-player-meta"><span class="fantasy-line">Fetching ESPN box score</span></span></span></div></div>`;
+    }
+    function renderFantasyBlock(game){
+      if(!isLiveGame(game)&&!isFinalGame(game))return "";
+      const title="FANTASY LEADERS";
+      const opened=expandedFantasyGames.get(fantasyStateKey(String(game.id)))??false;
+      const body=opened?initialFantasyBody(game.id):"";
       return `<details class="fantasy-block" id="fantasy-${slug(game.id)}" data-fantasy-game="${escapeHtml(String(game.id))}" aria-label="${title}" ${(expandedFantasyGames.get(fantasyStateKey(String(game.id))) ?? false)?'open':''}>
         <summary aria-label="Toggle fantasy leaders"><span class="card-grab-handle" aria-hidden="true"></span></summary>
         <div class="gg-fantasy-reveal"><div class="fantasy-body">${body}</div></div>
@@ -5984,7 +6018,7 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       const fantasyGames=games.filter(game=>isLiveGame(game)||isFinalGame(game));
       const pending=await Promise.allSettled(fantasyGames.map(async game=>{
         const el=document.querySelector(`#fantasy-${slug(game.id)} .fantasy-body`);
-        if(!el)return null;
+        if(!el||!el.closest("details")?.open)return null;
         const title="FANTASY LEADERS";
         try{
           const leaders=await getFantasyLeaders(game,{force});
@@ -5995,7 +6029,7 @@ let directvZip=localStorage.getItem(DIRECTV_ZIP_KEY)||"";
       for(const result of pending){
         if(result.status!=="fulfilled"||!result.value)continue;
         const {el,html}=result.value;
-        if(el.isConnected&&el.innerHTML!==html)el.innerHTML=html;
+        if(el.isConnected&&el.closest("details")?.open&&el.innerHTML!==html)el.innerHTML=html;
       }
     }
 
